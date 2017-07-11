@@ -2,13 +2,12 @@ package yaycrawler.admin.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import yaycrawler.dao.domain.SiteCookie;
 import yaycrawler.dao.repositories.SiteCookieRepository;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -28,6 +27,15 @@ public class ResourceController {
         SiteCookie siteCookie = new SiteCookie(siteId,domain, cookie);
         siteCookie.setLastUpdatedDate(new java.sql.Date(System.currentTimeMillis()));
         return cookieRepository.save(siteCookie);
+    }
+
+    @RequestMapping(value = "/addLoginJs", method = RequestMethod.POST)
+    public Object addLoginJs(String siteId, String domain, @RequestParam("files") MultipartFile[] files) {
+        Assert.notNull(siteId);
+        Assert.notNull(domain);
+        Assert.notNull(files);
+
+        return 1;
     }
 
     @RequestMapping(value = "/deleteCookieByIds", method = RequestMethod.POST)

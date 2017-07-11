@@ -151,7 +151,7 @@ public class GenericPageProcessor implements PageProcessor {
                     tmp.add(SelectorExpressionResolver.resolve(request, node, fieldParseRule.getRule()));
                     datas = tmp;
                 }
-                if((datas == null && "label".equalsIgnoreCase(fieldParseRule.getFieldName()))||(datas == null && childMap.get("label") == null && "value".equalsIgnoreCase(fieldParseRule.getFieldName()))||(fieldParseRuleList.size() == 1 && datas.toString() == null && !"label".equalsIgnoreCase(fieldParseRule.getFieldName()) && ! "value".equalsIgnoreCase(fieldParseRule.getFieldName())))
+                if((datas == null && "label".equalsIgnoreCase(fieldParseRule.getFieldName()))||(datas == null && childMap.get("label") == null && "value".equalsIgnoreCase(fieldParseRule.getFieldName()))||(fieldParseRuleList.size() == 1 && (datas == null || datas.toString() == null) && !"label".equalsIgnoreCase(fieldParseRule.getFieldName()) && ! "value".equalsIgnoreCase(fieldParseRule.getFieldName())))
                     continue;
                 childMap.put(fieldParseRule.getFieldName(), datas);
             }
