@@ -8,9 +8,9 @@
         id="myServer">
     <listeners>
         <nio-listener name="default" port="2121">
-            <ssl>
-                <keystore file="ftpserver.jks" password="password" />
-            </ssl>
+            <!--<ssl>-->
+                <!--<keystore file="ftpserver.jks" password="password" />-->
+            <!--</ssl>-->
         </nio-listener>
     </listeners>
 

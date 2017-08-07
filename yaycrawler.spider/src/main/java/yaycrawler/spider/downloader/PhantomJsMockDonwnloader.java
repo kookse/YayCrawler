@@ -66,7 +66,7 @@ public class PhantomJsMockDonwnloader extends AbstractDownloader {
             result = CasperjsProgramManager.launch("casperjsDownload.js", charset, paramList);
 
             statusCode = Integer.parseInt(StringUtils.substringBefore(result, "\r\n").trim());
-            request.putExtra(Request.STATUS_CODE, statusCode);
+//            request.putExtra(Request.STATUS_CODE, statusCode);
             if (statusAccept(acceptStatCode, statusCode)) {
                 Page page = handleResponse(request, result);
                 onSuccess(request);
@@ -78,12 +78,12 @@ public class PhantomJsMockDonwnloader extends AbstractDownloader {
         } catch (Exception e) {
             logger.warn("download page {} error {} msg {}", request.getUrl(), e, result);
             if (site.getCycleRetryTimes() > 0) {
-                return addToCycleRetry(request, site);
+//                return addToCycleRetry(request, site);
             }
             onError(request);
             return null;
         } finally {
-            request.putExtra(Request.STATUS_CODE, statusCode);
+//            request.putExtra(Request.STATUS_CODE, statusCode);
         }
     }
 

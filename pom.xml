@@ -5,7 +5,7 @@
 
     <groupId>com.yaycrawler</groupId>
     <artifactId>yaycrawler-parent</artifactId>
-    <version>${yaycrawler.version}</version>
+    <version>1.0.0-SNAPSHOT</version>
     <modules>
         <module>yaycrawler.common</module>
         <module>yaycrawler.admin</module>
@@ -38,30 +38,52 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.3.3.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>1.5.2.RELEASE</version>
     </parent>
 
     <properties>
+        <spring.version>4.3.7.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <!--<webmagic.version>0.5.3</webmagic.version>-->
-        <webmagic.version>0.6.1</webmagic.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <spring-boot.version>1.5.2.RELEASE</spring-boot.version>
+        <mybatis.version>3.3.1</mybatis.version>
+        <mybatis.spring.version>1.2.4</mybatis.spring.version>
+        <mapper.version>3.3.6</mapper.version>
+        <start-class>Application</start-class>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <webmagic.version>0.7.3</webmagic.version>
         <yaycrawler.version>1.0.0-SNAPSHOT</yaycrawler.version>
         <json-path.version>0.8.1</json-path.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
 
+        <!--测试相关开始-->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <!--<scope>test</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <!--<scope>test</scope>-->
+        </dependency>
+        <!--测试相关结束-->
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -79,36 +101,109 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.11</version>
-                <scope>test</scope>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>1.5.2.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <exclusions>
+                    <!-- 想要配置log4j2，就要先去除logging包 -->
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-log4j2</artifactId>
+                <version>1.5.2.RELEASE</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>1.2.28</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>1.3.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.4</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>1.2.2</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.3.3</version>
+                <version>4.3.5</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.3.5</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>15.0</version>
             </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.7.6</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.6</version>
-            </dependency>
+
             <dependency>
                 <groupId>us.codecraft</groupId>
                 <artifactId>xsoup</artifactId>
@@ -131,42 +226,18 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.17</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>1.5.0</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>3.1</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>3.2.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>1.3.2</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>1.8.3</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <version>1.9.5</version>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -197,7 +268,7 @@
                 <artifactId>quartz</artifactId>
                 <version>2.2.1</version>
             </dependency>
-
+            <!--项目依赖开始-->
             <dependency>
                 <groupId>com.yaycrawler</groupId>
                 <artifactId>yaycrawler-common</artifactId>
@@ -223,17 +294,121 @@
                 <artifactId>yaycrawler-quartz</artifactId>
                 <version>${yaycrawler.version}</version>
             </dependency>
+            <!--项目依赖结束-->
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-tx</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <!-- logger start-->
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-1.2-api</artifactId>
+                <version>2.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>2.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>2.5</version>
+            </dependency>
+
+            <dependency> <!-- 桥接：告诉commons logging使用Log4j2 -->
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-jcl</artifactId>
+                <version>2.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.15</version>
+            </dependency>
+            <!--logger end-->
+
+            <!--<dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>2.0-rc1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>2.0-rc1</version>
+            </dependency>-->
+            <!--logger end-->
         </dependencies>
     </dependencyManagement>
 
+    <repositories>
+        <repository>
+            <id>maven</id>
+            <name>alimaven nexus</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+
+    </repositories>
+
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>maven</id>
+            <name>alimaven nexus</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <!--<updatePolicy>always</updatePolicy>-->
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <!--<updatePolicy>always</updatePolicy>-->
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
     <build>
         <plugins>
-            <!--<plugin>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
-
 </project>

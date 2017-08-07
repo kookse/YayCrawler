@@ -15,7 +15,8 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.io.CopyStreamEvent;
 import org.apache.commons.net.io.CopyStreamListener;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import yaycrawler.common.model.FtpTransferFileVo;
 
 /**
@@ -29,8 +30,7 @@ public class FtpUtil {
     /**
      * 日志记录器
      */
-    private static Logger logger = Logger.getLogger(FtpUtil.class);
-
+    private static Logger logger = LoggerFactory.getLogger(FtpUtil.class);
     /**
      * ftp服务器ip地址
      */
@@ -373,7 +373,7 @@ public class FtpUtil {
 
             //得到指定目录下所有的文件,指定需要获取的文件的后缀名
             ftpFiles = ftpClient.listFiles(sourceFtpFileDir, new FTPFileSuffixFilter(".rar,.zip"));
-            logger.info("list file size is:" + ftpFiles == null ? 0 : ftpFiles.length);
+            logger.info("list file size is: {}",ftpFiles == null ? 0 : ftpFiles.length);
         } catch (Exception e) {
             logger.error("download file failed,", e);
             throw new Exception(e);

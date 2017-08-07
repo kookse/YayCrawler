@@ -39,7 +39,7 @@ public class WorkerController {
      */
     @RequestMapping("/register")
     @ResponseBody
-    public RestFulResult register(HttpServletRequest request, @RequestBody WorkerRegistration registration) {
+    public RestFulResult register(@RequestBody WorkerRegistration registration) {
         logger.info("接收到worker的注册信息：{}", JSON.toJSON(registration));
         Assert.notNull(registration.getWorkerId());
         Assert.notNull(registration.getWorkerContextPath());
@@ -57,7 +57,7 @@ public class WorkerController {
      */
     @RequestMapping("/heartBeat")
     @ResponseBody
-    public RestFulResult heartBeat(HttpServletRequest request, @RequestBody WorkerHeartbeat heartbeat) {
+    public RestFulResult heartBeat(@RequestBody WorkerHeartbeat heartbeat) {
         Assert.notNull(heartbeat.getWorkerId());
         Assert.notNull(heartbeat.getWorkerContextPath());
         logger.debug("workerId {} 剩余任务数{}", heartbeat.getWorkerId(), heartbeat.getWaitTaskCount());
@@ -75,7 +75,7 @@ public class WorkerController {
 
     @RequestMapping("/crawlerSuccessNotify")
     @ResponseBody
-    public RestFulResult crawlerSuccessNotify(HttpServletRequest request, @RequestBody CrawlerResult crawlerResult) {
+    public RestFulResult crawlerSuccessNotify(@RequestBody CrawlerResult crawlerResult) {
         logger.debug("接收到任务执行成功通知:{}", crawlerResult.toString());
         Assert.notNull(crawlerResult);
         taskDispatcher.dealResultNotify(crawlerResult);
@@ -84,7 +84,7 @@ public class WorkerController {
 
     @RequestMapping("/crawlerFailureNotify")
     @ResponseBody
-    public RestFulResult crawlerFailureNotify(HttpServletRequest request, @RequestBody CrawlerResult crawlerResult) {
+    public RestFulResult crawlerFailureNotify(@RequestBody CrawlerResult crawlerResult) {
         logger.debug("接收到任务执行失败通知:{}", JSON.toJSON(crawlerResult));
         Assert.notNull(crawlerResult);
         taskDispatcher.dealResultNotify(crawlerResult);

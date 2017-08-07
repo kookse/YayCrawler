@@ -1,9 +1,7 @@
 package yaycrawler.common.utils;
 
-import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;

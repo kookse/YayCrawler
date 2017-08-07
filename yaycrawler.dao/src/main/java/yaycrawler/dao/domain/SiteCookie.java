@@ -36,7 +36,7 @@ public class SiteCookie implements Serializable {
     @Column(name = "cookie", columnDefinition = "text")
     private String cookie;
 
-//    @NotNull
+    @NotNull
     @Column(columnDefinition = "varchar(38)")
     private String siteId;
 

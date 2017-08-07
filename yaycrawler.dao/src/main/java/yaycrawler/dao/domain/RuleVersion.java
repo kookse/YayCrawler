@@ -1,5 +1,4 @@
 package yaycrawler.dao.domain;
-
 import com.sun.istack.internal.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 

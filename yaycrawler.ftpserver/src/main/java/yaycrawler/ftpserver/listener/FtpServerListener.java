@@ -7,7 +7,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.ftpserver.impl.DefaultFtpServer;
-import org.apache.ftpserver.usermanager.SaltedPasswordEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -39,8 +38,13 @@ public class FtpServerListener implements ServletContextListener {
         contextEvent.getServletContext().setAttribute("FTPSERVER_CONTEXT_NAME", server);
         try {
             server.start();
-            logger.info("FtpServer started");
+            String msg = "FtpServer started，ftp服务启动了";
+            msg = new String(msg.getBytes("gbk"));
+            System.out.println(msg);
+            logger.info("FtpServer started，ftp服务启动了");
+            System.out.println("*********************ftp服务启动了*******************");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Failed to start FtpServer", e);
         }
     }
