@@ -3,17 +3,17 @@
 
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd HH:mm:ss.fff}{ABSOLUTE} &lt;%c&gt; %5p --- [%14t]: %m%n"/>
+            <PatternLayout charset="gbk" pattern="%d{yyyy-MM-dd HH:mm:ss.fff}{ABSOLUTE} &lt;%c&gt; %5p --- [%14t]: %m%n"/>
         </Console>
 
         <Console name="STDERR" target="SYSTEM_ERR">
-            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd HH:mm:ss.fff}{ABSOLUTE} &lt;%c&gt; %5p --- [%14t]: %m%n"/>
+            <PatternLayout charset="gbk" pattern="%d{yyyy-MM-dd HH:mm:ss.fff}{ABSOLUTE} &lt;%c&gt; %5p --- [%14t]: %m%n"/>
         </Console>
 
         <RollingRandomAccessFile name="SERVICE_LOG_FILE" fileName="${sys:user.dir}/logs/yaycrawler-ftpserver.log"
                                  filePattern="$${sys:user.dir}/logs/$${date:yyyy-MM}/yaycrawler-ftpserver-%d{yyyy-MM-dd}-%i.log.gz">
 
-            <PatternLayout charset="UTF-8" pattern="%d{ABSOLUTE} &lt;%c&gt; %5p [%t]: %m%n"/>
+            <PatternLayout charset="gbk" pattern="%d{ABSOLUTE} &lt;%c&gt; %5p [%t]: %m%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
             </Policies>

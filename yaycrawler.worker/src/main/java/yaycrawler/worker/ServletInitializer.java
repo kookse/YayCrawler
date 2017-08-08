@@ -16,9 +16,9 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		return application.sources(Application.class);
 	}
 
-//	@Override
-//	public void onStartup(ServletContext servletContext) throws ServletException {
-//		servletContext.setInitParameter("logging.config", "classpath:log4j2-${spring.profiles.active}.xml");
-//		super.onStartup(servletContext);
-//	}
+	@Override
+	public void onStartup(ServletContext servletContext) throws ServletException {
+		servletContext.setInitParameter("logging.config", "classpath:log4j2-${spring.profiles.active}.xml");
+		super.onStartup(servletContext);
+	}
 }
