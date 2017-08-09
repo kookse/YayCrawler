@@ -54,8 +54,8 @@ public class TaskController {
     public Object postPublishTask(@RequestBody Map taskMap) {
         String url = MapUtils.getString(taskMap, "pageUrl");
         String method = MapUtils.getString(taskMap, "method");
-        Assert.notNull(url);
-        Assert.notNull(method);
+        Assert.notNull(url,"抓取链接不能为空！");
+        Assert.notNull(method,"抓取方法不能为空！");
 
         List<Map> paramMapList = (List<Map>) taskMap.get("paramList");
         CrawlerRequest[] crawlerRequestArray = new CrawlerRequest[paramMapList==null?1:paramMapList.size()];
@@ -94,9 +94,9 @@ public class TaskController {
             String cronExpression = MapUtils.getString(taskMap, "cronExpression");
             String description = MapUtils.getString(taskMap, "description");
 
-            Assert.notNull(jobName);
-            Assert.notNull(jobGroup);
-            Assert.notNull(cronExpression);
+            Assert.notNull(jobName,"工作名称不能为空！");
+            Assert.notNull(jobGroup,"工作组不能为空！");
+            Assert.notNull(cronExpression,"定时时间不能为空！");
 
             cronExpression = CronExpressionUtils.convertToSpringCron(cronExpression);
             if (!CronExpressionUtils.isValidExpression(cronExpression))
@@ -166,8 +166,8 @@ public class TaskController {
     public Object viewCrawlerResult(@RequestBody Map map) {
         String pageUrl = MapUtils.getString(map, "pageUrl");
         String taskId = MapUtils.getString(map, "taskId");
-        Assert.notNull(pageUrl);
-        Assert.notNull(taskId);
+        Assert.notNull(pageUrl,"抓取链接不能为空！");
+        Assert.notNull(taskId,"任务ID不能为空！");
 
         return resultRetrivalService.retrivalByTaskId(UrlUtils.getDomain(pageUrl).replace(".", "_"), taskId);
     }

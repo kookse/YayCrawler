@@ -5,7 +5,6 @@
 
     <groupId>com.yaycrawler</groupId>
     <artifactId>yaycrawler-master</artifactId>
-    <version>${yaycrawler.version}</version>
     <packaging>war</packaging>
 
     <name>yaycrawler.master</name>

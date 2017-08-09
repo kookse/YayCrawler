@@ -5,7 +5,6 @@
 
     <groupId>com.yaycrawler</groupId>
     <artifactId>yaycrawler-ftpserver</artifactId>
-    <version>${yaycrawler.version}</version>
     <packaging>war</packaging>
 
     <name>yaycrawler.ftpserver</name>

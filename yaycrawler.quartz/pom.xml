@@ -5,7 +5,6 @@
 
     <groupId>com.yaycrawler</groupId>
     <artifactId>yaycrawler-quartz</artifactId>
-    <version>${yaycrawler.version}</version>
     <packaging>jar</packaging>
 
     <name>yaycrawler.quartz</name>

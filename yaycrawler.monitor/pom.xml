@@ -5,7 +5,6 @@
 
 	<groupId>com.example</groupId>
 	<artifactId>yaycrawler-monitor</artifactId>
-	<version>${yaycrawler.version}</version>
 	<packaging>jar</packaging>
 
 	<name>yaycrawler.monitor</name>
