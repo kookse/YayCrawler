@@ -1,7 +1,9 @@
 package yaycrawler.dao.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sun.istack.internal.NotNull;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -94,7 +96,8 @@ public class SiteCookie implements Serializable {
         this.available = available;
     }
 
-
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getCreatedDate() {
         return createdDate;
     }

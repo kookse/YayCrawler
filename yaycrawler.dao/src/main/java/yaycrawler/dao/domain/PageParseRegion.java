@@ -1,7 +1,10 @@
 package yaycrawler.dao.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -42,6 +45,7 @@ public class PageParseRegion implements Serializable {
     @JoinColumn(name = "regionId", insertable = false, updatable = false)
     @OrderBy(value = "id ASC")
     private Set<UrlParseRule> urlParseRules;
+
     @Column(name = "createdDate",columnDefinition = "timestamp default now()")
     private Date createdDate;
 
@@ -99,6 +103,8 @@ public class PageParseRegion implements Serializable {
         this.urlParseRules = urlParseRules;
     }
 
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getCreatedDate() {
         return createdDate;
     }
