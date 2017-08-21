@@ -2,6 +2,7 @@ package yaycrawler.common.utils;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.http.Header;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -274,16 +275,17 @@ public class HttpUtil {
     }
 
     private RequestConfig getRequestConfig() {
-//        HttpHost proxy = new HttpHost("127.0.0.1", 8888);
-        RequestConfig.Builder build = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES)//.setProxy(proxy)
+        HttpHost proxy = new HttpHost("127.0.0.1", 8888);
+        RequestConfig.Builder build = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES).setProxy(proxy)
                 .setConnectTimeout(30000).setConnectionRequestTimeout(30000)
                 .setSocketTimeout(30000);
         return build.build();
     }
 
     private void setHeaders(List<Header> headerList, HttpRequestBase request) {
-        if (headerList != null)
-            headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"));
+//        if (headerList != null) {
+//            headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"));
+//        }
         if (headerList != null && headerList.size() > 0) {
             Header[] headerArray = new Header[headerList.size()];
             for (int i = 0; i < headerList.size(); i++) {
