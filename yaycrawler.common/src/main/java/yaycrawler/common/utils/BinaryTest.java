@@ -15,8 +15,8 @@ import javax.imageio.ImageIO;
 public class BinaryTest {
 
     public static void main(String[] args) throws IOException {
-        File testDataDir = new File("d:/tmp/ocr");
-        final String destDir = testDataDir.getAbsolutePath()+"/tmp6";
+        File testDataDir = new File("d:/tmp/social/tmp1");
+        final String destDir = testDataDir.getAbsolutePath()+"/tmp1";
 
         File destF = new File(destDir);
         if (!destF.exists())
@@ -29,41 +29,50 @@ public class BinaryTest {
                 int h = bi.getHeight();//获取图像的高
                 int w = bi.getWidth();//获取图像的宽
                 int rgb = bi.getRGB(0, 0);//获取指定坐标的ARGB的像素值
-                int[][] gray = new int[w][h];
-                for (int x = 0; x < w; x++) {
-                    for (int y = 0; y < h; y++) {
-                        gray[x][y] = getGray(bi.getRGB(x, y));
-                    }
-                }
-
-                BufferedImage nbi = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_BINARY);
-                int SW = 240;
-                for (int x = 0; x < w; x++) {
-                    for (int y = 0; y < h; y++) {
-                        if (getAverageColor(gray, x, y, w, h) > SW) {
-                            int max = new Color(255, 255, 255).getRGB();
-                            nbi.setRGB(x, y, max);
-                        } else {
-                            int min = new Color(0, 0, 0).getRGB();
-                            nbi.setRGB(x, y, min);
-                        }
-                    }
-                }
-
-                // 矩阵打印
-                for (int y = 0; y < h; y++) {
-                    for (int x = 0; x < w; x++) {
-                        if (isBlack(nbi.getRGB(x, y))) {
-                            System.out.print("*");
-                        } else {
-                            System.out.print(" ");
-                        }
-                    }
-                    System.out.println();
-                }
-
+                BufferedImage nbi = getBufferedImage(bi, h, w);
+                printGrayRGB(h, w, nbi);
                 ImageIO.write(nbi, "jpg", new File(destDir, file.getName()));
             }
+        }
+    }
+
+    public static BufferedImage getBufferedImage(BufferedImage bi, int h, int w) {
+        int[][] gray = new int[w][h];
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                gray[x][y] = getGray(bi.getRGB(x, y));
+            }
+        }
+
+        BufferedImage nbi = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_BINARY);
+        int SW = 178;
+        int pw;
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                pw = getAverageColor(gray, x, y, w, h);
+                if (pw > SW ) {
+                    int max = new Color(255, 255, 255).getRGB();
+                    nbi.setRGB(x, y, max);
+                } else {
+                    int min = new Color(0, 0, 0).getRGB();
+                    nbi.setRGB(x, y, min);
+                }
+            }
+        }
+        return nbi;
+    }
+
+    public static void printGrayRGB(int h, int w, BufferedImage nbi) {
+        // 矩阵打印
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                if (isBlack(nbi.getRGB(x, y))) {
+                    System.out.print("*");
+                } else {
+                    System.out.print(" ");
+                }
+            }
+            System.out.println();
         }
     }
 
@@ -88,6 +97,9 @@ public class BinaryTest {
         g=c.getGreen();
         b=c.getBlue();
         int top=(r+g+b)/3;
+        if(top <= 13 || top >= 160) {
+            return 255;
+        }
         return (int)(top);
     }
 

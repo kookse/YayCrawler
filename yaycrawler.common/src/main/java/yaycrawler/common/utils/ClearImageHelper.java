@@ -1,4 +1,4 @@
-package com.zhy.test;
+package yaycrawler.common.utils;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
