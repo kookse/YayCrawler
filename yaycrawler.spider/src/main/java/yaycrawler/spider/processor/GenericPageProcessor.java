@@ -1,5 +1,6 @@
 package yaycrawler.spider.processor;
 
+import com.alibaba.fastjson.JSON;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
@@ -10,14 +11,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Json;
 import us.codecraft.webmagic.selector.Selectable;
+import yaycrawler.api.engine.Engine;
+import yaycrawler.api.engine.login.GZGJJEngine;
+import yaycrawler.api.engine.ocr.BinaryEngine;
+import yaycrawler.api.process.SpringContextUtil;
 import yaycrawler.common.model.CrawlerRequest;
+import yaycrawler.common.model.EngineResult;
+import yaycrawler.common.model.LoginParam;
+import yaycrawler.common.model.PhantomCookie;
+import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.dao.domain.*;
+import yaycrawler.dao.service.PageCookieService;
 import yaycrawler.dao.service.PageParserRuleService;
 import yaycrawler.monitor.captcha.CaptchaIdentificationProxy;
 import yaycrawler.monitor.login.AutoLoginProxy;
@@ -43,9 +54,12 @@ public class GenericPageProcessor implements PageProcessor {
     private PageSiteService pageSiteService;
     @Autowired
     private AutoLoginProxy autoLoginProxy;
+
     @Autowired
     private CaptchaIdentificationProxy captchaIdentificationProxy;
 
+    @Autowired
+    private PageCookieService pageCookieService;
 
     @Override
     public void process(Page page) {
@@ -311,36 +325,104 @@ public class GenericPageProcessor implements PageProcessor {
      * @param pageRequest
      * @param pageUrl
      */
+//    private boolean doAutomaticRecovery(Page page, Request pageRequest, String pageUrl,int status) {
+//        boolean doRecovery = false;
+//        PageSite pageSite = pageSiteService.getPageSiteByUrl(pageUrl);
+//        if (pageSite != null) {
+//            String loginJudgeExpression = pageSite.getLoginJudgeExpression();
+//            String captchaJudgeExpression = pageSite.getCaptchaJudgeExpression();
+//            String loginJsFileName = pageSite.getLoginJsFileName();
+//            String captchaJsFileName = pageSite.getCaptchaJsFileName();
+//            String oldCookieId = (String) pageRequest.getExtra("cookieId");
+//
+//            Selectable judgeContext = StringUtils.isNotBlank(loginJsFileName) ? getPageRegionContext(page, pageRequest, loginJudgeExpression) : null;
+//            if (judgeContext != null && judgeContext.match()) {
+//                doRecovery = true;
+//                //需要登录了
+//                autoLoginProxy.login(pageUrl, loginJsFileName, page.getRawText(), oldCookieId);
+//                //重新加入队列
+//                page.addTargetRequest(pageRequest);
+//            } else {
+//                judgeContext = StringUtils.isNotBlank(captchaJsFileName) ? getPageRegionContext(page, pageRequest, captchaJudgeExpression) : null;
+//                if (judgeContext != null && judgeContext.match()) {
+//                    doRecovery = true;
+//                    //需要刷新验证码了
+//                    captchaIdentificationProxy.recognition(pageUrl, captchaJsFileName, page.getRawText(), oldCookieId);
+//                }
+//            }
+//        }
+//        return doRecovery;
+//    }
+
+    /**
+     * 页面自动恢复
+     *
+     * @param page
+     * @param pageRequest
+     * @param pageUrl
+     */
     private boolean doAutomaticRecovery(Page page, Request pageRequest, String pageUrl) {
         boolean doRecovery = false;
         PageSite pageSite = pageSiteService.getPageSiteByUrl(pageUrl);
         if (pageSite != null) {
+            String login = pageSite.getLoginEngine();
+            String encrypt = pageSite.getEncryptEngine();
+            int status = pageSite.getStatus();
             String loginJudgeExpression = pageSite.getLoginJudgeExpression();
             String captchaJudgeExpression = pageSite.getCaptchaJudgeExpression();
             String loginJsFileName = pageSite.getLoginJsFileName();
             String captchaJsFileName = pageSite.getCaptchaJsFileName();
-            String oldCookieId = (String) pageRequest.getExtra("cookieId");
-
-            Selectable judgeContext = StringUtils.isNotBlank(loginJsFileName) ? getPageRegionContext(page, pageRequest, loginJudgeExpression) : null;
-            if (judgeContext != null && judgeContext.match()) {
-                doRecovery = true;
-                //需要登录了
-                autoLoginProxy.login(pageUrl, loginJsFileName, page.getRawText(), oldCookieId);
-                //重新加入队列
-                page.addTargetRequest(pageRequest);
+            String param = pageSite.getLoginParam() != null ?pageSite.getLoginParam():"";
+            String oldCookieId = String.valueOf(pageRequest.getExtra("cookieId"));
+            if(status == 0) {
+                if(StringUtils.isEmpty(encrypt))
+                    encrypt = "encryptEngine";
+                if(StringUtils.isEmpty(login))
+                    login = "loginEngine";
+                Engine loginEngine = (Engine) SpringContextUtil.getBean(login);
+                Engine encryptEngine = (Engine) SpringContextUtil.getBean(encrypt);
+                Map paramData = JSON.parseObject(param,Map.class);
+                paramData.putAll(pageRequest.getExtras());
+                EngineResult engineResult = encryptEngine.execute(paramData);
+                LoginParam loginParam = engineResult.getLoginParam();
+                engineResult = loginEngine.execute(loginParam);
+                if(engineResult.getStatus()) {
+                    doRecovery = Boolean.TRUE;
+                    //需要登录了
+                    List<PhantomCookie> phantomCookies = new ArrayList<>();
+                    engineResult.getHeaders().forEach(header -> {
+                        PhantomCookie phantomCookie = new PhantomCookie(header.getName(),header.getValue());
+                        phantomCookies.add(phantomCookie);
+                    });
+                    pageCookieService.deleteCookieBySiteId(pageSite.getId());
+                    if (pageCookieService.saveCookies(UrlUtils.getDomain(pageUrl),pageSite.getId(),phantomCookies)) {
+                        logger.info("保存新的cookie成功！");
+                    } else
+                        logger.info("保存新的cookie失败！");
+                    //重新加入队列
+                    page.addTargetRequest(pageRequest);
+                }
             } else {
-                judgeContext = StringUtils.isNotBlank(captchaJsFileName) ? getPageRegionContext(page, pageRequest, captchaJudgeExpression) : null;
+                Selectable judgeContext = StringUtils.isNotBlank(loginJsFileName) ? getPageRegionContext(page, pageRequest, loginJudgeExpression) : null;
                 if (judgeContext != null && judgeContext.match()) {
                     doRecovery = true;
-                    //需要刷新验证码了
-                    captchaIdentificationProxy.recognition(pageUrl, captchaJsFileName, page.getRawText(), oldCookieId);
+                    //需要登录了
+                    autoLoginProxy.login(pageUrl, loginJsFileName, page.getRawText(), oldCookieId);
+                    //重新加入队列
+                    page.addTargetRequest(pageRequest);
+                } else {
+                    judgeContext = StringUtils.isNotBlank(captchaJsFileName) ? getPageRegionContext(page, pageRequest, captchaJudgeExpression) : null;
+                    if (judgeContext != null && judgeContext.match()) {
+                        doRecovery = true;
+                        //需要刷新验证码了
+                        captchaIdentificationProxy.recognition(pageUrl, captchaJsFileName, page.getRawText(), oldCookieId);
+                    }
                 }
             }
+
         }
         return doRecovery;
     }
-
-
     /**
      * 验证是否正确的页面
      *

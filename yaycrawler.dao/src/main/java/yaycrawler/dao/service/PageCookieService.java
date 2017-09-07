@@ -1,12 +1,15 @@
 package yaycrawler.dao.service;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import yaycrawler.common.model.PhantomCookie;
-import yaycrawler.common.utils.UrlUtils;
+import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.dao.domain.SiteCookie;
 import yaycrawler.dao.repositories.SiteCookieRepository;
 
@@ -32,7 +35,35 @@ public class PageCookieService {
     }
 
     @CacheEvict(value = DEMO_CACHE_NAME)
-    public boolean saveCookies(String domain, List<PhantomCookie> cookies) {
+    public void deleteCookieBySiteId(String siteId) {
+        try {
+            if (StringUtils.isBlank(siteId)) return;
+            cookieRepository.deleteBySiteId(siteId);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @CacheEvict(value = DEMO_CACHE_NAME)
+    public boolean saveCookies(String domain,String siteId, List<PhantomCookie> cookies) {
+        if (cookies == null || cookies.size() == 0) return false;
+        try {
+            StringBuilder cookieBuild = new StringBuilder();
+            cookies.forEach(
+                    phantomCookie -> {
+                        if(phantomCookie.getName().equalsIgnoreCase("Cookie"))
+                            cookieBuild.append(String.format("%s;",phantomCookie.getValue()));
+                        else
+                            cookieBuild.append(String.format("%s=%s;",phantomCookie.getName(),phantomCookie.getValue()));
+                    });
+            return cookieRepository.save(new SiteCookie(siteId,domain,cookieBuild.toString())) != null;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    @CacheEvict(value = DEMO_CACHE_NAME)
+    public boolean saveCookies(String domain,List<PhantomCookie> cookies) {
         if (cookies == null || cookies.size() == 0) return false;
         try {
             StringBuilder cookieBuild = new StringBuilder();

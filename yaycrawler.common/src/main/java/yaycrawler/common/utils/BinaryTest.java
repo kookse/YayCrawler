@@ -15,8 +15,8 @@ import javax.imageio.ImageIO;
 public class BinaryTest {
 
     public static void main(String[] args) throws IOException {
-        File testDataDir = new File("d:/tmp/social/tmp1");
-        final String destDir = testDataDir.getAbsolutePath()+"/tmp1";
+        File testDataDir = new File("d:/tmp/ocr");
+        final String destDir = testDataDir.getAbsolutePath()+"/tmp6";
 
         File destF = new File(destDir);
         if (!destF.exists())
@@ -45,7 +45,7 @@ public class BinaryTest {
         }
 
         BufferedImage nbi = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_BINARY);
-        int SW = 178;
+        int SW = 200;
         int pw;
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
@@ -97,7 +97,7 @@ public class BinaryTest {
         g=c.getGreen();
         b=c.getBlue();
         int top=(r+g+b)/3;
-        if(top <= 13 || top >= 160) {
+        if(top <= 13 || top >= 190) {
             return 255;
         }
         return (int)(top);

@@ -28,7 +28,7 @@
  *
  */
 
-var require = patchRequire(require);
+require = patchRequire(require);
 var fs = require('fs');
 var events = require('events');
 var utils = require('utils');
@@ -114,6 +114,7 @@ var Tester = function Tester(casper, options) {
         failText: "FAIL", // text to use for a failed test
         passText: "PASS", // text to use for a succesful test
         skipText: "SKIP", // text to use for a skipped test
+        save:     false,  // false to not save 
         pad:      80    , // maximum number of chars for a result line
         warnText: "WARN"  // text to use for a dubious test
     }, options);
@@ -556,9 +557,9 @@ Tester.prototype.assertField = function assertField(input, expected, message, op
         }
     }
 
-    var actual = this.casper.evaluate(function(inputName, options) {
-        return __utils__.getFieldValue(inputName, options);
-    }, input, options);
+    var actual = this.casper.evaluate(function(inputName) {
+        return __utils__.getFieldValue(__utils__.makeSelector(inputName,'name'));
+    }, input);
 
     return baseFieldAssert.call(this, input, expected, actual, message);
 };
@@ -573,9 +574,9 @@ Tester.prototype.assertField = function assertField(input, expected, message, op
  */
 Tester.prototype.assertFieldCSS = function assertFieldCSS(cssSelector, expected, message) {
     "use strict";
-    var actual = this.casper.evaluate(function(inputName, cssSelector) {
-        return __utils__.getFieldValue(inputName, {inputSelector: cssSelector});
-    }, null, cssSelector);
+    var actual = this.casper.evaluate(function(inputName) {
+        return __utils__.getFieldValue(__utils__.makeSelector(inputName,'css'));
+    }, cssSelector);
 
     return baseFieldAssert.call(this, null, expected, actual, message);
 };
@@ -590,9 +591,9 @@ Tester.prototype.assertFieldCSS = function assertFieldCSS(cssSelector, expected,
  */
 Tester.prototype.assertFieldXPath = function assertFieldXPath(xPathSelector, expected, message) {
     "use strict";
-    var actual = this.casper.evaluate(function(inputName, xPathSelector) {
-        return __utils__.getFieldValue(inputName, {inputXPath: xPathSelector});
-    }, null, xPathSelector);
+    var actual = this.casper.evaluate(function(inputName) {
+        return __utils__.getFieldValue(__utils__.makeSelector(inputName,'xpath'));
+    }, xPathSelector);
 
     return baseFieldAssert.call(this, null, expected, actual, message);
 };
@@ -1038,6 +1039,25 @@ Tester.prototype.assertVisible = function assertVisible(selector, message) {
 };
 
 /**
+ * Asserts that all elements matching selector expression are currently visible.
+ * Fails if even one element is not visible.
+ *
+ * @param  String  expected  selector expression
+ * @param  String  message   Test description
+ * @return Object            An assertion result object
+ */
+Tester.prototype.assertAllVisible = function assertAllVisible(selector, message) {
+    "use strict";
+    return this.assert(this.casper.allVisible(selector), message, {
+        type: "assertAllVisible",
+        standard: "All elements matching selector are visible",
+        values: {
+            selector: selector
+        }
+    });
+};
+
+/**
  * Prints out a colored bar onto the console.
  *
  */
@@ -1109,15 +1129,6 @@ Tester.prototype.begin = function begin() {
         config = getConfig([].slice.call(arguments)),
         next = function() {
             config.test(this, this.casper);
-            if (!this.options.concise) {
-                this.casper.echo([
-                    this.colorize('PASS', 'INFO'),
-                    this.formatMessage(description),
-                    this.colorize(f('(%d test%s)',
-                                    config.planned,
-                                    config.planned > 1 ? 's' : ''), 'INFO')
-                ].join(' '));
-            }
         }.bind(this);
 
     if (!this.options.concise)
@@ -1207,6 +1218,24 @@ Tester.prototype.done = function done() {
         }
         if (this.currentSuite) {
             this.suiteResults.push(this.currentSuite);
+            
+            if (!this.options.concise) {
+                var message = [
+                    this.colorize('PASS', 'INFO'),
+                    this.formatMessage(this.currentSuite.name)
+                ];
+
+                if (config.planned) {
+                    message.push([
+                        this.colorize(f('(%d test%s)',
+                        config.planned,
+                        config.planned > 1 ? 's' : ''), 'INFO')
+                    ]);
+                }
+
+                this.casper.echo(message.join(' '));
+            }
+            
             this.currentSuite = undefined;
             this.executed = 0;
         }

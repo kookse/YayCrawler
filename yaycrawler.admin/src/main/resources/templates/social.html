@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.springframework.org/schema/jdbc">
 <head xmlns:th="http://www.thymeleaf.org" th:include="master::head">
-    <title>查询公积金</title>
+    <title>查询社保</title>
 </head>
 <body>
 <div class="container">
@@ -21,12 +21,12 @@
                         <div class="form-group">
                             <label class="control-label">账户：</label>
                             <input type="text" class="form-control" id="username" name="username" required="required"
-                                   value="" placeholder="请输入公积金账户"/>
+                                   value="" placeholder="请输入社保账户"/>
                         </div>
                         <div class="form-group">
                             <label class="control-label">密码：</label>
                             <input type="text" class="form-control" id="pwd" name="pwd" required="required"
-                                   value="" placeholder="请输入公积金密码"/>
+                                   value="" placeholder="请输入社保密码"/>
                         </div>
                         <div class="form-group">
                             <button type="button" id="btn_testMatch" class="btn green">提交</button>
@@ -51,8 +51,8 @@
                 type: "post",
                 cache: false,
 //                contentType: "application/json",
-                url: global.contextPath + "/testFus?random=" + Math.random(),
-                data: {"username":$("#username").val(),"pwd":$("#pwd").val(),"address":$("#address").val()},
+                url: global.contextPath + "/testSocial?random=" + Math.random(),
+                data: {"loginName":$("#username").val(),"loginPassword":$("#pwd").val(),"address":$("#address").val()},
 //                dataType: 'json',
                 success: function (result) {     //回调函数，result，返回值
                     debugger

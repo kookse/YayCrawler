@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import yaycrawler.common.model.PhantomCookie;
 import yaycrawler.common.utils.CasperjsProgramManager;
-import yaycrawler.common.utils.UrlUtils;
+import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.dao.domain.SiteAccount;
 import yaycrawler.dao.repositories.SiteAccountRepository;
 import yaycrawler.dao.service.PageCookieService;

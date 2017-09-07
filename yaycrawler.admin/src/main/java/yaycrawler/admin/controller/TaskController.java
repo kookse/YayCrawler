@@ -15,7 +15,7 @@ import yaycrawler.admin.service.CrawlerResultRetrivalService;
 import yaycrawler.admin.service.TaskService;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.model.QueueQueryParam;
-import yaycrawler.common.utils.UrlUtils;
+import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.quartz.model.ScheduleJobInfo;
 import yaycrawler.quartz.service.QuartzScheduleService;
 import yaycrawler.quartz.utils.CronExpressionUtils;

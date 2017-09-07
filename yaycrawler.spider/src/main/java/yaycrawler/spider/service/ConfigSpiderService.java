@@ -46,17 +46,36 @@ public class ConfigSpiderService {
      *
      * @param crawlerRequest
      * @param parseRegion
-     * @param page
+     * @param pageInfo
      * @return
      */
-    public Map<String, Object> testRegionRule(CrawlerRequest crawlerRequest, PageParseRegion parseRegion, Page page, Site site) {
+    public Map<String, Object> testRegionRule(CrawlerRequest crawlerRequest, PageParseRegion parseRegion, PageInfo pageInfo, Site site) {
         final Request request = RequestHelper.createRequest(crawlerRequest.getUrl(), crawlerRequest.getMethod(), crawlerRequest.getData());
         if (pageProcessor == null || request == null) return null;
+        Page page = null;
         if (page == null) {
             final Site finalSite = site;
             page = downloadPage(request, finalSite);
         }
         if (page == null) return null;
+        int i = 0;
+        while(i < 5 && !pageProcessor.pageValidated(page,pageInfo.getPageValidationRule())) {
+            pageMap.remove(request.getUrl());
+            request.setExtras(crawlerRequest.getData());
+            page.setRequest(request);
+            pageProcessor.process(page);
+            final Site finalSite = site;
+            page = downloadPage(request, finalSite);
+            i++;
+        }
+        if(i < 5) {
+            Map<String, Object> m = new HashMap<>();
+            m.put("inputTime", System.currentTimeMillis());
+            m.put("page", page);
+            pageMap.put(request.getUrl(), m);
+        } else {
+            return null;
+        }
         List<CrawlerRequest> childRequestList = new LinkedList<>();
         Map<String, Object> data = pageProcessor.parseOneRegion(page, parseRegion, childRequestList);
         Map<String, Object> result = new HashMap<>();
@@ -77,8 +96,21 @@ public class ConfigSpiderService {
         request.putExtra("$pageInfo",pageInfo);
         Page page = downloadPage(request, null);
         if (page == null) return RestFulResult.failure("页面下载失败！");
-        pageProcessor.process(page);
-        if (!pageProcessor.pageValidated(page, pageInfo.getPageValidationRule())) {
+        int i = 0;
+        while(i < 5 && !pageProcessor.pageValidated(page,pageInfo.getPageValidationRule())) {
+            pageMap.remove(request.getUrl());
+            request.setExtras(paramsMap);
+            page.setRequest(request);
+            pageProcessor.process(page);
+            page = downloadPage(request, null);
+            i++;
+        }
+        if(i < 5) {
+            Map<String, Object> m = new HashMap<>();
+            m.put("inputTime", System.currentTimeMillis());
+            m.put("page", page);
+            pageMap.put(request.getUrl(), m);
+        } else {
             pageMap.remove(request.getUrl());
             return RestFulResult.failure("页面内容不正确!");
         }

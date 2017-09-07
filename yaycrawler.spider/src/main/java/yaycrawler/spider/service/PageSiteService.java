@@ -5,7 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Site;
-import yaycrawler.common.utils.UrlUtils;
+import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.dao.domain.PageSite;
 import yaycrawler.dao.repositories.PageSiteRepository;
 

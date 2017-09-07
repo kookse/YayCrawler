@@ -1,7 +1,7 @@
 package yaycrawler.common.model;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.codec.digest.DigestUtils;
-import yaycrawler.common.utils.UrlUtils;
+import us.codecraft.webmagic.utils.UrlUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;

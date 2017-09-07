@@ -1,6 +1,5 @@
 package yaycrawler.spider.resolver;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -9,6 +8,7 @@ import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.selector.Json;
 import us.codecraft.webmagic.selector.PlainText;
 import us.codecraft.webmagic.selector.Selectable;
+import yaycrawler.api.selector.CrawlerSelectable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -97,9 +97,13 @@ public class SelectorExpressionResolver {
                 p = p.substring(0, p.length() - 1);
             if (p.equals("\\$\\"))
                 p = localObject.toString();
+            if (p.equals("$1"))
+                p = localObject.toString();
             params[i] = p;
         }
         try {
+
+
             /**
              * 自定义常量字段
              */

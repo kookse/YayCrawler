@@ -88,13 +88,14 @@ public class CrawlerHttpClientDownloader extends AbstractDownloader {
         if (site != null && StringUtils.isNotBlank(cookie)) {
             site.addHeader("Cookie", cookie);
         }
-        CloseableHttpClient httpClient = getHttpClient(task.getSite());
+        CloseableHttpClient httpClient = getHttpClient(site);
         Proxy proxy = proxyProvider != null ? proxyProvider.getProxy(task) : null;
-        HttpClientRequestContext requestContext = httpUriRequestConverter.convert(request, task.getSite(), proxy);
+//        proxy = new Proxy("127.0.0.1",8888);
+        HttpClientRequestContext requestContext = httpUriRequestConverter.convert(request, site, proxy);
         Page page = Page.fail();
         try {
             httpResponse = httpClient.execute(requestContext.getHttpUriRequest(), requestContext.getHttpClientContext());
-            page = handleResponse(request, request.getCharset() != null ? request.getCharset() : task.getSite().getCharset(), httpResponse, task);
+            page = handleResponse(request, request.getCharset() != null ? request.getCharset() : site.getCharset(), httpResponse, task);
             onSuccess(request);
             logger.info("downloading page success {}", request.getUrl());
             return page;

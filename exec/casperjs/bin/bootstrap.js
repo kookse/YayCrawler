@@ -42,39 +42,42 @@ if (!('phantom' in this)) {
 }
 
 // Common polyfills
+void function() {
 
-// cujos bind shim instead of MDN shim, see #1396
-var isFunction = function(o) {
-  return 'function' === typeof o;
-};
-var bind;
-var slice = [].slice;
-var proto = Function.prototype;
-var featureMap = {
-  'function-bind': 'bind'
-};
-function has(feature) {
-  var prop = featureMap[feature];
-  return isFunction(proto[prop]);
-}
-// check for missing features
-if (!has('function-bind')) {
-  // adapted from Mozilla Developer Network example at
-  // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind
-  bind = function bind(obj) {
-    var args = slice.call(arguments, 1),
-      self = this,
-      nop = function() {
-      },
-      bound = function() {
-        return self.apply(this instanceof nop ? this : (obj || {}), args.concat(slice.call(arguments)));
+    // cujos bind shim instead of MDN shim, see #1396
+    var isFunction = function(o) {
+      return 'function' === typeof o;
+    };
+    var bind;
+    var slice = [].slice;
+    var proto = Function.prototype;
+    var featureMap = {
+      'function-bind': 'bind'
+    };
+    function has(feature) {
+      var prop = featureMap[feature];
+      return isFunction(proto[prop]);
+    }
+    // check for missing features
+    if (!has('function-bind')) {
+      // adapted from Mozilla Developer Network example at
+      // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind
+      bind = function bind(obj) {
+        var args = slice.call(arguments, 1),
+          self = this,
+          nop = function() {
+          },
+          bound = function() {
+            return self.apply(this instanceof nop ? this : (obj || {}), args.concat(slice.call(arguments)));
+          };
+        nop.prototype = this.prototype || {}; // Firefox cries sometimes if prototype is undefined
+        bound.prototype = new nop();
+        return bound;
       };
-    nop.prototype = this.prototype || {}; // Firefox cries sometimes if prototype is undefined
-    bound.prototype = new nop();
-    return bound;
-  };
-  proto.bind = bind;
-}
+      proto.bind = bind;
+    }
+
+}();
 
 // Custom base error
 var CasperError = function CasperError(msg) {
@@ -176,6 +179,13 @@ CasperError.prototype = Object.getPrototypeOf(new Error());
                 return Array.prototype.filter.call(arguments,function(elm){
                     return typeof elm !== "undefined" && elm !== null;
                 }).join('/');
+            };
+        }
+        
+        if (phantom.casperEngine === 'slimerjs' && slimer.version.major === 0 && slimer.version.minor <= 9){
+            fs.size = function (filename){
+                var t = fs.read(filename, "rt");
+                return t.length;
             };
         }
         return fs;
@@ -419,7 +429,18 @@ CasperError.prototype = Object.getPrototypeOf(new Error());
         } else {
             require.paths.push(fs.pathJoin(fs.workingDirectory, phantom.casperScriptBaseDir));
         }
-        require.paths.push(fs.pathJoin(require.paths[require.paths.length-1], 'node_modules'));
+        (function nodeModulePath(path) {
+            var resolved = false, prevBaseDir;
+            var baseDir = path;
+            do {
+                path = fs.pathJoin(baseDir, 'node_modules');
+                resolved = fs.exists(path) && fs.isDirectory(path);
+                prevBaseDir = baseDir;
+                baseDir = fs.absolute(fs.pathJoin(prevBaseDir, '..'));
+            } while (!resolved && baseDir !== '/' && prevBaseDir !== '/' && baseDir !== prevBaseDir);
+            if (!resolved) return;
+            require.paths.push(fs.pathJoin(prevBaseDir, 'node_modules'));
+        })(fs.pathJoin(fs.workingDirectory, phantom.casperScriptBaseDir));
     }
 
     // casper loading status flag

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Request;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.model.CrawlerResult;
-import yaycrawler.common.utils.UrlUtils;
+import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.spider.listener.IPageParseListener;
 import yaycrawler.worker.communication.MasterActor;
 import yaycrawler.worker.model.WorkerContext;

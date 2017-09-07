@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  */
 public class CasperJsDownloadTest {
 
-    private static Logger logger = LoggerFactory.getLogger(SelectorExpressionResolver.class);
+    private static Logger logger = LoggerFactory.getLogger(CasperJsDownloadTest.class);
     private static Pattern INVOKE_PATTERN = Pattern.compile("(\\w+)\\((.*)\\)");
 
     @Test

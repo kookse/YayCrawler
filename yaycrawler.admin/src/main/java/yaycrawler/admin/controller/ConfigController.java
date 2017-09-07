@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.model.RestFulResult;
-import yaycrawler.common.utils.UrlUtils;
+import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.dao.domain.*;
 import yaycrawler.dao.service.PageParserRuleService;
 import yaycrawler.spider.service.ConfigSpiderService;
@@ -201,7 +201,7 @@ public class ConfigController {
         CrawlerRequest request = new CrawlerRequest(targetUrl, UrlUtils.getDomain(targetUrl), pageInfo.getMethod());
         request.setData(paramsMap);
 
-        return configSpiderService.testRegionRule(request, parseRegion, null, null);
+        return configSpiderService.testRegionRule(request, parseRegion, pageInfo, null);
     }
 
     @RequestMapping(value = "/testPageWithRule")
@@ -245,7 +245,7 @@ public class ConfigController {
         CrawlerRequest request = new CrawlerRequest(targetUrl, UrlUtils.getDomain(targetUrl), pageInfo.getMethod());
         request.setData(paramsMap);
 
-        return configSpiderService.testRegionRule(request, region, null, null);
+        return configSpiderService.testRegionRule(request, region, pageInfo, null);
     }
 
     @RequestMapping(value = "/testUrlRuleParam")
@@ -276,7 +276,7 @@ public class ConfigController {
         CrawlerRequest request = new CrawlerRequest(targetUrl, UrlUtils.getDomain(targetUrl), pageInfo.getMethod());
         request.setData(paramsMap);
 
-        return configSpiderService.testRegionRule(request, testRegion, null, null);
+        return configSpiderService.testRegionRule(request, testRegion, pageInfo, null);
     }
 
 

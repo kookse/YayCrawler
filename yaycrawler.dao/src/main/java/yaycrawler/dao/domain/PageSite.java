@@ -38,6 +38,17 @@ public class PageSite implements Serializable {
     @Column(name = "headers", columnDefinition = "varchar(1000)")
     private String headers;
 
+    @Column(name = "binaryEngine", columnDefinition = "varchar(100)")
+    private String binaryEngine ;
+    @Column(name = "ocrEngine", columnDefinition = "varchar(100)")
+    private String ocrEngine ;
+    @Column(name = "loginEngine", columnDefinition = "varchar(100)")
+    private String loginEngine;
+    @Column(name = "encryptEngine", columnDefinition = "varchar(100)")
+    private String encryptEngine;
+    @Column(name = "loginParam", columnDefinition = "text")
+    private String loginParam;
+    private int status;
     /**
      * 是否需要登录判断表达式
      */
@@ -189,5 +200,53 @@ public class PageSite implements Serializable {
 
     public void setTimeOut(Integer timeOut) {
         this.timeOut = timeOut;
+    }
+
+    public String getBinaryEngine() {
+        return binaryEngine;
+    }
+
+    public void setBinaryEngine(String binaryEngine) {
+        this.binaryEngine = binaryEngine;
+    }
+
+    public String getOcrEngine() {
+        return ocrEngine;
+    }
+
+    public void setOcrEngine(String ocrEngine) {
+        this.ocrEngine = ocrEngine;
+    }
+
+    public String getLoginEngine() {
+        return loginEngine;
+    }
+
+    public void setLoginEngine(String loginEngine) {
+        this.loginEngine = loginEngine;
+    }
+
+    public String getEncryptEngine() {
+        return encryptEngine;
+    }
+
+    public void setEncryptEngine(String encryptEngine) {
+        this.encryptEngine = encryptEngine;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getLoginParam() {
+        return loginParam;
+    }
+
+    public void setLoginParam(String loginParam) {
+        this.loginParam = loginParam;
     }
 }

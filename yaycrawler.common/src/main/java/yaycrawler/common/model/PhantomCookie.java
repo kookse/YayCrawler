@@ -14,6 +14,14 @@ public class PhantomCookie {
     private Boolean secure;
     private String value;
 
+    public PhantomCookie() {
+
+    }
+    public PhantomCookie(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
     public String getDomain() {
         return domain;
     }
@@ -76,5 +84,19 @@ public class PhantomCookie {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "PhantomCookie{" +
+                "domain='" + domain + '\'' +
+                ", expires='" + expires + '\'' +
+                ", expiry=" + expiry +
+                ", httponly=" + httponly +
+                ", name='" + name + '\'' +
+                ", path='" + path + '\'' +
+                ", secure=" + secure +
+                ", value='" + value + '\'' +
+                '}';
     }
 }
