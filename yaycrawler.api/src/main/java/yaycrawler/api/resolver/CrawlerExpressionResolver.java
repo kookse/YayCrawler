@@ -1,6 +1,8 @@
 package yaycrawler.api.resolver;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Request;
@@ -83,7 +85,11 @@ public class CrawlerExpressionResolver {
                     selector = new Json(((Selectable)selector).all());
                     cls = null;
                 } else if(method.equalsIgnoreCase("getHtml")) {
-                    selector = new Html(((Selectable)selector).get());
+                    StringBuffer buffer = new StringBuffer();
+                    ((Selectable)selector).all().forEach(sel -> {
+                        buffer.append(sel);
+                    });
+                    selector = new Html(buffer.toString());
                     cls = null;
                 } else if(method.equalsIgnoreCase("all")){
                     selector = ((Selectable)selector).all();

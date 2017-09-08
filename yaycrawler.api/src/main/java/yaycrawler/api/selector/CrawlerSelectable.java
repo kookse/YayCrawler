@@ -16,7 +16,7 @@ import java.util.List;
  * @create 2017-09-06 11:44
  * @desc 文档抽取器
  **/
-public class CrawlerSelectable extends AbstractSelectable {
+public class CrawlerSelectable<T> extends AbstractSelectable {
 
     protected List<String> sourceTexts;
 
@@ -67,13 +67,28 @@ public class CrawlerSelectable extends AbstractSelectable {
     }
 
     public CrawlerSelectable array(int start,int end) {
+        return array(start, end,1);
+    }
+    public CrawlerSelectable array(int start,int end,int step) {return array(start, end,step,1);}
+    public CrawlerSelectable array(int start,int end,int step,int jump) {
         List<String> datas = Lists.newArrayList();
         List<String> tmps = all();
         if(end < 0) {
             end += tmps.size();
         }
-        for (int i = start; i <end ; i++) {
-            datas.add(tmps.get(i));
+        for (int i = 0; i <end /step ; i++) {
+
+        }
+        for (int i = start; i <end / step ; i++) {
+            if (step == 1) {
+                datas.add(tmps.get(i));
+            } else {
+                List tmp = Lists.newArrayList();
+                for (int j = 0; j < step; j++) {
+                    tmp.add(tmps.get(j * jump + i));
+                }
+                datas.add(JSON.toJSONString(tmp));
+            }
         }
         return new CrawlerSelectable(datas);
     }
@@ -81,7 +96,7 @@ public class CrawlerSelectable extends AbstractSelectable {
     public CrawlerSelectable index(int index) {
         List datas = all();
         if(datas.size() == 1) {
-            datas = JSON.parseArray(get(), List.class);
+            datas = JSON.parseObject(get(), List.class);
         }
         Object data = null;
         data = datas.get(index);
@@ -92,6 +107,18 @@ public class CrawlerSelectable extends AbstractSelectable {
         }
     }
 
+    public CrawlerSelectable regexp(String regex,int result) {
+        return regexp(regex, String.valueOf(result));
+    }
+    public CrawlerSelectable regexp(String regex,String result) {
+        RegexSelector regexSelector = Selectors.regex(String.valueOf(regex));
+        String data = regexSelector.select(get());
+        if(StringUtils.isEmpty(data)) {
+            return new CrawlerSelectable(result);
+        } else {
+            return new CrawlerSelectable(data);
+        }
+    }
     public CrawlerSelectable add(String param) {
         BigDecimal num1 = new BigDecimal(get());
         BigDecimal num2 = new BigDecimal(param);
@@ -234,6 +261,12 @@ public class CrawlerSelectable extends AbstractSelectable {
 
     @Override
     public List<Selectable> nodes() {
-        return null;
+        List<Selectable> nodes = new ArrayList<Selectable>(getSourceTexts().size());
+        for (String string : getSourceTexts()) {
+            nodes.add(PlainText.create(string));
+        }
+        return nodes;
     }
+
+
 }

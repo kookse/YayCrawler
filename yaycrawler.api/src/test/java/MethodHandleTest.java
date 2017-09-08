@@ -71,22 +71,137 @@ public class MethodHandleTest {
         Request request = new Request();
         HttpUtil httpUtil = HttpUtil.getInstance();
         Html html = new Html(EntityUtils.toString(httpUtil.doGet("http://localhost:8069/admin/hrssz",null, Lists.newArrayList(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"))).getEntity(),"utf-8"));
-        Object selectable = CrawlerExpressionResolver.resolve(request,html,"css(tr:gt(4)$$allText).getCrawler().array(0$$6)");
-        if(selectable instanceof Collection) {
-            for (Object tmp:(List)selectable) {
-                System.out.println(tmp);
-                Object data = CrawlerExpressionResolver.resolve(request,tmp,"getCrawler().split().index(0)");
-                System.out.println(data);
-            }
+        Object selectables = CrawlerExpressionResolver.resolve(request,html,"css(tr:gt(4)$$allText).getCrawler().array(0$$6)");
+        if( selectables instanceof Selectable) {
+            ((Selectable)selectables).nodes().forEach(selectable -> {
+                System.out.println(selectable);
+                Object data = null;
+                for (int i = 0; i < 13; i++) {
+                    try {
+                        data = CrawlerExpressionResolver.resolve(request,selectable,String.format("getCrawler().split().index(%s)",i));
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                    System.out.println(data);
+                }
+            });
         }
     }
 
+    @Test
+    public void testQisuu() throws Throwable {
+        Request request = new Request();
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        Html html = new Html(EntityUtils.toString(httpUtil.doGet("http://www.qisuu.com/35478.html",null, Lists.newArrayList(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"))).getEntity(),"utf-8"));
+        Object selectables = CrawlerExpressionResolver.resolve(request,html,"css(.detail_right li:not(.link),.detail_right h1)");
+        if( selectables instanceof Selectable) {
+            ((Selectable)selectables).nodes().forEach(selectable -> {
+                Object data = null;
+                    try {
+                        data = CrawlerExpressionResolver.resolve(request,selectable,String.format("getCrawler().regexp(\">(.*)：.*<\"$$\"书籍信息\")"));
+                        System.out.println(data);
+                        data = CrawlerExpressionResolver.resolve(request,selectable,String.format("getCrawler().regexp(\">.*：(.*)<\"$$\"$1\").regexp(\"class=\"(.*)\"\"$$\"$1\").regexp(\">(.*)<\"$$\"$1\")"));
+                        System.out.println(data);
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+            });
+        }
+    }
+
+    @Test
+    public void testDividend() throws Throwable {
+        Request request = new Request();
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        Html html = new Html(EntityUtils.toString(httpUtil.doGet("http://www.cninfo.com.cn/information/fund/dividend/150008.html",null, Lists.newArrayList(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"))).getEntity(),"gb2312"));
+        Object selectables = CrawlerExpressionResolver.resolve(request,html,"css(tr:gt(0)$$allText)");
+        if( selectables instanceof Selectable) {
+            ((Selectable)selectables).nodes().forEach(selectable -> {
+                System.out.println(selectable);
+                Object data = null;
+                for (int i = 0; i < 4; i++) {
+                    try {
+                        data = CrawlerExpressionResolver.resolve(request,selectable,String.format("getCrawler().split().index(%s)",i));
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                    System.out.println(data);
+                }
+            });
+        }
+    }
+
+    @Test
+    public void testShareholders() throws Throwable {
+        Request request = new Request();
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        Html html = new Html(EntityUtils.toString(httpUtil.doGet("http://www.cninfo.com.cn/information/shareholders/000002.html",null, Lists.newArrayList(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"))).getEntity(),"gb2312"));
+        Object selectables = CrawlerExpressionResolver.resolve(request,html,"css(.clear tr:gt(0)$$allText)");
+        if( selectables instanceof Selectable) {
+            ((Selectable)selectables).nodes().forEach(selectable -> {
+                System.out.println(selectable);
+                Object data = null;
+                for (int i = 0; i < 4; i++) {
+                    try {
+                        data = CrawlerExpressionResolver.resolve(request,selectable,String.format("getCrawler().split().index(%s)",i));
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                    System.out.println(data);
+                }
+            });
+        }
+    }
+
+    @Test
+    public void testStockstructure() throws Throwable {
+        Request request = new Request();
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        Html html = new Html(EntityUtils.toString(httpUtil.doGet("http://www.cninfo.com.cn/information/stockstructure/szmb000002.html",null, Lists.newArrayList(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"))).getEntity(),"gb2312"));
+        Object selectables = CrawlerExpressionResolver.resolve(request,html,"css(\".clear tr td\"$$allText).getCrawler().array(0$$76$$19$$4)");
+        if( selectables instanceof Selectable) {
+            ((Selectable)selectables).all().forEach(selectable -> {
+                System.out.println(selectable);
+                Object data = null;
+                for (int i = 1; i < 19; i++) {
+                    try {
+                        data = CrawlerExpressionResolver.resolve(request,selectable,String.format("getCrawler().split().index(%s)",i));
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                    System.out.println(data);
+                }
+            });
+        }
+    }
+
+
+    @Test
+    public void testFund() throws Throwable {
+        Request request = new Request();
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        Html html = new Html(EntityUtils.toString(httpUtil.doGet("http://www.cninfo.com.cn/information/fund/financialreport/150008.html",null, Lists.newArrayList(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"))).getEntity(),"gb2312"));
+        Object selectables = CrawlerExpressionResolver.resolve(request,html,"css(\".clear tr td\"$$allText).getCrawler().array(0$$96$$2)");
+        if( selectables instanceof Selectable) {
+            ((Selectable)selectables).all().forEach(selectable -> {
+                Object data = null;
+                try {
+                    data = CrawlerExpressionResolver.resolve(request,selectable,String.format("getCrawler().index(0)"));
+                    System.out.println(data);
+                    data = CrawlerExpressionResolver.resolve(request,selectable,String.format("getCrawler().index(1)"));
+                    System.out.println(data);
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
+            });
+        }
+    }
     @Test
     public void testPa() {
         String[][][] dataStr = new String[][][]{{{"1","2","3"},{"4","5","6"}},{{"7","8","9"},{"10","11","12"}}};
         String str = JSON.toJSONString(dataStr);
         System.out.println(str);
-        List datas = JSON.parseArray(str,List.class);
+        List datas = JSON.parseObject(str,List.class);
 
         for(Object data:datas) {
             if(data instanceof Collection) {
