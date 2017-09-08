@@ -56,6 +56,12 @@ public class HomeController {
         return new ModelAndView("social");
     }
 
+    @RequestMapping("/hrssz")
+    public ModelAndView hrssz() {
+        return new ModelAndView("hrssz");
+    }
+
+
     @RequestMapping("/gdltax")
     public ModelAndView gdltax() {
         return new ModelAndView("gdltax");

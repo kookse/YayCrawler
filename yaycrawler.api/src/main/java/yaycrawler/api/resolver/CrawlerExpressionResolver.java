@@ -73,15 +73,23 @@ public class CrawlerExpressionResolver {
 
                 if(selector instanceof Collection) {
                     selector = new PlainText((List)selector);
+                } else if(selector instanceof String) {
+                    selector = new PlainText(String.valueOf(selector));
                 }
                 if(method.equalsIgnoreCase("getCrawler")) {
-                    selector = new CrawlerSelectable(((Selectable)selector).get());
+                    selector = new CrawlerSelectable(((Selectable)selector).all());
+                    cls = null;
                 } else if(method.equalsIgnoreCase("getJson")) {
-                    selector = new Json(((Selectable)selector).get());
+                    selector = new Json(((Selectable)selector).all());
+                    cls = null;
                 } else if(method.equalsIgnoreCase("getHtml")) {
                     selector = new Html(((Selectable)selector).get());
+                    cls = null;
                 } else if(method.equalsIgnoreCase("all")){
                     selector = ((Selectable)selector).all();
+                    cls = null;
+                } else if(method.equalsIgnoreCase("nodes")){
+                    selector = ((Selectable)selector).nodes();
                     cls = null;
                 } else if(method.equalsIgnoreCase("get")){
                     selector = ((Selectable)selector).get();

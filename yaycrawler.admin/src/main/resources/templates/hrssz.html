@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.springframework.org/schema/jdbc">
+<head xmlns:th="http://www.thymeleaf.org" th:include="master::head">
+    <title>社保</title>
+</head>
+<body oncontextmenu="return true" onselectstart="return true" ondragstart="return true" style="">
+
+<div style="width:96%;margin: 0px auto;margin-top: 2px;">
+
+    <div style="min-width: 740px;margin: 0px auto;border: 1px #666666 solid;padding: 30px;margin-top: 5px;padding-top: 15px;">
+        <!--startprint-->
+        <div style="font-size:16px; font-weight:bold; text-align:center; height:56px; line-height:56px;">
+            缴费历史明细表
+        </div>
+        <table style="border-collapse: collapse;text-align: left;width: 100%;min-width: 800px;	margin: 0px auto;border: 0">
+            <tbody><tr>
+                <td colspan="13" style="padding: 5px;border: 1px #666666 solid;	border-bottom:0px; text-align:left;  font-size:16px;">
+                    <span style="width:30%; display:inline-block;">个人编号：&nbsp;&nbsp;&nbsp;&nbsp;1009547681</span>
+                    <span style="width:30%;display:inline-block;">姓名：&nbsp;&nbsp;&nbsp;&nbsp;郭蕴华</span>
+                    <span style="width:38%;display:inline-block;">证件号码：&nbsp;&nbsp;&nbsp;&nbsp;431027197805183119</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="13" style="padding: 5px;border: 1px #666666 solid;	border-top:0px; text-align:left;  font-size:16px;">
+                    <span style="width:30%; display:inline-block;">养老视同缴费月数：&nbsp;&nbsp;&nbsp;&nbsp;0</span>
+                    <span style="text-align:left; width:68%;display:inline-block;">现在单位名称:&nbsp;&nbsp;&nbsp;&nbsp;广州智数信息技术有限公司</span>
+                </td>
+            </tr>
+            <tr style="padding: 5px;border: 1px #666666 solid;	 text-align:center;  font-size:16px;">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" rowspan="3">开始缴费日期</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" rowspan="3">终止缴费日期</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" rowspan="3">累计月数</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" rowspan="3">缴费基数</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" colspan="6">各险种缴费历史</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" rowspan="3">单位编号</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" rowspan="3">单位名称</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" rowspan="3">核定方式</td>
+            </tr>
+            <tr style="padding: 5px;border: 1px #666666 solid;	 text-align:center;  font-size:16px;">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" colspan="2">养老</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" colspan="2">失业</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" rowspan="2">工伤</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" rowspan="2">生育</td>
+            </tr>
+            <tr style="padding: 5px;border: 1px #666666 solid;	 text-align:center;  font-size:16px;">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">单位缴费</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">个人缴费 </td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">单位缴费</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">个人缴费</td>
+            </tr>
+
+            <tr class="table_white_data">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201706</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201706</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">1</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">2906.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">406.84</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">232.48</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">71673277</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">广州智数信息技术有限公司</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">正常</td>
+            </tr>
+
+            <tr class="table_white_data">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201706</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201706</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">1</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">1895.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">12.13</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">3.79</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">3.79</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">71673277</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">广州智数信息技术有限公司</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">正常</td>
+            </tr>
+
+            <tr class="table_white_data">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201706</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201706</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">1</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">4058.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">34.49</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">71673277</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">广州智数信息技术有限公司</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">正常</td>
+            </tr>
+
+            <tr class="table_white_data">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201707</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201708</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">2</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">2906.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">813.68</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">464.96</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">71673277</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">广州智数信息技术有限公司</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">正常</td>
+            </tr>
+
+            <tr class="table_white_data">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201707</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201708</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">2</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">1895.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">24.26</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">7.58</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">7.58</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">71673277</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">广州智数信息技术有限公司</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">正常</td>
+            </tr>
+
+            <tr class="table_white_data">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201707</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">201708</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">2</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">4455.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">0.00</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">75.74</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">71673277</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">广州智数信息技术有限公司</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">正常</td>
+            </tr>
+
+            <tr class="table_white_data" style="border: 0px;">
+                <td colspan="4" style="padding:5px;text-align:right;">分险种月数统计：</td>
+                <td colspan="2" style="padding:5px;text-align:left;">3</td>
+                <td colspan="2" style="padding:5px;text-align:left;">3</td>
+                <td style="padding:5px;text-align:left;">3</td>
+                <td style="padding:5px;text-align:left;">3</td>
+                <td colspan="2" style="padding:5px;text-align:center;">---</td>
+            </tr>
+            <tr class="table_white_data">
+                <td colspan="13">&nbsp;</td>
+            </tr>
+            <tr style="padding: 5px;border: 1px #666666 solid;	 text-align:center;  font-size:16px;">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" colspan="2">一次性缴费类型</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">缴费月数</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">台账年月</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" colspan="2">险种类型</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">缴费基数</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">缴纳总额</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">缴纳本金</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">缴纳利息</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">单位编号</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">单位名称</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">核定方式</td>
+            </tr>
+            <tr class="table_white_data">
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" colspan="2">&nbsp;</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">&nbsp;</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">&nbsp;</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;" colspan="2">&nbsp;</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">&nbsp;</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">&nbsp;</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">&nbsp;</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">&nbsp;</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">&nbsp;</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">&nbsp;</td>
+                <td style="padding:5px;border:1px #666666 solid;text-align:center;">&nbsp;</td>
+            </tr>
+            </tbody></table>
+        <div style="margin-top:21px;line-height:24px; padding:11px;text-align:right;font-size:16px;">
+            社会保险基金中心
+            <br/>
+            打印日期:2017年09月07日
+        </div>
+        <!--endprint-->
+        <div id="remark" style="margin-top:20px;line-height:24px; padding:10px;">
+            <label style="font-weight:bold;">说明：</label><br/>
+            本表显示实际缴款到帐的缴费历史。  生育保险、工伤保险均为单位缴费，个人不缴费。<br/>
+            本表中“养老视同缴费月数”仅供参考，如有不符，以参保人经人社部门审核的养老视同缴费年限为准。<br/>
+            本表不反映医疗保险的缴费历史，医保缴费可以通过医保卡或医保存折查询。<br/>
+            本表为参保人自行由广州市人社局网办业务系统中打印。<br/>
+        </div><div id="print" style="line-height:24px; text-align:center; padding:10px;">
+        <input type="button" class="buttonLink" onclick="printt()" value="盖章打印" id="printview"/>
+        <input type="button" class="buttonLink" onclick="javascript:window.history.back(-1);" value="返回" id="reback"/>
+    </div>
+    </div>
+</div>
+</body>
+</html>

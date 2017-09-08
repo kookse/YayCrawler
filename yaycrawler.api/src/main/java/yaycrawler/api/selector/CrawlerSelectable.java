@@ -2,10 +2,12 @@ package yaycrawler.api.selector;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import us.codecraft.webmagic.selector.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -56,8 +58,24 @@ public class CrawlerSelectable extends AbstractSelectable {
         return format(selector, String.valueOf(text));
     }
 
+    public CrawlerSelectable split() {
+        return split(" ");
+    }
     public CrawlerSelectable split(String separator) {
-        return null;
+        String[] datas = StringUtils.split(get(),separator);
+        return new CrawlerSelectable(Arrays.asList(datas));
+    }
+
+    public CrawlerSelectable array(int start,int end) {
+        List<String> datas = Lists.newArrayList();
+        List<String> tmps = all();
+        if(end < 0) {
+            end += tmps.size();
+        }
+        for (int i = start; i <end ; i++) {
+            datas.add(tmps.get(i));
+        }
+        return new CrawlerSelectable(datas);
     }
 
     public CrawlerSelectable index(int index) {

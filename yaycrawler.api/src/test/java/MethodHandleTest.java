@@ -1,4 +1,5 @@
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Lists;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
@@ -61,8 +62,23 @@ public class MethodHandleTest {
         Request request = new Request();
         HttpUtil httpUtil = HttpUtil.getInstance();
         Html html = new Html(EntityUtils.toString(httpUtil.doGet("http://www.qisuu.com/35478.html",null, Lists.newArrayList(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"))).getEntity(),"utf-8"));
-        Object selectable = CrawlerExpressionResolver.resolve(request,html,"css(.position).css(a:gt(0)$$allText).all().getCrawler().index(1)");
+        Object selectable = CrawlerExpressionResolver.resolve(request,html,"css(.position).css(a:gt(0)$$allText).all()");
         System.out.println(selectable);
+    }
+
+    @Test
+    public void testHrssz() throws Throwable {
+        Request request = new Request();
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        Html html = new Html(EntityUtils.toString(httpUtil.doGet("http://localhost:8069/admin/hrssz",null, Lists.newArrayList(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"))).getEntity(),"utf-8"));
+        Object selectable = CrawlerExpressionResolver.resolve(request,html,"css(tr:gt(4)$$allText).getCrawler().array(0$$6)");
+        if(selectable instanceof Collection) {
+            for (Object tmp:(List)selectable) {
+                System.out.println(tmp);
+                Object data = CrawlerExpressionResolver.resolve(request,tmp,"getCrawler().split().index(0)");
+                System.out.println(data);
+            }
+        }
     }
 
     @Test
@@ -92,5 +108,14 @@ public class MethodHandleTest {
         CrawlerSelectable crawlerSelectable = new CrawlerSelectable(str);
         Selectable selectable = CrawlerExpressionResolver.resolve(request,crawlerSelectable,"getCrawler().index(1).index(1).index(2)");
         System.out.println(selectable.get());
+    }
+
+    @Test
+    public void toJson() throws Throwable {
+        Request request = new Request();
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        Html html = new Html(EntityUtils.toString(httpUtil.doGet("http://www.qisuu.com/35478.html",null, Lists.newArrayList(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"))).getEntity(),"utf-8"));
+        Object selectable = CrawlerExpressionResolver.resolve(request,html,"css(.position).css(a:gt(2)$$allText).get()");
+        System.out.println(selectable);
     }
 }
