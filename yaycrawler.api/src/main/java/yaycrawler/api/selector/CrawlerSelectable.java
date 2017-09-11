@@ -159,6 +159,19 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
         }
     }
 
+    public CrawlerSelectable trim() {
+        List<String> datas = all();
+        List<String> tmps = Lists.newArrayList();
+        if(datas.size() == 1) {
+            tmps.add(StringUtils.trim(datas.get(0)));
+        } else {
+            datas.forEach(data -> {
+                tmps.add(StringUtils.trim(data));
+            });
+        }
+        return new CrawlerSelectable(tmps);
+    }
+
     public CrawlerSelectable add(String param) {
         BigDecimal num1 = new BigDecimal(get());
         BigDecimal num2 = new BigDecimal(param);

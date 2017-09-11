@@ -1,5 +1,7 @@
 package yaycrawler.admin;
 
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import yaycrawler.spider.processor.GenericPageProcessor;
+
+import java.util.Map;
 
 /**
  * @author bill
@@ -61,7 +65,7 @@ public class PageProcessorTest {
         request.putExtra("$yzm","downloadEngine(http://gzlss.hrssgz.gov.cn/cas/captcha.jpg).binaryEngine($1$$178$$13$$160).ocrEngine($1$$[0-9a-zA-z]{4})");
         request.putExtra("usertype", "2");
         request.putExtra("_eventId", "submit");
-        request.putExtra("$lt", "regex(<input type=\"hidden\" name=\"lt\" value=\"(.*)\")");
+        request.putExtra("$lt", "regex(<input type=\"hidden\" name=\"lt\" value=\"(.*)\" )");
         page.setRequest(request);
         pageProcessor.process(page);
     }
@@ -120,4 +124,7 @@ public class PageProcessorTest {
         page.setRequest(request);
         pageProcessor.process(page);
     }
+
+
+
 }

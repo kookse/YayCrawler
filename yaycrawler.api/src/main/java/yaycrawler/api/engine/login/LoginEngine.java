@@ -61,15 +61,21 @@ public class LoginEngine implements Engine<LoginParam> {
                 matcher = pattern.matcher(content);
 
                 if (matcher.find()) {
+                    Header[] headers ;
                     while (response.getStatusLine().getStatusCode() == 302) {
                         String url = response.getFirstHeader("Location").getValue();
-                        Header[] headers = response.getHeaders("Set-Cookie");
+                        headers = response.getHeaders("Set-Cookie");
                         for(Header header:headers) {
                             headerList.add(new BasicHeader("Cookie",header.getValue()));
                         }
                         response = httpUtil.doPost(url,null,null,headerList);
                     }
-                    response = httpUtil.doGet(matcher.group(1),null,headerList);
+                    if (response.getStatusLine().getStatusCode() == 200 ) {
+                        headers = response.getHeaders("Set-Cookie");
+                        for(Header header:headers) {
+                            headerList.add(new BasicHeader("Cookie",header.getValue()));
+                        }
+                    }
                     List<Header> headerList1 = new ArrayList<>();
                     headerList.forEach(header -> {
                         if(StringUtils.equalsIgnoreCase(header.getName(),"Cookie")) {

@@ -275,8 +275,8 @@ public class HttpUtil {
     }
 
     private RequestConfig getRequestConfig() {
-//        HttpHost proxy = new HttpHost("127.0.0.1", 8888);
-        RequestConfig.Builder build = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES)//.setProxy(proxy)
+        HttpHost proxy = new HttpHost("127.0.0.1", 8888);
+        RequestConfig.Builder build = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES).setProxy(proxy)
                 .setConnectTimeout(30000).setConnectionRequestTimeout(30000)
                 .setSocketTimeout(30000);
         return build.build();
