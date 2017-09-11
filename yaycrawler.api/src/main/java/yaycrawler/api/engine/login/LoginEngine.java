@@ -69,6 +69,7 @@ public class LoginEngine implements Engine<LoginParam> {
                         }
                         response = httpUtil.doPost(url,null,null,headerList);
                     }
+                    response = httpUtil.doGet(matcher.group(1),null,headerList);
                     List<Header> headerList1 = new ArrayList<>();
                     headerList.forEach(header -> {
                         if(StringUtils.equalsIgnoreCase(header.getName(),"Cookie")) {

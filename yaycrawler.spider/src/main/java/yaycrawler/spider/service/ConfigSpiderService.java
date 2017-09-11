@@ -11,6 +11,7 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.selector.Selectable;
 import us.codecraft.webmagic.utils.UrlUtils;
+import yaycrawler.api.resolver.CrawlerExpressionResolver;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.model.RestFulResult;
 import yaycrawler.dao.domain.PageInfo;
@@ -117,9 +118,9 @@ public class ConfigSpiderService {
 
         Object result = null;
         if (expression.toLowerCase().contains("getjson()"))
-            result = SelectorExpressionResolver.resolve(request, page.getJson(), expression);
+            result = CrawlerExpressionResolver.resolve(request, page.getJson(), expression);
         else
-            result = SelectorExpressionResolver.resolve(request, page.getHtml(), expression);
+            result = CrawlerExpressionResolver.resolve(request, page.getHtml(), expression);
         if (result instanceof Selectable) {
             final StringBuilder sb = new StringBuilder();
             ((Selectable) result).all().forEach(new Consumer<String>() {

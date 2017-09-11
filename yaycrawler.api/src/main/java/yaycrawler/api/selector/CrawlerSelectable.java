@@ -30,7 +30,11 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
     }
 
     public CrawlerSelectable constant(String text) {
-        return new CrawlerSelectable(text);
+        List resulDatas = Lists.newArrayList();
+        all().forEach(data -> {
+            resulDatas.add(text);
+        });
+        return new CrawlerSelectable(resulDatas);
     }
 
     public CrawlerSelectable constant(int text) {
@@ -45,12 +49,20 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
         return new CrawlerSelectable(urls);
     }
 
+    public CrawlerSelectable format(String selector) {
+        return format(selector,"");
+    }
+
     public CrawlerSelectable format(String selector, String text) {
         List<String> datas = all();
         List<String> tmps = Lists.newArrayList();
-        datas.forEach(data ->{
-            tmps.add(String.format(data,text));
-        });
+        if(datas.size() == 1 && StringUtils.isNotEmpty(text)) {
+            tmps.add(String.format(selector,text));
+        } else {
+            datas.forEach(data -> {
+                tmps.add(String.format(selector,data));
+            });
+        }
         return new CrawlerSelectable(tmps);
     }
 
@@ -61,31 +73,43 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
     public CrawlerSelectable split() {
         return split(" ");
     }
+
     public CrawlerSelectable split(String separator) {
-        String[] datas = StringUtils.split(get(),separator);
-        return new CrawlerSelectable(Arrays.asList(datas));
+        List<String> datas = all();
+        List splitData = Lists.newArrayList();
+        datas.forEach(data ->{
+            splitData.addAll(Arrays.asList(StringUtils.split(data,separator)));
+        });
+        return new CrawlerSelectable(splitData);
     }
 
-    public CrawlerSelectable array(int start,int end) {
-        return array(start, end,1);
+    public CrawlerSelectable array(int start, int end) {
+        return array(start, end, 1);
     }
-    public CrawlerSelectable array(int start,int end,int step) {return array(start, end,step,1);}
-    public CrawlerSelectable array(int start,int end,int step,int jump) {
+
+    public CrawlerSelectable array(int start, int end, int step) {
+        return array(start, end, step, 1);
+    }
+
+    public CrawlerSelectable array(int start, int end, int step, int jump) {
         List<String> datas = Lists.newArrayList();
         List<String> tmps = all();
-        if(end < 0) {
+        if (end < 0) {
             end += tmps.size();
         }
-        for (int i = 0; i <end /step ; i++) {
-
-        }
-        for (int i = start; i <end / step ; i++) {
+        for (int i = start; i < end / step; i++) {
             if (step == 1) {
                 datas.add(tmps.get(i));
             } else {
                 List tmp = Lists.newArrayList();
+                int index = 1;
                 for (int j = 0; j < step; j++) {
-                    tmp.add(tmps.get(j * jump + i));
+                    if (jump == 1) {
+                        index = i * step + j;
+                    } else {
+                        index = j * jump + i;
+                    }
+                    tmp.add(tmps.get(index));
                 }
                 datas.add(JSON.toJSONString(tmp));
             }
@@ -93,32 +117,48 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
         return new CrawlerSelectable(datas);
     }
 
-    public CrawlerSelectable index(int index) {
+    public CrawlerSelectable index (String indexs) {
         List datas = all();
-        if(datas.size() == 1) {
+        if (datas.size() == 1) {
             datas = JSON.parseObject(get(), List.class);
         }
-        Object data = null;
-        data = datas.get(index);
-        if (data instanceof Collection) {
-            return new CrawlerSelectable((List) data);
+        List<String> indexData = Lists.newArrayList();
+        if(StringUtils.contains(indexs,"-")) {
+            String [] tmps = StringUtils.split(indexs,"-");
+            for (int i = Integer.parseInt(tmps[0]); i < Integer.parseInt(tmps[1]); i++) {
+                indexData.add(String.valueOf(i));
+            }
+        } else if(StringUtils.contains(indexs,",")){
+            indexData .addAll(Arrays.asList(StringUtils.split(indexs,",")));
         } else {
-            return new CrawlerSelectable(String.valueOf(data != null ? data : ""));
+            indexData.add(indexs);
         }
+        List resultData = Lists.newArrayList();
+        List finalDatas = datas;
+        indexData.forEach(index -> {
+            resultData.add(String.valueOf(finalDatas.get(Integer.parseInt(index))));
+        });
+        return new CrawlerSelectable(resultData);
     }
 
-    public CrawlerSelectable regexp(String regex,int result) {
+    public CrawlerSelectable index(int index) {
+        return index(String.valueOf(index));
+    }
+
+    public CrawlerSelectable regexp(String regex, int result) {
         return regexp(regex, String.valueOf(result));
     }
-    public CrawlerSelectable regexp(String regex,String result) {
+
+    public CrawlerSelectable regexp(String regex, String result) {
         RegexSelector regexSelector = Selectors.regex(String.valueOf(regex));
         String data = regexSelector.select(get());
-        if(StringUtils.isEmpty(data)) {
+        if (StringUtils.isEmpty(data)) {
             return new CrawlerSelectable(result);
         } else {
             return new CrawlerSelectable(data);
         }
     }
+
     public CrawlerSelectable add(String param) {
         BigDecimal num1 = new BigDecimal(get());
         BigDecimal num2 = new BigDecimal(param);
@@ -139,23 +179,23 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
         return divide(String.valueOf(param));
     }
 
-    public CrawlerSelectable divide(int param,int roundingMode) {
-        return divide(String.valueOf(param),roundingMode);
+    public CrawlerSelectable divide(int param, int roundingMode) {
+        return divide(String.valueOf(param), roundingMode);
     }
 
-    public CrawlerSelectable divide(int param,int scale,int roundingMode) {
-        return divide(String.valueOf(param),scale,roundingMode);
+    public CrawlerSelectable divide(int param, int scale, int roundingMode) {
+        return divide(String.valueOf(param), scale, roundingMode);
     }
 
-    public CrawlerSelectable divide(String param,int scale,int roundingMode) {
+    public CrawlerSelectable divide(String param, int scale, int roundingMode) {
         BigDecimal num1 = new BigDecimal(get());
         BigDecimal num2 = new BigDecimal(param);
-        num1.divide(num2,1);
-        return new CrawlerSelectable(num1.divide(num2,scale,roundingMode).toString());
+        num1.divide(num2, 1);
+        return new CrawlerSelectable(num1.divide(num2, scale, roundingMode).toString());
     }
 
-    public CrawlerSelectable divide(String param,int roundingMode) {
-        return divide(param, 1,roundingMode);
+    public CrawlerSelectable divide(String param, int roundingMode) {
+        return divide(param, 1, roundingMode);
     }
 
     public CrawlerSelectable subtract(String param) {
@@ -182,29 +222,39 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
         return paging(url, pageName, start, end, 1);
     }
 
-    public CrawlerSelectable regex(int regex) {
-        RegexSelector regexSelector = Selectors.regex(String.valueOf(regex));
+    public CrawlerSelectable regex(String regex) {
+        RegexSelector regexSelector = Selectors.regex(regex);
         return selectList(regexSelector, getSourceTexts());
+    }
+
+    public CrawlerSelectable regex(String regex, int group) {
+        RegexSelector regexSelector = Selectors.regex(regex, group);
+        return selectList(regexSelector, getSourceTexts());
+    }
+
+    public CrawlerSelectable replace(String regex, String replacement) {
+        ReplaceSelector replaceSelector = new ReplaceSelector(regex, replacement);
+        return select(replaceSelector, getSourceTexts());
+    }
+
+    public CrawlerSelectable regex(int regex) {
+        return regex(String.valueOf(regex));
     }
 
     public CrawlerSelectable regex(int regex, int group) {
-        RegexSelector regexSelector = Selectors.regex(String.valueOf(regex), group);
-        return selectList(regexSelector, getSourceTexts());
+        return regex(String.valueOf(regex), group);
     }
 
     public CrawlerSelectable replace(int regex, String replacement) {
-        ReplaceSelector replaceSelector = new ReplaceSelector(String.valueOf(regex), replacement);
-        return select(replaceSelector, getSourceTexts());
+        return replace(String.valueOf(regex), replacement);
     }
 
     public CrawlerSelectable replace(int regex, int replacement) {
-        ReplaceSelector replaceSelector = new ReplaceSelector(String.valueOf(regex), String.valueOf(replacement));
-        return select(replaceSelector, getSourceTexts());
+        return  replace(String.valueOf(regex), String.valueOf(replacement));
     }
 
     public CrawlerSelectable replace(String regex, int replacement) {
-        ReplaceSelector replaceSelector = new ReplaceSelector(regex, String.valueOf(replacement));
-        return select(replaceSelector, getSourceTexts());
+        return replace(regex, String.valueOf(replacement));
     }
 
     @Override

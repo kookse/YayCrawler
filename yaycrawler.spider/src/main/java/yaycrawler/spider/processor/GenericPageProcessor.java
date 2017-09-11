@@ -1,17 +1,13 @@
 package yaycrawler.spider.processor;
 
 import com.alibaba.fastjson.JSON;
-import com.github.stuxuhai.jpinyin.PinyinException;
-import com.github.stuxuhai.jpinyin.PinyinFormat;
-import com.github.stuxuhai.jpinyin.PinyinHelper;
-import org.apache.commons.collections.MapUtils;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Base64Utils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
@@ -19,21 +15,20 @@ import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Json;
 import us.codecraft.webmagic.selector.Selectable;
 import yaycrawler.api.engine.Engine;
-import yaycrawler.api.engine.login.GZGJJEngine;
-import yaycrawler.api.engine.ocr.BinaryEngine;
 import yaycrawler.api.process.SpringContextUtil;
+import yaycrawler.api.resolver.CrawlerExpressionResolver;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.model.EngineResult;
 import yaycrawler.common.model.LoginParam;
 import yaycrawler.common.model.PhantomCookie;
 import us.codecraft.webmagic.utils.UrlUtils;
+import yaycrawler.common.utils.PinYinUtil;
 import yaycrawler.dao.domain.*;
 import yaycrawler.dao.service.PageCookieService;
 import yaycrawler.dao.service.PageParserRuleService;
 import yaycrawler.monitor.captcha.CaptchaIdentificationProxy;
 import yaycrawler.monitor.login.AutoLoginProxy;
 import yaycrawler.spider.listener.IPageParseListener;
-import yaycrawler.spider.resolver.SelectorExpressionResolver;
 import yaycrawler.spider.service.PageSiteService;
 
 import java.util.*;
@@ -134,9 +129,9 @@ public class GenericPageProcessor implements PageProcessor {
         if (StringUtils.isBlank(regionSelectExpression) || DEFAULT_PAGE_SELECTOR.equals(regionSelectExpression))
             context = page.getHtml();
         else if (regionSelectExpression.toLowerCase().contains("getjson()") || regionSelectExpression.toLowerCase().contains("jsonpath"))
-            context = SelectorExpressionResolver.resolve(request, page.getJson(), regionSelectExpression);
+            context = CrawlerExpressionResolver.resolve(request, page.getJson(), regionSelectExpression);
         else
-            context = SelectorExpressionResolver.resolve(request, page.getHtml(), regionSelectExpression);
+            context = CrawlerExpressionResolver.resolve(request, page.getHtml(), regionSelectExpression);
         return context;
     }
 
@@ -150,118 +145,55 @@ public class GenericPageProcessor implements PageProcessor {
      */
     private Map<String, Object> parseFieldRules(Selectable context, Request request, Collection<FieldParseRule> fieldParseRuleList,String dataType) {
         int i = 0;
-        HashedMap resultMap = new HashedMap();
+        Map resultMap = new HashedMap();
         List<Selectable> nodes = getNodes(context);
-
         for (Selectable node : nodes) {
-            HashedMap childMap = new HashedMap();
+            Map childMap = new HashedMap();
+            Object label = null;
+            Object value = null;
             for (FieldParseRule fieldParseRule : fieldParseRuleList) {
-                Object datas = childMap.get(fieldParseRule.getFieldName());
-                if(datas == null) {
-                    datas = SelectorExpressionResolver.resolve(request, node, fieldParseRule.getRule());
+                if (StringUtils.equalsIgnoreCase(fieldParseRule.getFieldName(),"label")) {
+                    label = CrawlerExpressionResolver.resolve(request, node, fieldParseRule.getRule());
+                } else if (StringUtils.equalsIgnoreCase(fieldParseRule.getFieldName(),"value")) {
+                    value = CrawlerExpressionResolver.resolve(request, node, fieldParseRule.getRule());
                 } else {
-                    List tmp = new ArrayList();
-                    tmp.add(datas);
-                    tmp.add(SelectorExpressionResolver.resolve(request, node, fieldParseRule.getRule()));
-                    datas = tmp;
+                    childMap.put(fieldParseRule.getFieldName(), CrawlerExpressionResolver.resolve(request, node, fieldParseRule.getRule()));
                 }
-                if((datas == null && "label".equalsIgnoreCase(fieldParseRule.getFieldName()))||(datas == null && childMap.get("label") == null && "value".equalsIgnoreCase(fieldParseRule.getFieldName()))||(fieldParseRuleList.size() == 1 && (datas == null || datas.toString() == null) && !"label".equalsIgnoreCase(fieldParseRule.getFieldName()) && ! "value".equalsIgnoreCase(fieldParseRule.getFieldName())))
-                    continue;
-                childMap.put(fieldParseRule.getFieldName(), datas);
             }
-            if(StringUtils.equalsIgnoreCase(dataType,"autoField") && MapUtils.getString(childMap,"label") != null && MapUtils.getString(childMap,"value") != null) {
+            if(StringUtils.equalsIgnoreCase(dataType,"autoField")) {
                 try {
-                    HashedMap dataMap = null;
-                    if(MapUtils.getObject(childMap,"value") instanceof Collection) {
-                        Object labels = MapUtils.getObject(childMap,"label");
-                        List<String> values = (ArrayList)MapUtils.getObject(childMap,"value");
-                        for (int j = 0; j < values.size(); j++) {
-                            dataMap = (HashedMap) resultMap.get(String.valueOf(j));
-                            if(dataMap == null) {
-                                dataMap = new HashedMap();
-                            }
-                            if(MapUtils.getObject(childMap,"label") instanceof Collection) {
-                                dataMap = (HashedMap) resultMap.get(String.valueOf(0));
-                                if(dataMap == null) {
-                                    dataMap = new HashedMap();
-                                }
-                                if(((List)labels).get(j) != null) {
-                                    dataMap.put(PinyinHelper.convertToPinyinString(((List) labels).get(j).toString(), "", PinyinFormat.WITHOUT_TONE), values.get(j));
-                                    resultMap.put(String.valueOf(0), dataMap);
-                                }
-                            } else {
-                                dataMap.put(PinyinHelper.convertToPinyinString(MapUtils.getString(childMap,"label"),"", PinyinFormat.WITHOUT_TONE),values.get(j));
-                                resultMap.put(String.valueOf(j),dataMap);
-                            }
-                            if(MapUtils.getObject(childMap,"label") instanceof Collection) {
-                                dataMap = (HashedMap) resultMap.get(String.valueOf(0));
-                                if(dataMap == null) {
-                                    dataMap = new HashedMap();
-                                }
-                                if(((List)labels).get(j) != null) {
-                                    dataMap.put(PinyinHelper.convertToPinyinString(((List) labels).get(j).toString(), "", PinyinFormat.WITHOUT_TONE), values.get(j));
-                                    resultMap.put(String.valueOf(0), dataMap);
-                                }
-                            } else {
-                                dataMap.put(PinyinHelper.convertToPinyinString(MapUtils.getString(childMap,"label"),"", PinyinFormat.WITHOUT_TONE),values.get(j));
-                                resultMap.put(String.valueOf(j),dataMap);
-                            }
+                    if (label == null && value != null && value instanceof Collection) {
+                        for(Object val:(Collection)value) {
+                            childMap.put("value",val);
+                            resultMap.put(String.valueOf(i++), childMap);
                         }
-                    } else {
-                        resultMap.put(PinyinHelper.convertToPinyinString(MapUtils.getString(childMap,"label"),"", PinyinFormat.WITHOUT_TONE),MapUtils.getString(childMap,"value"));
+                    } else if (label != null && value != null && value instanceof Collection) {
+                        i = 0;
+                        for(Object val:(Collection)value) {
+                            childMap = resultMap.get(String.valueOf(i)) == null ? Maps.newHashMap() : (Map) resultMap.get(String.valueOf(i));
+                            childMap.put(PinYinUtil.converterToFirstSpell(String.valueOf(label)), val);
+                            resultMap.put(String.valueOf(i++), childMap);
+                        }
+                    }
+                    else if(label != null && value == null) {
+                        childMap.put("label",label);
+                        resultMap.put(String.valueOf(i++), childMap);
+                    } else if(label == null && value != null) {
+                        childMap.put("value",value);
+                        resultMap.put(String.valueOf(i++), childMap);
+                    } else if (label != null && value != null) {
+                        resultMap.put(PinYinUtil.converterToFirstSpell(String.valueOf(label)),value);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if(StringUtils.equalsIgnoreCase(dataType,"autoRowField") && MapUtils.getObject(childMap,"label") != null && MapUtils.getString(childMap,"value") != null) {
-                List labels = (ArrayList)MapUtils.getObject(childMap,"label");
-                List<List> values = (ArrayList)MapUtils.getObject(childMap,"value");
-                int k = 0;
-                for (List value:values) {
-                    HashedMap dataMap = new HashedMap();
-                    for (int j = 0; j < labels.size(); j++) {
-                        try {
-                            dataMap.put(PinyinHelper.convertToPinyinString(labels.get(j).toString(),"",PinyinFormat.WITHOUT_TONE),value.get(j));
-                        } catch (PinyinException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    resultMap.put(String.valueOf(k++),dataMap);
-                }
-            }else if(StringUtils.equalsIgnoreCase(dataType,"autoRowField") && MapUtils.getObject(childMap,"value") instanceof Collection){
-                Collection childs = (Collection)MapUtils.getObject(childMap,"value");
-                int j = 0;
-                for (Object child : childs) {
-                    resultMap.put(String.valueOf(j++), child);
-                }
-            } else if((StringUtils.equalsIgnoreCase(dataType,"autoField") || StringUtils.equalsIgnoreCase(dataType,"autoRowField"))&& MapUtils.getString(childMap,"label") == null &&  MapUtils.getString(childMap,"value") == null) {
-                resultMap.putAll(childMap);
-            }else {
+            } else {
                 resultMap.put(String.valueOf(i++), childMap);
             }
-            if((StringUtils.equalsIgnoreCase(dataType,"autoField") || StringUtils.equalsIgnoreCase(dataType,"autoRowField")) && (MapUtils.getString(childMap,"label") != null &&  MapUtils.getString(childMap,"value") != null)){
-                for (Object o : childMap.entrySet()) {
-                    Map.Entry<String,Object> item = (Map.Entry<String, Object>) o;
-                    if(!(StringUtils.equalsIgnoreCase(item.getKey(),"label") || StringUtils.equalsIgnoreCase(item.getKey(),"value"))){
-                        for (Object o1 : resultMap.values()) {
-                            if (o1 instanceof HashedMap) {
-                                HashedMap dataMap = (HashedMap) o1;
-                                try {
-                                    dataMap.put(PinyinHelper.convertToPinyinString(item.getKey().toLowerCase().toString(), "", PinyinFormat.WITHOUT_TONE), item.getValue());
-                                } catch (PinyinException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
         }
-        if (nodes.size() > 1 ||StringUtils.equalsIgnoreCase(dataType,"autoField") ||StringUtils.equalsIgnoreCase(dataType,"autoRowField"))
+        if (nodes.size() > 1 || StringUtils.equalsIgnoreCase(dataType,"autoField"))
             return resultMap;
-        else
-            return (Map<String, Object>) resultMap.get("0");
+        else return (Map<String, Object>) resultMap.get("0");
     }
 
 
@@ -282,12 +214,12 @@ public class GenericPageProcessor implements PageProcessor {
 
             for (UrlParseRule urlParseRule : urlParseRuleList) {
                 //解析url
-                Object u = SelectorExpressionResolver.resolve(request, node, urlParseRule.getRule());
+                Object u = CrawlerExpressionResolver.resolve(request, node, urlParseRule.getRule());
                 //解析Url的参数
                 Map<String, Object> urlParamMap = new HashMap<>();
                 if (urlParseRule.getUrlRuleParams() != null)
                     for (UrlRuleParam ruleParam : urlParseRule.getUrlRuleParams()) {
-                        urlParamMap.put(ruleParam.getParamName(), SelectorExpressionResolver.resolve(request, node, ruleParam.getExpression()));
+                        urlParamMap.put(ruleParam.getParamName(), CrawlerExpressionResolver.resolve(request, node, ruleParam.getExpression()));
                     }
                 //组装成完整的URL
                 if (u instanceof Collection) {
@@ -296,7 +228,7 @@ public class GenericPageProcessor implements PageProcessor {
                         for (String url : urlList)
                             childRequestList.add(new CrawlerRequest(url, urlParseRule.getMethod(), urlParamMap));
                 } else
-                    childRequestList.add(new CrawlerRequest((String) u, urlParseRule.getMethod(), urlParamMap));
+                    childRequestList.add(new CrawlerRequest(String.valueOf(u) , urlParseRule.getMethod(), urlParamMap));
             }
         }
         return childRequestList;
@@ -381,7 +313,12 @@ public class GenericPageProcessor implements PageProcessor {
                     login = "loginEngine";
                 Engine loginEngine = (Engine) SpringContextUtil.getBean(login);
                 Engine encryptEngine = (Engine) SpringContextUtil.getBean(encrypt);
-                Map paramData = JSON.parseObject(param,Map.class);
+                Map paramData = null;
+                if(StringUtils.isEmpty(param)) {
+                    paramData = Maps.newHashMap();
+                } else {
+                    paramData = JSON.parseObject(param,Map.class);
+                }
                 paramData.putAll(pageRequest.getExtras());
                 EngineResult engineResult = encryptEngine.execute(paramData);
                 LoginParam loginParam = engineResult.getLoginParam();

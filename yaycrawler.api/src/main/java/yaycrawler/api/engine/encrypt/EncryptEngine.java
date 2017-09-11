@@ -44,6 +44,9 @@ public class EncryptEngine implements Engine<Map<String, Object>> {
     @Value("${yaycrawler.api.src.path:d:/tmp/ocr/dest}")
     private String destPath;
 
+    @Value("${yaycrawler.api.src.path:d:/tmp/js}")
+    private String jsPath;
+
     private static Pattern INVOKE_PATTERN = Pattern.compile("(\\w+)\\((.*)\\)");
 
     @Override
@@ -120,7 +123,7 @@ public class EncryptEngine implements Engine<Map<String, Object>> {
             String[] invokeArray = username.split("\\)\\.");
             ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
             ScriptEngine nashorn = scriptEngineManager.getEngineByName("nashorn");
-            nashorn.eval(new InputStreamReader(new FileInputStream("C:\\Users\\bill\\Downloads\\security.js"), "utf-8"));
+            nashorn.eval(new InputStreamReader(new FileInputStream(jsPath + "/security.js"), "utf-8"));
             Boolean status = Boolean.FALSE;
             String content = MapUtils.getString(data,"$content");
             String cookie = MapUtils.getString(data,"$Cookie");

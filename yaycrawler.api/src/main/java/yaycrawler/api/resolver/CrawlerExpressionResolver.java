@@ -29,7 +29,7 @@ public class CrawlerExpressionResolver {
     private static Pattern INVOKE_PATTERN = Pattern.compile("(\\w+)\\((.*)\\)");
 
 
-    public static <T> T resolve(Request request, Object selector, String expression) throws Throwable {
+    public static <T> T resolve(Request request, Object selector, String expression) {
         if (selector == null) return null;
         String[] invokeArray = expression.split("\\)\\.");
         MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -112,8 +112,16 @@ public class CrawlerExpressionResolver {
                         methodType = MethodType.methodType(cls);
                     else
                         methodType = MethodType.methodType(cls,ptypes);
-                    methodHandle = lookup.findVirtual(cls,method,methodType);
-                    selector = methodHandle.invokeWithArguments(params);
+                    try {
+                        methodHandle = lookup.findVirtual(cls,method,methodType);
+                        selector = methodHandle.invokeWithArguments(params);
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
                 }
             }
         }

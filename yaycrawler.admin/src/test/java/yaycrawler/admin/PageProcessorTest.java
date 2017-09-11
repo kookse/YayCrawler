@@ -92,4 +92,32 @@ public class PageProcessorTest {
         page.setRequest(request);
         pageProcessor.process(page);
     }
+
+    @Test
+    public void testJiaYuanProcess() {
+        Page page = new Page();
+        Request request = new Request("http://www.jiayuan.com/4764431");
+        request.putExtra("$loginUrl","https://passport.jiayuan.com/dologin.php?pre_url=http://www.jiayuan.com/usercp");
+        request.putExtra("$valideLogin","top.location.href='(http://login.jiayuan.com/jump.*)'");
+        request.putExtra("name","13216635314");
+        request.putExtra("password","123456789");
+        request.putExtra("remem_pass","on");
+        request.putExtra("_s_x_id","5ce312f2f3f7fe31245fc3d26f3cf2fd");
+        request.putExtra("ljg_login","1");
+        request.putExtra("m_p_l","1");
+        request.putExtra("channel","0");
+        request.putExtra("position","0");
+        page.setRequest(request);
+        pageProcessor.process(page);
+    }
+
+    @Test
+    public void testJiaYuanProcessSite() {
+        Page page = new Page();
+        Request request = new Request("http://www.jiayuan.com/4764431");
+        request.putExtra("loginName","13216635314");
+        request.putExtra("loginPassword","123456789");
+        page.setRequest(request);
+        pageProcessor.process(page);
+    }
 }

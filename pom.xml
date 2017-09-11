@@ -55,7 +55,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <webmagic.version>0.7.3</webmagic.version>
         <yaycrawler.version>1.0.0-SNAPSHOT</yaycrawler.version>
-        <json-path.version>0.8.1</json-path.version>
+        <!--<json-path.version>0.8.1</json-path.version>-->
     </properties>
 
     <dependencies>

@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 /**
  * Created by yuananyun on 2016/5/1.
  */
+@Deprecated
 public class SelectorExpressionResolver {
     private static Logger logger = LoggerFactory.getLogger(SelectorExpressionResolver.class);
     private static Pattern INVOKE_PATTERN = Pattern.compile("(\\w+)\\((.*)\\)");

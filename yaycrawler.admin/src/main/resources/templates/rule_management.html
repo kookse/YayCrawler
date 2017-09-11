@@ -67,7 +67,8 @@
                     </h4>
                 </div>
                 <div class="modal-body">
-                    <textarea id="ta_result" style="width: 100%;" rows="20"></textarea>
+                    <!--<textarea id="ta_result" style="width: 100%;" rows="20"></textarea>-->
+                    <pre id="ta_result"></pre>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default"
@@ -333,6 +334,7 @@
                                                         },
                                                         'click .testRegion': function (e, value, row, index) {
                                                             var data = row;
+                                                            var dataType = row.dataType;
                                                             $.ajax({
                                                                 type: "post",
                                                                 cache: false,
@@ -342,7 +344,12 @@
                                                                 dataType: 'json',
                                                                 success: function (result) {     //回调函数，result，返回值
                                                                     debugger
-                                                                    $("#resultModal #ta_result").val(JSON.stringify(result, null, "\t"));
+                                                                    var resultData = JSON.stringify(result, null, "\t");
+                                                                    if(dataType == "IMAGE") {
+                                                                        var reg=new RegExp("\"src\": (.*)","g");
+                                                                        resultData = resultData .replace(reg,"<img src=$1 />");
+                                                                    }
+                                                                    $("#resultModal #ta_result").html(resultData);
                                                                     $('#resultModal').modal({keyboard: false});
                                                                 },
                                                                 error: function (msg) {
