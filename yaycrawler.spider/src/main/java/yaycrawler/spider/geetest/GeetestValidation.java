@@ -62,17 +62,6 @@ public class GeetestValidation {
         this.code = code;
     }
 
-    @Override
-    public String toString() {
-        return "GeetestValidation{" +
-                "code='" + code + '\'' +
-                ", message='" + getMessage() + '\'' +
-                ", geetest_challenge='" + geetest_challenge + '\'' +
-                ", geetest_validate='" + geetest_validate + '\'' +
-                ", geetest_seccode='" + geetest_seccode + '\'' +
-                '}';
-    }
-
     public String getMessage() {
         return message;
     }
@@ -81,5 +70,14 @@ public class GeetestValidation {
         this.message = message;
     }
 
-
+    @Override
+    public String toString() {
+        return "GeetestValidation{" +
+                "code='" + code + '\'' +
+                ", message='" + message + '\'' +
+                ", geetest_challenge='" + geetest_challenge + '\'' +
+                ", geetest_validate='" + geetest_validate + '\'' +
+                ", geetest_seccode='" + geetest_seccode + '\'' +
+                '}';
+    }
 }

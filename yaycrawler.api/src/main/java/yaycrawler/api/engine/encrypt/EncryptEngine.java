@@ -8,6 +8,8 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
@@ -37,6 +39,8 @@ import java.util.regex.Pattern;
  **/
 @Service("encryptEngine")
 public class EncryptEngine implements Engine<Map<String, Object>> {
+
+    private static final Logger logger = LoggerFactory.getLogger(EncryptEngine.class);
 
     @Value("${yaycrawler.api.src.path:d:/tmp/ocr/}")
     private String srcPath;

@@ -15,7 +15,7 @@ import yaycrawler.quartz.model.IExecutable;
  */
 @DisallowConcurrentExecution
 public class QuartzJobFactory implements Job {
-    private static Logger logger = LoggerFactory.getLogger(QuartzJobFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuartzJobFactory.class);
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {

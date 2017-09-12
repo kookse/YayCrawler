@@ -5,6 +5,9 @@ package yaycrawler.common.utils;
  */
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import yaycrawler.common.interceptor.SignatureSecurityInterceptor;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -13,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CSVUtils {
+
+    private static final Logger logger  = LoggerFactory.getLogger(CSVUtils.class);
 
     /**
      * 导出

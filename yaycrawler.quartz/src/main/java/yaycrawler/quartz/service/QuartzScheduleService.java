@@ -21,7 +21,7 @@ import java.util.Set;
 @Service
 public class QuartzScheduleService {
 
-    private static Logger logger = LoggerFactory.getLogger(QuartzScheduleService.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuartzScheduleService.class);
 
     @Autowired
     private Scheduler scheduler;

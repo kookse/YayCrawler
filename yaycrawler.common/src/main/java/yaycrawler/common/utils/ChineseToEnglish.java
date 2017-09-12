@@ -5,12 +5,18 @@ package yaycrawler.common.utils;
  */
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import yaycrawler.common.interceptor.SignatureSecurityInterceptor;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
 public class ChineseToEnglish {
+
+    private static final Logger logger  = LoggerFactory.getLogger(ChineseToEnglish.class);
+
     private static LinkedHashMap spellMap = null;
 
     static {

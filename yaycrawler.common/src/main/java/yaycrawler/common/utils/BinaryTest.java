@@ -5,6 +5,10 @@ package yaycrawler.common.utils;
  * @create 2017-08-21 10:18
  * @desc 二值化
  **/
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import yaycrawler.common.interceptor.SignatureSecurityInterceptor;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -13,6 +17,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class BinaryTest {
+
+    private static final Logger logger  = LoggerFactory.getLogger(BinaryTest.class);
 
     public static void main(String[] args) throws IOException {
         File testDataDir = new File("d:/tmp/ocr");

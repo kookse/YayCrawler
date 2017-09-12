@@ -9,6 +9,8 @@ import jdk.nashorn.internal.scripts.JS;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Base64Utils;
 
 import java.io.FileReader;
@@ -27,6 +29,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 public class RSAUtils {
+
+    private static final Logger logger  = LoggerFactory.getLogger(RSAUtils.class);
 
     /** 算法名称 */
     private static final String ALGORITHOM = "RSA";

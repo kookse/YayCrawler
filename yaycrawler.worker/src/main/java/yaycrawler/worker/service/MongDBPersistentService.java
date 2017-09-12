@@ -17,7 +17,8 @@ import java.util.Map;
  */
 @Service
 public class MongDBPersistentService implements IResultPersistentService {
-    private static Logger logger = LoggerFactory.getLogger(MongDBPersistentService.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(MongDBPersistentService.class);
     @Autowired
     private MongoTemplate mongoTemplate;
 

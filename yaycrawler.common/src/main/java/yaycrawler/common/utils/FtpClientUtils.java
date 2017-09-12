@@ -5,6 +5,8 @@ import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
@@ -12,6 +14,9 @@ import java.io.*;
  * Created by ucs_guoguibiao on 6/13 0013.
  */
 public class FtpClientUtils {
+
+    private static final Logger logger  = LoggerFactory.getLogger(FtpClientUtils.class);
+
     /**
      * Description: 向FTP服务器上传文件
      * @Version1.0 Jul 27, 2008 4:31:09 PM by 崔红保（cuihongbao@d-heaven.com）创建

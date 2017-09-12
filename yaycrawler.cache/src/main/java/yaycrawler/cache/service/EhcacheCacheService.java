@@ -2,6 +2,8 @@ package yaycrawler.cache.service;
 
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class EhcacheCacheService implements ICacheService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EhcacheCacheService.class);
 
     @Autowired
     private EhCacheCacheManager cacheManager;

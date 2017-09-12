@@ -1,7 +1,10 @@
 package yaycrawler.admin.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import yaycrawler.admin.communication.MasterActor;
 import yaycrawler.common.utils.CSVUtils;
 import yaycrawler.common.utils.ExcelUtils;
 import java.io.InputStream;
@@ -12,6 +15,8 @@ import java.util.*;
  */
 @Service
 public class TaskService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TaskService.class);
 
     public Map insertExcel(MultipartFile file) {
         Map result = new HashMap();

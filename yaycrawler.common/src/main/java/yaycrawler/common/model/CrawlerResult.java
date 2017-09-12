@@ -59,6 +59,7 @@ public class CrawlerResult {
         return "CrawlerResult{" +
                 "key='" + key + '\'' +
                 ", isSuccess=" + isSuccess +
+                ", crawlerRequestList=" + crawlerRequestList +
                 ", message='" + message + '\'' +
                 '}';
     }

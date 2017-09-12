@@ -18,6 +18,9 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.io.CopyStreamEvent;
 import org.apache.commons.net.io.CopyStreamListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * FTP进行文件上传和下载；
  * 支持断点续传；
@@ -25,6 +28,7 @@ import org.apache.commons.net.io.CopyStreamListener;
 public final class FTPUtils {
     private final FTPClient ftp = new FTPClient();
     private static volatile FTPUtils instance;
+    private static final Logger logger  = LoggerFactory.getLogger(FTPUtils.class);
 
     private FTPUtils() {
 

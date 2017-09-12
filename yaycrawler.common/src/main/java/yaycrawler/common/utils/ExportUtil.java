@@ -3,12 +3,16 @@ package yaycrawler.common.utils;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by Administrator on 2016/4/1.
  */
 public class ExportUtil
 {
+    private static final Logger logger  = LoggerFactory.getLogger(ExportUtil.class);
+
     private XSSFWorkbook wb = null;
 
     private XSSFSheet sheet = null;

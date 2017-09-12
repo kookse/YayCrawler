@@ -10,6 +10,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.script.ScriptEngine;
@@ -30,6 +32,8 @@ import java.util.regex.Pattern;
  * @desc 训练脚本
  **/
 public class GdltaxSecurity {
+
+    private static final Logger logger  = LoggerFactory.getLogger(GdltaxSecurity.class);
 
     public static void main(String[] args) throws Exception {
         int i = 0, j = 0;

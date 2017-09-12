@@ -6,6 +6,8 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import yaycrawler.api.engine.Engine;
@@ -26,6 +28,8 @@ import java.util.List;
 
 @Service("downloadEngine")
 public class DownloadEngine implements Engine<BinaryDto> {
+
+    private static final Logger logger = LoggerFactory.getLogger(DownloadEngine.class);
 
     @Override
     public EngineResult execute(BinaryDto info) {

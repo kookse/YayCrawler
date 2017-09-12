@@ -3,6 +3,8 @@ package yaycrawler.monitor.controller;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.map.HashedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,8 @@ import java.util.Map;
  */
 @RestController
 public class CaptchaController {
+
+    private static final Logger logger  = LoggerFactory.getLogger(CaptchaController.class);
 
     @Autowired
     private GeetestTrailRepository geetestTrailRepository;

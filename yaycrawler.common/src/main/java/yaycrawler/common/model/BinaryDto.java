@@ -110,6 +110,7 @@ public class BinaryDto {
                 ", src='" + src + '\'' +
                 ", dest='" + dest + '\'' +
                 ", language='" + language + '\'' +
+                ", cookie='" + cookie + '\'' +
                 '}';
     }
 }

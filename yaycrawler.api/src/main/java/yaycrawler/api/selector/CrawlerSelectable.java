@@ -3,6 +3,8 @@ package yaycrawler.api.selector;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.selector.*;
 
 import java.math.BigDecimal;
@@ -17,6 +19,8 @@ import java.util.List;
  * @desc 文档抽取器
  **/
 public class CrawlerSelectable<T> extends AbstractSelectable {
+
+    private static final Logger logger = LoggerFactory.getLogger(CrawlerSelectable.class);
 
     protected List<String> sourceTexts;
 

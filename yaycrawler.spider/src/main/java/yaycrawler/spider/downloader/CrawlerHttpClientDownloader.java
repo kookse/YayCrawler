@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 public class CrawlerHttpClientDownloader extends AbstractDownloader {
 
     private static Pattern UNICODE_PATTERN = Pattern.compile("\\\\u([0-9a-fA-F]{4})");
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger  = LoggerFactory.getLogger(CrawlerHttpClientDownloader.class);
 
     private final Map<String, CloseableHttpClient> httpClients = new HashMap<String, CloseableHttpClient>();
 

@@ -21,7 +21,7 @@ import java.util.Map;
  */
 @Component
 public class GenericPipeline implements Pipeline {
-    private static Logger logger = LoggerFactory.getLogger(GenericPipeline.class);
+    private static final Logger logger = LoggerFactory.getLogger(GenericPipeline.class);
 
     @Autowired(required = false)
     private PersistentServiceFactory persistentServiceFactory;

@@ -23,4 +23,12 @@ public class FtpTransferFileVo {
     public void setHttpFileUrl(String httpFileUrl) {
         this.httpFileUrl = httpFileUrl;
     }
+
+    @Override
+    public String toString() {
+        return "FtpTransferFileVo{" +
+                "fileName='" + fileName + '\'' +
+                ", httpFileUrl='" + httpFileUrl + '\'' +
+                '}';
+    }
 }

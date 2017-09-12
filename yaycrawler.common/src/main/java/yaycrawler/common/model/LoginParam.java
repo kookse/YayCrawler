@@ -141,6 +141,10 @@ public class LoginParam {
         return content;
     }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     @Override
     public String toString() {
         return "LoginParam{" +
@@ -157,9 +161,4 @@ public class LoginParam {
                 ", content='" + content + '\'' +
                 '}';
     }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
 }

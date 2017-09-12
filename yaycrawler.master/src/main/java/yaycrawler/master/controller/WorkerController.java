@@ -24,7 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping(value = "/worker", produces = "application/json;charset=UTF-8")
 public class WorkerController {
-    private static Logger logger = LoggerFactory.getLogger(WorkerController.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(WorkerController.class);
 
 //    @Autowired
 //    private WorkerHearbeatHandler hearbeatHandler;

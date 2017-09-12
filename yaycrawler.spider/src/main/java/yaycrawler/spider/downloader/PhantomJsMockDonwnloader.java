@@ -22,7 +22,8 @@ import java.util.Set;
  * Created by ucs_yuananyun on 2016/5/27.
  */
 public class PhantomJsMockDonwnloader extends AbstractDownloader {
-    private Logger logger = LoggerFactory.getLogger(getClass());
+
+    private static final Logger logger  = LoggerFactory.getLogger(PhantomJsMockDonwnloader.class);
 
     public Page download(Request request, Task task, String cookie) {
         Site site = null;

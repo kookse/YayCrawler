@@ -2,6 +2,8 @@ package yaycrawler.spider.service;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Site;
@@ -16,6 +18,9 @@ import java.util.Map;
  */
 @Service
 public class PageSiteService {
+
+    private static final Logger logger  = LoggerFactory.getLogger(PageSiteService.class);
+
     @Autowired
     private PageSiteRepository siteRepository;
 

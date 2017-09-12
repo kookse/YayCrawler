@@ -17,7 +17,9 @@ import java.util.List;
  * Created by ucs_yuananyun on 2016/6/6.
  */
 public class CrawlerRequestJob extends AbstractExecutableJob {
-    private static Logger logger = LoggerFactory.getLogger(CrawlerRequestJob.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(CrawlerRequestJob.class);
+
     private List<CrawlerRequest> crawlerRequestList;
 
     public CrawlerRequestJob(ScheduleJobInfo jobInfo) {

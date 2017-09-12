@@ -12,8 +12,13 @@ import org.apache.ftpserver.ftplet.DefaultFtplet;
 import org.apache.ftpserver.ftplet.FtpException;
 import org.apache.ftpserver.ftplet.FtpRequest;
 import org.apache.ftpserver.ftplet.FtpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import yaycrawler.common.utils.FtpClientUtils;
 
 public class FtpService extends DefaultFtplet {
+
+    private static final Logger logger  = LoggerFactory.getLogger(FtpService.class);
 
     @Override
     public FtpletResult onUploadEnd(FtpSession session, FtpRequest request)
@@ -21,7 +26,7 @@ public class FtpService extends DefaultFtplet {
         String path = session.getFileSystemView().getWorkingDirectory().getAbsolutePath();//获取当前路径
         String rootPath = session.getUser().getHomeDirectory();//获取根目录绝对路径
         String filename = request.getArgument();//获取文件名
-        System.out.println("path=" + path + "rootPath=" + rootPath + "filename=" + filename);
+        logger.info("path={},rootPath ={},filename={}",path,rootPath,filename);
         //得到相应的信息后，下面可以进行我们的逻辑处理啦.......
         return super.onUploadEnd(session, request);
     }

@@ -34,4 +34,12 @@ public class LoginResult {
     public void setCookies(List<PhantomCookie> cookies) {
         this.cookies = cookies;
     }
+
+    @Override
+    public String toString() {
+        return "LoginResult{" +
+                "isSuccess=" + isSuccess +
+                ", cookies=" + cookies +
+                '}';
+    }
 }

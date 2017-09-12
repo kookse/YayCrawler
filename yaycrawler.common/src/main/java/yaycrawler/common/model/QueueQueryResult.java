@@ -43,4 +43,13 @@ public class QueueQueryResult {
     public void setTotalPages(long totalPages) {
         this.totalPages = totalPages;
     }
+
+    @Override
+    public String toString() {
+        return "QueueQueryResult{" +
+                "rows=" + rows +
+                ", totalPages=" + totalPages +
+                ", total=" + total +
+                '}';
+    }
 }

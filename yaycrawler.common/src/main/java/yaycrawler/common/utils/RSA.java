@@ -15,6 +15,9 @@ import javax.crypto.Cipher;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author bill
  * @create 2017-08-23 14:33
@@ -25,6 +28,9 @@ import org.bouncycastle.util.encoders.Hex;
  *
  */
 public class RSA {
+
+    private static final Logger logger  = LoggerFactory.getLogger(RSA.class);
+
     /** 算法名称 */
     private static final String ALGORITHOM = "RSA";
 

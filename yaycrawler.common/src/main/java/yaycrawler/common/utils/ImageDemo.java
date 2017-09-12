@@ -1,4 +1,7 @@
 package yaycrawler.common.utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +13,8 @@ import javax.imageio.ImageIO;
  **/
 
 public class ImageDemo {
+
+    private static final Logger logger  = LoggerFactory.getLogger(ImageDemo.class);
 
     public void binaryImage() throws IOException{
         File testDataDir = new File("d:/tmp/ocr");

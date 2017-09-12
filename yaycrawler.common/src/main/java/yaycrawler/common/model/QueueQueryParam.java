@@ -32,4 +32,12 @@ public class QueueQueryParam {
         this.pageSize = pageSize;
     }
 
+    @Override
+    public String toString() {
+        return "QueueQueryParam{" +
+                "name='" + name + '\'' +
+                ", pageIndex=" + pageIndex +
+                ", pageSize=" + pageSize +
+                '}';
+    }
 }

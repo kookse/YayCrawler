@@ -23,7 +23,8 @@ import java.util.regex.Pattern;
  */
 @Deprecated
 public class SelectorExpressionResolver {
-    private static Logger logger = LoggerFactory.getLogger(SelectorExpressionResolver.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(SelectorExpressionResolver.class);
     private static Pattern INVOKE_PATTERN = Pattern.compile("(\\w+)\\((.*)\\)");
 
 

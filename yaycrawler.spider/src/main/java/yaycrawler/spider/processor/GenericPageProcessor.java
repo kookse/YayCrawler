@@ -38,7 +38,7 @@ import java.util.*;
  */
 @Component(value = "genericPageProcessor")
 public class GenericPageProcessor implements PageProcessor {
-    private static Logger logger = LoggerFactory.getLogger(GenericPageProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(GenericPageProcessor.class);
     private static String DEFAULT_PAGE_SELECTOR = "page";
 
     @Autowired(required = false)

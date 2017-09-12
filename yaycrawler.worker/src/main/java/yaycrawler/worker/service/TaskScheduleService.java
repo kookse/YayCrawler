@@ -31,7 +31,7 @@ import java.util.Map;
  */
 @Service
 public class TaskScheduleService {
-    private static Logger logger = LoggerFactory.getLogger(TaskScheduleService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskScheduleService.class);
 
     @Autowired
     private PageSiteService pageSiteService;

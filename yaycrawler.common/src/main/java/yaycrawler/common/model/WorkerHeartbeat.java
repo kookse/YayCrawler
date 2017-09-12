@@ -64,4 +64,15 @@ public class WorkerHeartbeat {
     public void setCompletedCrawlerResultList(List<CrawlerResult> completedCrawlerResultList) {
         this.completedCrawlerResultList = completedCrawlerResultList;
     }
+
+    @Override
+    public String toString() {
+        return "WorkerHeartbeat{" +
+                "workerId='" + workerId + '\'' +
+                ", workerContextPath='" + workerContextPath + '\'' +
+                ", heartbeatInteval=" + heartbeatInteval +
+                ", waitTaskCount=" + waitTaskCount +
+                ", completedCrawlerResultList=" + completedCrawlerResultList +
+                '}';
+    }
 }

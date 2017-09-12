@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
  * Created by bill on 2016/5/1.
  */
 public class CrawlerExpressionResolver {
+
     private static Logger logger = LoggerFactory.getLogger(CrawlerExpressionResolver.class);
     private static Pattern INVOKE_PATTERN = Pattern.compile("(\\w+)\\((.*)\\)");
 

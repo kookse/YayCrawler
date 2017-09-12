@@ -5,6 +5,8 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +19,8 @@ import java.util.ArrayList;
  * @desc
  **/
 public class ImageDownload {
+
+    private static final Logger logger  = LoggerFactory.getLogger(ImageDownload.class);
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         HttpUtil httpUtil = HttpUtil.getInstance();

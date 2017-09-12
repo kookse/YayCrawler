@@ -19,7 +19,8 @@ import yaycrawler.common.utils.HttpUtils;
 @Component
 public class MasterActor {
 
-    private static Logger logger = LoggerFactory.getLogger(MasterActor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MasterActor.class);
+
     @Value("${master.server.address}")
     private String masterServerAddress;
     @Value("${signature.token}")

@@ -4,12 +4,15 @@ import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import yaycrawler.common.model.PhantomCookie;
 import us.codecraft.webmagic.utils.UrlUtils;
+import yaycrawler.common.utils.FtpClientUtils;
 import yaycrawler.dao.domain.SiteCookie;
 import yaycrawler.dao.repositories.SiteCookieRepository;
 
@@ -20,6 +23,8 @@ import java.util.List;
  */
 @Service
 public class PageCookieService {
+
+    private static final Logger logger  = LoggerFactory.getLogger(PageCookieService.class);
 
     @Autowired
     private SiteCookieRepository cookieRepository;

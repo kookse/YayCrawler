@@ -93,14 +93,6 @@ public class CrawlerRequest implements Serializable{
         this.data = data;
     }
 
-    @Override
-    public String toString() {
-        return "CrawlerRequest{" +
-                "url='" + url + '\'' +
-                ", method='" + method + '\'' +
-                '}';
-    }
-
     /**
      * 为爬虫任务生成一个唯一的url
      *
@@ -118,4 +110,15 @@ public class CrawlerRequest implements Serializable{
         }
     }
 
+    @Override
+    public String toString() {
+        return "CrawlerRequest{" +
+                "url='" + url + '\'' +
+                ", method='" + method + '\'' +
+                ", data=" + data +
+                ", hashCode='" + hashCode + '\'' +
+                ", domain='" + domain + '\'' +
+                ", extendMap=" + extendMap +
+                '}';
+    }
 }

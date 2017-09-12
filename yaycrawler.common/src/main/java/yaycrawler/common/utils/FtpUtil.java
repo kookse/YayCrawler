@@ -30,7 +30,7 @@ public class FtpUtil {
     /**
      * 日志记录器
      */
-    private static Logger logger = LoggerFactory.getLogger(FtpUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(FtpUtil.class);
     /**
      * ftp服务器ip地址
      */

@@ -1,5 +1,7 @@
 package yaycrawler.api.engine.ocr;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import yaycrawler.api.engine.Engine;
 import yaycrawler.common.model.BinaryDto;
@@ -20,6 +22,8 @@ import java.util.regex.Pattern;
 
 @Service("ocrEngine")
 public class OCREngine implements Engine<BinaryDto> {
+
+    private static final Logger logger = LoggerFactory.getLogger(OCREngine.class);
 
     @Override
     public EngineResult execute(BinaryDto info) {

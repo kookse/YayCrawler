@@ -1,11 +1,18 @@
 package yaycrawler.common.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import yaycrawler.common.interceptor.SignatureSecurityInterceptor;
+
 import java.util.Random;
 
 /**
  * Created by ucs_yuananyun on 2016/5/19.
  */
 public class CharacterUtils {
+
+    private static final Logger logger  = LoggerFactory.getLogger(CharacterUtils.class);
+
     public static String getRandomString(int length) {
         Random random = new Random();
         StringBuffer sb = new StringBuffer();

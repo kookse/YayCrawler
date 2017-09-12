@@ -13,7 +13,7 @@ import java.util.List;
  * Created by ucs_yuananyun on 2016/6/14.
  */
 public class GeetestCaptchaIdentification {
-    private static Logger logger = LoggerFactory.getLogger(GeetestCaptchaIdentification.class);
+    private static final Logger logger = LoggerFactory.getLogger(GeetestCaptchaIdentification.class);
 
     /**
      * 验证码自动识别     *

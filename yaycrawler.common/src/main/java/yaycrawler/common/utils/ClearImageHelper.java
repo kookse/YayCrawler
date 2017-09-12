@@ -1,5 +1,9 @@
 package yaycrawler.common.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import yaycrawler.common.interceptor.SignatureSecurityInterceptor;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -9,6 +13,8 @@ import javax.imageio.ImageIO;
 
 public class ClearImageHelper
 {
+
+    private static final Logger logger  = LoggerFactory.getLogger(ClearImageHelper.class);
 
     public static void main(String[] args) throws IOException
     {

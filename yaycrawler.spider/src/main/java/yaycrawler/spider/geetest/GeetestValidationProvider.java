@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class GeetestValidationProvider {
 
-    private static Logger logger = LoggerFactory.getLogger(GeetestValidationProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(GeetestValidationProvider.class);
     private static String GEETEST_CRACKER_URL_TEMPLATE = "http://120.77.36.82:8080/rest/geetest/cracker?targetUrl=%s&userId=%s";
 
     /**

@@ -16,8 +16,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static sun.plugin.cache.FileVersion.regEx;
-
 /**
  * @author bill
  * @create 2017-08-17 11:20

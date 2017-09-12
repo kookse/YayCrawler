@@ -3,6 +3,9 @@ package yaycrawler.common.utils;
 /**
  * Created by Administrator on 2015/11/24.
  */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OCRHelper {
+
+    private static final Logger logger  = LoggerFactory.getLogger(OCRHelper.class);
+
     private final String LANG_OPTION = "-l";
     private final String PSM = "-psm";
     private final String EOL = System.getProperty("line.separator");

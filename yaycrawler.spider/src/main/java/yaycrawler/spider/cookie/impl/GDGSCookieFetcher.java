@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @Component
 public class GDGSCookieFetcher implements ICookieProvider {
-    private static Logger logger = LoggerFactory.getLogger(GDGSCookieFetcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(GDGSCookieFetcher.class);
     private static String DOMAIN = "gd.gsxt.gov.cn";
     private long lastFetchTime = 0;
     private List<CrawlerCookie> cachedCookieList;

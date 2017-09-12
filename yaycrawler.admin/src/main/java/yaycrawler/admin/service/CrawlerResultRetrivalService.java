@@ -1,8 +1,11 @@
 package yaycrawler.admin.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+import yaycrawler.admin.communication.MasterActor;
 
 import java.util.LinkedHashMap;
 
@@ -11,6 +14,9 @@ import java.util.LinkedHashMap;
  */
 @Service
 public class CrawlerResultRetrivalService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CrawlerResultRetrivalService.class);
+
     @Autowired
     private MongoTemplate mongoTemplate;
 

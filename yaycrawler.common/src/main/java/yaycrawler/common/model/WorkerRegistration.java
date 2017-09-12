@@ -46,15 +46,6 @@ public class WorkerRegistration {
         this.heartbeatInteval = heartbeatInteval;
     }
 
-    @Override
-    public String toString() {
-        return "WorkerRegistration{" +
-                "workerId='" + workerId + '\'' +
-                ", workerContextPath='" + workerContextPath + '\'' +
-                ", heartbeatInteval=" + heartbeatInteval +
-                '}';
-    }
-
     public Long getLastHeartbeatTime() {
         return lastHeartbeatTime;
     }
@@ -69,5 +60,16 @@ public class WorkerRegistration {
 
     public void setWaitTaskCount(int waitTaskCount) {
         this.waitTaskCount = waitTaskCount;
+    }
+
+    @Override
+    public String toString() {
+        return "WorkerRegistration{" +
+                "workerId='" + workerId + '\'' +
+                ", workerContextPath='" + workerContextPath + '\'' +
+                ", heartbeatInteval=" + heartbeatInteval +
+                ", waitTaskCount=" + waitTaskCount +
+                ", lastHeartbeatTime=" + lastHeartbeatTime +
+                '}';
     }
 }

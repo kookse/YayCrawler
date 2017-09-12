@@ -9,6 +9,8 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,6 +36,8 @@ import java.util.Map;
  */
 @Component
 public class DocumentPersistentService implements IResultPersistentService {
+
+    private static final Logger logger  = LoggerFactory.getLogger(DocumentPersistentService.class);
 
     @Value("${ftp.server.url}")
     private String url;

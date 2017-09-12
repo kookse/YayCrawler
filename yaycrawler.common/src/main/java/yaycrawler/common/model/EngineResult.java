@@ -99,6 +99,8 @@ public class EngineResult implements Serializable{
                 ", index=" + index +
                 ", code='" + code + '\'' +
                 ", headers=" + headers +
+                ", loginParam=" + loginParam +
+                ", result='" + result + '\'' +
                 '}';
     }
 }

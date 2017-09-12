@@ -12,11 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import yaycrawler.common.utils.FtpClientUtils;
 
 @Component
 public class FtpServerListener implements ServletContextListener {
 
-    private static Logger logger = LoggerFactory.getLogger(FtpServerListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(FtpServerListener.class);
 
     public void contextDestroyed(ServletContextEvent contextEvent) {
         logger.info("Stopping FtpServer");

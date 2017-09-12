@@ -18,6 +18,8 @@ import org.apache.http.impl.client.*;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -42,6 +44,8 @@ class AnyTrustStrategy implements TrustStrategy {
  * Created by Administrator on 2016/2/17.
  */
 public class HttpClientGenerator {
+
+    private static final Logger logger  = LoggerFactory.getLogger(HttpClientGenerator.class);
 
     private PoolingHttpClientConnectionManager connectionManager;
 

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  */
 @Component
 public class MasterActor {
-    private static Logger logger = LoggerFactory.getLogger(MasterActor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MasterActor.class);
 
     @Autowired
     private TaskScheduleService taskScheduleService;

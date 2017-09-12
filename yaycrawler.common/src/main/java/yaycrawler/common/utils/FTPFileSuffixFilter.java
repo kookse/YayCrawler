@@ -7,6 +7,8 @@ package yaycrawler.common.utils;
 import org.apache.commons.net.ftp.FTPFile;
 
 import org.apache.commons.net.ftp.FTPFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 获取文件时过滤文件后缀的过滤器
@@ -15,6 +17,8 @@ import org.apache.commons.net.ftp.FTPFileFilter;
  * @date Jun 7, 2016 3:37:36 PM
  */
 public class FTPFileSuffixFilter implements FTPFileFilter {
+
+    private static final Logger logger  = LoggerFactory.getLogger(FTPFileSuffixFilter.class);
 
     /**
      * 传过来的后缀信息(多个时用英文逗号隔开)

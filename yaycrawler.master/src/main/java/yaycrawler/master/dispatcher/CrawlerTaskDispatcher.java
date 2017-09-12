@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class CrawlerTaskDispatcher {
 
-    private static Logger logger = LoggerFactory.getLogger(CrawlerTaskDispatcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(CrawlerTaskDispatcher.class);
 
     @Value("${worker.task.batchSize}")
     private Integer batchSize;

@@ -24,7 +24,7 @@ import java.util.UUID;
 @Component
 public class AutoLoginProxy {
 
-    private static Logger logger = LoggerFactory.getLogger(AutoLoginProxy.class);
+    private static final Logger logger = LoggerFactory.getLogger(AutoLoginProxy.class);
 
     @Value("${server.address}")
     private String serverIP;

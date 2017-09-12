@@ -50,7 +50,7 @@ import java.util.Map.Entry;
 
 
 public class HttpUtil {
-    private static Logger logger = LoggerFactory.getLogger(HttpUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
     private static int bufferSize = 1024;
     private static volatile HttpUtil instance;
     private ConnectionConfig connConfig;

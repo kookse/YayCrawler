@@ -3,6 +3,7 @@ package yaycrawler.common.utils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import yaycrawler.common.interceptor.SignatureSecurityInterceptor;
 
 import java.io.*;
 import java.util.List;
@@ -13,7 +14,9 @@ import java.util.concurrent.Semaphore;
  * Created by ucs_yuananyun on 2016/6/23.
  */
 public class CasperjsProgramManager {
-    private static Logger logger = LoggerFactory.getLogger(CasperjsProgramManager.class);
+
+    private static final Logger logger  = LoggerFactory.getLogger(CasperjsProgramManager.class);
+
     public static String launch(String jsFileName, List<String> params) {
         return launch(jsFileName, null, params);
     }

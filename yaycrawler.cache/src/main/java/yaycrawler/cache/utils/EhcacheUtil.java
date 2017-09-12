@@ -3,6 +3,8 @@ package yaycrawler.cache.utils;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 
@@ -18,6 +20,8 @@ public class EhcacheUtil {
     private CacheManager manager;
 
     private static EhcacheUtil ehCache;
+
+    private static final Logger logger = LoggerFactory.getLogger(EhcacheUtil.class);
 
     private EhcacheUtil(String path) {
         url = getClass().getResource(path);

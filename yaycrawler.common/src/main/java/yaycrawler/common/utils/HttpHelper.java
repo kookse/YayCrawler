@@ -58,7 +58,7 @@ import java.util.Map.Entry;
  * @author comven
  */
 public class HttpHelper {
-    private static Logger logger = LoggerFactory.getLogger(HttpHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpHelper.class);
     private static final String DEFAULT_CHARSET = "UTF-8";// 默认请求编码
     private static final int DEFAULT_SOCKET_TIMEOUT = 5000;// 默认等待响应时间(毫秒)
     private static final int DEFAULT_RETRY_TIMES = 0;// 默认执行重试的次数

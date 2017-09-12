@@ -1,5 +1,7 @@
 package yaycrawler.spider.downloader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Page;
@@ -23,7 +25,7 @@ import java.util.regex.Pattern;
 @Component
 public class GenericCrawlerDownLoader extends AbstractDownloader {
 
-//    private static Logger logger = LoggerFactory.getLogger(GenericCrawlerDownLoader.class);
+    private static final Logger logger  = LoggerFactory.getLogger(GenericCrawlerDownLoader.class);
 
     @Autowired
     private PageParserRuleService pageParserRuleService;

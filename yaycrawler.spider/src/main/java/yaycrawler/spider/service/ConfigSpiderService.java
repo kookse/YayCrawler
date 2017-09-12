@@ -3,6 +3,8 @@ package yaycrawler.spider.service;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Page;
@@ -29,6 +31,8 @@ import java.util.function.Consumer;
  */
 @Service
 public class ConfigSpiderService {
+
+    private static final Logger logger  = LoggerFactory.getLogger(ConfigSpiderService.class);
 
     @Autowired
     private GenericCrawlerDownLoader downloader;

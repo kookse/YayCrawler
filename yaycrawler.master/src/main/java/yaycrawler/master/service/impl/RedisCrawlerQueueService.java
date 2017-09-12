@@ -31,6 +31,7 @@ import java.util.*;
 public class RedisCrawlerQueueService implements ICrawlerQueueService {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisCrawlerQueueService.class);
+
     @Autowired
     private RedisTemplate redisTemplate;
     private int batchSize = 1000;

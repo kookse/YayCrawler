@@ -1,6 +1,8 @@
 package yaycrawler.common.utils;
 
 import org.apache.poi.xssf.usermodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletOutputStream;
 import java.io.File;
@@ -15,6 +17,8 @@ import java.util.Map;
  * Created by Administrator on 2016/6/8.
  */
 public class ExcelUtils {
+
+    private static final Logger logger  = LoggerFactory.getLogger(ExcelUtils.class);
 
     /**
      * 导出

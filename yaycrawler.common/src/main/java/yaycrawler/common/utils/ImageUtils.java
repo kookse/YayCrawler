@@ -1,5 +1,8 @@
 package yaycrawler.common.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,6 +15,7 @@ import java.util.List;
  */
 public class ImageUtils {
 
+    private static final Logger logger  = LoggerFactory.getLogger(ImageUtils.class);
 
     /**
      * 合成指定的多张图片到一张图片

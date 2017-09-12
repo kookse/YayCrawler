@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Component
 public class WorkerActor {
-    private static Logger logger = LoggerFactory.getLogger(WorkerActor.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkerActor.class);
     @Value("${signature.token}")
     private String secret;
 

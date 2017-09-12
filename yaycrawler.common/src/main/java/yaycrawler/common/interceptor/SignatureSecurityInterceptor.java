@@ -19,7 +19,7 @@ import java.util.Map;
  * Created by ucs_yuananyun on 2016/5/19.
  */
 public class SignatureSecurityInterceptor implements HandlerInterceptor {
-    private static Logger logger = LoggerFactory.getLogger(SignatureSecurityInterceptor.class);
+    private static final Logger logger  = LoggerFactory.getLogger(SignatureSecurityInterceptor.class);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

@@ -19,7 +19,7 @@ import java.net.URLEncoder;
  */
 @Component
 public class CaptchaIdentificationProxy {
-    private static Logger logger = LoggerFactory.getLogger(CaptchaIdentificationProxy.class);
+    private static final Logger logger = LoggerFactory.getLogger(CaptchaIdentificationProxy.class);
 
     @Value("${server.address}")
     private String serverIP;

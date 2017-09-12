@@ -2,6 +2,8 @@ package yaycrawler.common.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,6 +25,8 @@ import java.util.List;
  * Created by ucs_yuananyun on 2016/5/13.
  */
 public class HttpUtils {
+
+    private static final Logger logger  = LoggerFactory.getLogger(HttpUtils.class);
 
     private static RestTemplate restTemplate;
 
