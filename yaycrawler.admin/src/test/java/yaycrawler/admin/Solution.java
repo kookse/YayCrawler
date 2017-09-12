@@ -76,4 +76,12 @@ public class Solution {
         param.put("loginPassword","890310");
         System.out.println(JSON.toJSONString(param));
     }
+
+    @Test
+    public void toGZLSS() {
+        Map param = Maps.newHashMap();
+        param.put("loginName","431027197805183119");
+        param.put("loginPassword","g123456");
+        System.out.println(JSON.toJSONString(param));
+    }
 }

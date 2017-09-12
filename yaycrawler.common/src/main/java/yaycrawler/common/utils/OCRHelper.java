@@ -48,7 +48,7 @@ public class OCRHelper {
 //        } else {
 //            cmd.add(tessPath + "\\tesseract");
 //        }
-        cmd.add("D:\\Program Files\\Tesseract-OCR" + "\\tesseract");
+        cmd.add("E:\\Program Files\\Tesseract-OCR" + "\\tesseract");
         cmd.add("");
         cmd.add(outputFile.getName());
         cmd.add(LANG_OPTION);

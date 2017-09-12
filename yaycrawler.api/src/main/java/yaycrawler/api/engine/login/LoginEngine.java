@@ -76,6 +76,7 @@ public class LoginEngine implements Engine<LoginParam> {
                             headerList.add(new BasicHeader("Cookie",header.getValue()));
                         }
                     }
+                    //System.out.println(EntityUtils.toString(httpUtil.doGet("https://gzgjj.gov.cn:8280/fund/wap/wap!depositQuery.do?rdm=0.5121620276304217",null,headerList).getEntity()));
                     List<Header> headerList1 = new ArrayList<>();
                     headerList.forEach(header -> {
                         if(StringUtils.equalsIgnoreCase(header.getName(),"Cookie")) {

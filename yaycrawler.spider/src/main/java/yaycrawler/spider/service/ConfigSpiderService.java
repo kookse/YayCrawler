@@ -10,10 +10,10 @@ import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.selector.Selectable;
-import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.api.resolver.CrawlerExpressionResolver;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.model.RestFulResult;
+import yaycrawler.common.utils.UrlUtils;
 import yaycrawler.dao.domain.PageInfo;
 import yaycrawler.dao.domain.PageParseRegion;
 import yaycrawler.spider.downloader.GenericCrawlerDownLoader;
@@ -147,7 +147,7 @@ public class ConfigSpiderService {
             if (leftTime > 86400000L) {
                 pageMap.remove(request.getUrl());
             }
-//                pageMap.remove(m);
+            pageMap.remove(m);
             return page;
         }
         Page page = downloader.download(request, new Task() {

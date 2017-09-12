@@ -144,7 +144,7 @@ public class EncryptEngine implements Engine<Map<String, Object>> {
                         if (p.endsWith("\""))
                             p = p.substring(0, p.length() - 1);
                         if (p.equals("$1"))
-                            p = result.toString();
+                            p = String.valueOf(result != null ?result :"");
                         params[j] = p;
                     }
                     if (method.equalsIgnoreCase("base64")) {
