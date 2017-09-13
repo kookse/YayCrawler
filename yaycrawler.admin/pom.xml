@@ -205,20 +205,20 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <excludes>
-                    <exclude>/assets/global/plugins/font-awesome/fonts/**</exclude>
-                    <exclude>/assets/global/plugins/simple-line-icons/fonts/**</exclude>
-                    <exclude>/assets/global/plugins/bootstrap/fonts/bootstrap/**</exclude>
-                    <exclude>/assets/global/plugins/font-awesome/fonts/**</exclude>
+                    <exclude>static/assets/global/plugins/font-awesome/fonts/**</exclude>
+                    <exclude>static/assets/global/plugins/simple-line-icons/fonts/**</exclude>
+                    <exclude>static/assets/global/plugins/bootstrap/fonts/bootstrap/**</exclude>
+                    <exclude>static/assets/global/plugins/font-awesome/fonts/**</exclude>
                 </excludes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <includes>
-                    <include>/assets//global/plugins/font-awesome/fonts/**</include>
-                    <include>/assets//global/plugins/simple-line-icons/fonts/**</include>
-                    <include>/assets/global/plugins/bootstrap/fonts/bootstrap/**</include>
-                    <include>/assets/global/plugins/font-awesome/fonts/**</include>
+                    <include>static/assets//global/plugins/font-awesome/fonts/**</include>
+                    <include>static/assets//global/plugins/simple-line-icons/fonts/**</include>
+                    <include>static/assets/global/plugins/bootstrap/fonts/bootstrap/**</include>
+                    <include>static/assets/global/plugins/font-awesome/fonts/**</include>
                 </includes>
             </resource>
         </resources>

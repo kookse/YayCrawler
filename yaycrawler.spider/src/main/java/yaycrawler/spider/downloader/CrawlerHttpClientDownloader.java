@@ -90,7 +90,7 @@ public class CrawlerHttpClientDownloader extends AbstractDownloader {
         }
         CloseableHttpClient httpClient = getHttpClient(site);
         Proxy proxy = proxyProvider != null ? proxyProvider.getProxy(task) : null;
-        proxy = new Proxy("127.0.0.1",8888);
+//        proxy = new Proxy("127.0.0.1",8888);
         HttpClientRequestContext requestContext = httpUriRequestConverter.convert(request, site, proxy);
         Page page = Page.fail();
         try {

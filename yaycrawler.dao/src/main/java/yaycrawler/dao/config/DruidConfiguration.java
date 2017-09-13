@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * @author qldhlbs
  *
  */
-@Configuration
+//@Configuration
 public class DruidConfiguration {
 
 	/**

@@ -17,4 +17,5 @@ public class GlobalErrorController implements ErrorController {
     public String getErrorPath() {
         return "error";
     }
+
 }
