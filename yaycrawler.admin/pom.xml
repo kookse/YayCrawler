@@ -202,19 +202,23 @@
 
         <resources>
             <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
+                <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <excludes>
-                    <exclude>public/fonts/**</exclude>
-                    <exclude>public/layui/font/**</exclude>
+                    <exclude>/assets/global/plugins/font-awesome/fonts/**</exclude>
+                    <exclude>/assets/global/plugins/simple-line-icons/fonts/**</exclude>
+                    <exclude>/assets/global/plugins/bootstrap/fonts/bootstrap/**</exclude>
+                    <exclude>/assets/global/plugins/font-awesome/fonts/**</exclude>
                 </excludes>
             </resource>
             <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
+                <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <includes>
-                    <include>public/fonts/**</include>
-                    <include>public/layui/font/**</include>
+                    <include>/assets//global/plugins/font-awesome/fonts/**</include>
+                    <include>/assets//global/plugins/simple-line-icons/fonts/**</include>
+                    <include>/assets/global/plugins/bootstrap/fonts/bootstrap/**</include>
+                    <include>/assets/global/plugins/font-awesome/fonts/**</include>
                 </includes>
             </resource>
         </resources>

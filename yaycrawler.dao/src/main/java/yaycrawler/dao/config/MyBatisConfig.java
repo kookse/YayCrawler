@@ -21,9 +21,9 @@ import java.util.Properties;
 /**
  * MyBatis基础配置
  */
-//@Configuration
-//@ConditionalOnBean(value = DataSource.class)
-//@AutoConfigureAfter(DataSourceAutoConfiguration.class)
+@Configuration
+@ConditionalOnBean(value = DataSource.class)
+@AutoConfigureAfter(DataSourceAutoConfiguration.class)
 public class MyBatisConfig {
 
     @Autowired

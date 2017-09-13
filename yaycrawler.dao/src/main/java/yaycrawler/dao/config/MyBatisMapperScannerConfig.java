@@ -10,9 +10,9 @@ import tk.mybatis.spring.mapper.MapperScannerConfigurer;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-//@Configuration
-//@AutoConfigureAfter(MyBatisConfig.class)
-//@ConditionalOnBean(value = DataSource.class)
+@Configuration
+@AutoConfigureAfter(MyBatisConfig.class)
+@ConditionalOnBean(value = DataSource.class)
 public class MyBatisMapperScannerConfig {
 
     private static final String PACKAGE_SPILT_SIGN = ";";
@@ -33,7 +33,7 @@ public class MyBatisMapperScannerConfig {
         Properties properties = new Properties();
         properties.setProperty("mappers", "yaycrawler.dao.AbiMapper");
         properties.setProperty("notEmpty", "false");
-        properties.setProperty("IDENTITY", "POSTGRESQL");
+        properties.setProperty("IDENTITY", "MYSQL");
         mapperScannerConfigurer.setProperties(properties);
         return mapperScannerConfigurer;
     }
