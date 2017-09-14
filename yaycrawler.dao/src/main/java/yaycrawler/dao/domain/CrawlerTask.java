@@ -44,7 +44,7 @@ public class CrawlerTask {
     @Column(name = "extend_data", columnDefinition = "text")
     private String extendData;
 
-    @Column(name = "created_time", columnDefinition = " datetime")
+    @Column(name = "created_time",columnDefinition = "timestamp default now()")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdTime;
 
@@ -59,7 +59,7 @@ public class CrawlerTask {
     /**
      * 状态，未开始：-2；运行中：-1；失败：0；成功：1；超时：2
      */
-    @Column(name = "status", columnDefinition = "tinyint default -2")
+    @Column(name = "status", columnDefinition = "int default -2")
     private Integer status;
 
     /**

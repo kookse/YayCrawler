@@ -12,7 +12,7 @@
         <!--这个输出控制台的配置-->
         <console name="Console" target="SYSTEM_OUT">
             <!--输出日志的格式-->
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"  charset="gbk"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </console>
         <RollingFile name="RollingFileDebug" fileName="${LOG_PATH}/logs/admin/debug.log"
                      filePattern="${LOG_PATH}/logs/admin/$${date:yyyy-MM}/debug-%d{yyyy-MM-dd}-%i.log">
