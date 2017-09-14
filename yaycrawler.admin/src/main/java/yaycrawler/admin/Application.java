@@ -20,18 +20,4 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-
-    @Bean
-    public EmbeddedServletContainerCustomizer containerCustomizer() {
-
-        return (container -> {
-            container.addErrorPages(
-                    new ErrorPage(HttpStatus.FORBIDDEN, "/error/403"),
-                    new ErrorPage(HttpStatus.NOT_FOUND, "/assets/404.html"),
-                    new ErrorPage(HttpStatus.NOT_FOUND, "/assets/500.html"),
-                    new ErrorPage(HttpStatus.METHOD_NOT_ALLOWED, "/error/error"),
-                    new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/error/error"),
-                    new ErrorPage(Exception.class, "/error/error"));
-        });
-    }
 }
