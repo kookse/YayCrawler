@@ -84,4 +84,27 @@ public class Solution {
         param.put("loginPassword","g123456");
         System.out.println(JSON.toJSONString(param));
     }
+
+    @Test
+    public void toGdltax() {
+        Map param = Maps.newHashMap();
+        param.put("$loginUrl","http://mtax.gdltax.gov.cn/appserver/security/user/tpLogin.do");
+        param.put("$valideLogin",".*\"flag\":\"ok\"");
+        param.put("phonenum","get(loginName)");
+        param.put("password","get(loginPassword)");
+        param.put("$yzm","downloadEngine(http://mtax.gdltax.gov.cn/appserver/security/binduser/captcha.do).ocrEngine($1$$[0-9a-zA-z]{4})");
+        param.put("#accountInfoStr","json(phonenum$$password$$yzm).encode($1).encode($1)");
+        param.put("callback", "jsonp_callback4");
+        param.put("timeOut", "100000");
+        param.put("$time", "currentTimeMillis()");
+        System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
+    public void toGdltaxSite() {
+        Map param = Maps.newHashMap();
+        param.put("loginName","15626241465");
+        param.put("loginPassword","jaB4Gz143AtQ");
+        System.out.println(JSON.toJSONString(param));
+    }
 }
