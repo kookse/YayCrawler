@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 @SpringBootApplication
 @ImportResource(locations = {"classpath*:spring/*.xml"})
 @EnableJpaRepositories(basePackages = {"yaycrawler.dao.repositories"})
-@EntityScan(basePackages = {"yaycrawler.dao.domain"})
+@EntityScan(basePackages = {"yaycrawler.**.domain"})
 public class Application {
     
     public static void main(String[] args) {

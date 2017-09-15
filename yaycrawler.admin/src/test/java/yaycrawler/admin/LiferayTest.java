@@ -27,9 +27,9 @@ public class LiferayTest {
     @org.junit.Test
     public void search(){
         List<User> userList = usereMapper.findAllUser();
-        for(int i=0;i<100;i++){
-            System.out.println(userList.get(i).getUid()+"-----");
-        }
+        userList.forEach(user -> {
+            System.out.println(user.getUid() + "-----" + user.getEmail());
+        });
         System.out.println(userList.size()+"---------userList size-----------");
     }
 }
