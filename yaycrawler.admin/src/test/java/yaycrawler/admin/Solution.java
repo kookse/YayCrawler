@@ -56,6 +56,14 @@ public class Solution {
     }
 
     @Test
+    public void toJiaYuanSite() {
+        Map param = Maps.newHashMap();
+        param.put("loginName","13216635314");
+        param.put("loginPassword","123456789");
+        System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
     public void toGzlss() {
         Map param = Maps.newHashMap();
         param.put("$loginUrl","http://gzlss.hrssgz.gov.cn/cas/login");

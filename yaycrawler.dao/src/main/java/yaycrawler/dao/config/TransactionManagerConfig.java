@@ -15,8 +15,8 @@ import javax.sql.DataSource;
  * 分布式事物管理配置
  * Created by  yuananyun on 2017/7/18.
  */
-@Configuration
-@EnableTransactionManagement
+//@Configuration
+//@EnableTransactionManagement
 public class TransactionManagerConfig implements TransactionManagementConfigurer {
 
     @Autowired
