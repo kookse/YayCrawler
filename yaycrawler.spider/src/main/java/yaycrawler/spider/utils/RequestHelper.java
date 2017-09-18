@@ -1,5 +1,6 @@
 package yaycrawler.spider.utils;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.utils.HttpConstant;
@@ -7,6 +8,8 @@ import us.codecraft.webmagic.utils.HttpConstant;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by ucs_yuananyun on 2016/5/12.
@@ -38,4 +41,24 @@ public class RequestHelper {
         return request;
     }
 
+    public static String getParam(String url,String param) {
+        Pattern pattern = Pattern.compile(String.format("%s=(.*?)&|/%s/(.*?)/",param,param));
+        Matcher matcher = pattern.matcher(url);
+        String value = "";
+        while (matcher.find()) {
+            value = matcher.group(1) != null ? matcher.group(1):matcher.group(2);
+        }
+        return value;
+    }
+
+    public static Map<String,Object> getParams( String url) {
+        Map<String,Object> data = Maps.newHashMap();
+        if(url.indexOf("?") > 0) {
+            String[] params = StringUtils.split(StringUtils.split(url,"?")[1],"&");
+            for (String param:params) {
+                data.put(StringUtils.substringBefore(param,"="),StringUtils.substringAfter(param,"="));
+            }
+        }
+        return data;
+    }
 }

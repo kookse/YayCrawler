@@ -55,7 +55,10 @@ public class ConfigSpiderService {
      * @return
      */
     public Map<String, Object> testRegionRule(CrawlerRequest crawlerRequest, PageParseRegion parseRegion, PageInfo pageInfo, Site site) {
-        final Request request = RequestHelper.createRequest(crawlerRequest.getUrl(), crawlerRequest.getMethod(), crawlerRequest.getData());
+        Request request = new Request();
+        request.setUrl(crawlerRequest.getUrl());
+        request.setExtras(crawlerRequest.getData());
+        request.setMethod(crawlerRequest.getMethod());
         if (pageProcessor == null || request == null) return null;
         Page page = null;
         if (page == null) {
@@ -66,9 +69,7 @@ public class ConfigSpiderService {
         int i = 0;
         while(i < 5 && !pageProcessor.pageValidated(page,pageInfo.getPageValidationRule())) {
             pageMap.remove(request.getUrl());
-            request.setExtras(crawlerRequest.getData());
             page.setRequest(request);
-            pageProcessor.process(page);
             final Site finalSite = site;
             page = downloadPage(request, finalSite);
             i++;
@@ -97,16 +98,17 @@ public class ConfigSpiderService {
         if (pageInfo == null ) return null;
         String targetUrl = pageInfo.getPageUrl();
         Map<String, Object> paramsMap = pageInfo.getParamsMap();
-        Request request = RequestHelper.createRequest(targetUrl, pageInfo.getMethod(), paramsMap);
+        Request request = new Request();
+        request.setUrl(targetUrl);
+        request.setExtras(paramsMap);
+        request.setMethod(pageInfo.getMethod());
         request.putExtra("$pageInfo",pageInfo);
         Page page = downloadPage(request, null);
         if (page == null) return RestFulResult.failure("页面下载失败！");
         int i = 0;
         while(i < 5 && !pageProcessor.pageValidated(page,pageInfo.getPageValidationRule())) {
             pageMap.remove(request.getUrl());
-            request.setExtras(paramsMap);
             page.setRequest(request);
-            pageProcessor.process(page);
             page = downloadPage(request, null);
             i++;
         }

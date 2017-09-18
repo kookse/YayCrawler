@@ -31,7 +31,6 @@ import yaycrawler.monitor.captcha.CaptchaIdentificationProxy;
 import yaycrawler.monitor.login.AutoLoginProxy;
 import yaycrawler.spider.listener.IPageParseListener;
 import yaycrawler.spider.service.PageSiteService;
-
 import java.util.*;
 
 /**
@@ -61,14 +60,10 @@ public class GenericPageProcessor implements PageProcessor {
     public void process(Page page) {
         Request pageRequest = page.getRequest();
         String pageUrl = pageRequest.getUrl();
-        if (doAutomaticRecovery(page, pageRequest, pageUrl)) {
-//            //重新加入队列
-//            page.addTargetRequest(page.getRequest());
-            return;
-        }
+
         //是否正确的页面
         PageInfo pageInfo = pageParserRuleService.findOnePageInfoByRgx(pageUrl);
-        if(pageInfo==null) return;
+        if (pageInfo == null) return;
         String pageValidationExpression = pageInfo.getPageValidationRule();
         if (pageValidated(page, pageValidationExpression)) {
             try {
@@ -77,11 +72,9 @@ public class GenericPageProcessor implements PageProcessor {
                 for (PageParseRegion pageParseRegion : regionList) {
                     Object result = parseOneRegion(page, pageParseRegion, childRequestList);
                     if (result != null) {
-                        if(result instanceof List)
+                        if (result instanceof List)
                             ((List) result).add(pageParseRegion.getDataType());
-                        else if(result instanceof Map)
-                            ((HashMap)result).put("dataType", pageParseRegion.getDataType());
-                        page.putField(pageParseRegion.getName(), result);
+                        page.putField(PinYinUtil.converterToFirstSpell(pageParseRegion.getName()), result);
                     }
                 }
                 if (pageParseListener != null)
@@ -114,7 +107,7 @@ public class GenericPageProcessor implements PageProcessor {
 
         Set<FieldParseRule> fieldParseRules = pageParseRegion.getFieldParseRules();
         if (fieldParseRules != null && fieldParseRules.size() > 0) {
-            return parseFieldRules(context, request, fieldParseRules,pageParseRegion.getDataType());
+            return parseFieldRules(context, request, fieldParseRules, pageParseRegion.getDataType());
         }
 
         return null;
@@ -147,64 +140,58 @@ public class GenericPageProcessor implements PageProcessor {
      * @param fieldParseRuleList
      * @return
      */
-    private Object parseFieldRules(Selectable context, Request request, Collection<FieldParseRule> fieldParseRuleList,String dataType) {
-        int i = 0;
+    private Object parseFieldRules(Selectable context, Request request, Collection<FieldParseRule> fieldParseRuleList, String dataType) {
         Map resultMap = new HashedMap();
-        List resultData = Lists.newArrayList();
+        List<Map> resultData = Lists.newArrayList();
         List<Selectable> nodes = getNodes(context);
         for (Selectable node : nodes) {
             Map childMap = new HashedMap();
             Object label = null;
             Object value = null;
             for (FieldParseRule fieldParseRule : fieldParseRuleList) {
-                if (StringUtils.equalsIgnoreCase(fieldParseRule.getFieldName(),"label")) {
+                if (StringUtils.equalsIgnoreCase(fieldParseRule.getFieldName(), "label")) {
                     label = CrawlerExpressionResolver.resolve(request, node, fieldParseRule.getRule());
-                } else if (StringUtils.equalsIgnoreCase(fieldParseRule.getFieldName(),"value")) {
+                } else if (StringUtils.equalsIgnoreCase(fieldParseRule.getFieldName(), "value")) {
                     value = CrawlerExpressionResolver.resolve(request, node, fieldParseRule.getRule());
                 } else {
                     childMap.put(fieldParseRule.getFieldName(), CrawlerExpressionResolver.resolve(request, node, fieldParseRule.getRule()));
                 }
             }
-            if(StringUtils.equalsIgnoreCase(dataType,"autoField")) {
+            if (StringUtils.equalsIgnoreCase(dataType, "autoField")) {
                 try {
                     if (label == null && value != null && value instanceof Collection) {
-                        for(Object val:(Collection)value) {
-                            childMap.put("value",val);
-//                            resultMap.put(String.valueOf(i++), childMap);
+                        for (Object val : (Collection) value) {
+                            childMap.put("value", val);
                             resultData.add(childMap);
                         }
                     } else if (label != null && value != null && value instanceof Collection) {
-                        i = 0;
-                        for(Object val:(Collection)value) {
-                            childMap = resultMap.get(String.valueOf(i)) == null ? Maps.newHashMap() : (Map) resultMap.get(String.valueOf(i));
-                            childMap.put(PinYinUtil.converterToFirstSpell(String.valueOf(label)), val);
-                            resultMap.put(String.valueOf(i++), childMap);
+                        int i = 0;
+                        if (resultData.size() == 0) {
+                            for (Object val : (Collection) value) {
+                                resultData.add(Maps.newHashMap());
+                            }
                         }
-                    }
-                    else if(label != null && value == null) {
-                        childMap.put("label",label);
-//                        resultMap.put(String.valueOf(i++), childMap);
+                        for (Object val : (Collection) value) {
+                            childMap = resultData.get(i++);
+                            childMap.put(PinYinUtil.converterToFirstSpell(String.valueOf(label)), val);
+                        }
+                    } else if (label != null && value == null) {
+                        childMap.put("label", label);
                         resultData.add(childMap);
-                    } else if(label == null && value != null) {
-                        childMap.put("value",value);
-//                        resultMap.put(String.valueOf(i++), childMap);
+                    } else if (label == null && value != null) {
+                        childMap.put("value", value);
                         resultData.add(childMap);
                     } else if (label != null && value != null) {
-                        resultMap.put(PinYinUtil.converterToFirstSpell(String.valueOf(label)),value);
+                        resultMap.put(PinYinUtil.converterToFirstSpell(String.valueOf(label)), value);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {
                 resultData.add(childMap);
-//                resultMap.put(String.valueOf(i++), childMap);
             }
         }
-
-        if(resultData.size() == 0) {
-            resultData.add(resultMap);
-        }
-        if ((nodes.size() > 1 || StringUtils.equalsIgnoreCase(dataType,"autoField")) && resultData.size() > 0)
+        if ((nodes.size() > 1 || StringUtils.equalsIgnoreCase(dataType, "autoField")) && resultData.size() > 0)
             return resultData;
         else {
             resultData.add(resultMap);
@@ -244,7 +231,7 @@ public class GenericPageProcessor implements PageProcessor {
                         for (String url : urlList)
                             childRequestList.add(new CrawlerRequest(url, urlParseRule.getMethod(), urlParamMap));
                 } else
-                    childRequestList.add(new CrawlerRequest(String.valueOf(u) , urlParseRule.getMethod(), urlParamMap));
+                    childRequestList.add(new CrawlerRequest(String.valueOf(u), urlParseRule.getMethod(), urlParamMap));
             }
         }
         return childRequestList;
@@ -309,7 +296,7 @@ public class GenericPageProcessor implements PageProcessor {
      * @param pageRequest
      * @param pageUrl
      */
-    private boolean doAutomaticRecovery(Page page, Request pageRequest, String pageUrl) {
+    public boolean doAutomaticRecovery(Page page, Request pageRequest, String pageUrl) {
         boolean doRecovery = false;
         PageSite pageSite = pageSiteService.getPageSiteByUrl(pageUrl);
         if (pageSite != null) {
@@ -320,36 +307,37 @@ public class GenericPageProcessor implements PageProcessor {
             String captchaJudgeExpression = pageSite.getCaptchaJudgeExpression();
             String loginJsFileName = pageSite.getLoginJsFileName();
             String captchaJsFileName = pageSite.getCaptchaJsFileName();
-            String param = pageSite.getLoginParam() != null ?pageSite.getLoginParam():"";
+            String param = pageSite.getLoginParam() != null ? pageSite.getLoginParam() : "";
             String oldCookieId = String.valueOf(pageRequest.getExtra("cookieId"));
-            if(status == 0) {
-                if(StringUtils.isEmpty(encrypt))
+            if (status == 0) {
+                if (StringUtils.isEmpty(encrypt))
                     encrypt = "encryptEngine";
-                if(StringUtils.isEmpty(login))
+                if (StringUtils.isEmpty(login))
                     login = "loginEngine";
                 Engine loginEngine = (Engine) SpringContextUtil.getBean(login);
                 Engine encryptEngine = (Engine) SpringContextUtil.getBean(encrypt);
                 Map paramData = null;
-                if(StringUtils.isEmpty(param)) {
+                if (StringUtils.isEmpty(param)) {
                     paramData = Maps.newHashMap();
                 } else {
-                    paramData = JSON.parseObject(param,Map.class);
+                    paramData = JSON.parseObject(param, Map.class);
                 }
-                if( pageRequest.getExtras() != null)
+                if (pageRequest.getExtras() != null)
                     paramData.putAll(pageRequest.getExtras());
                 EngineResult engineResult = encryptEngine.execute(paramData);
                 LoginParam loginParam = engineResult.getLoginParam();
                 engineResult = loginEngine.execute(loginParam);
-                if(engineResult.getStatus()) {
+                if (engineResult.getStatus()) {
                     doRecovery = Boolean.TRUE;
                     //需要登录了
                     List<PhantomCookie> phantomCookies = new ArrayList<>();
                     engineResult.getHeaders().forEach(header -> {
-                        PhantomCookie phantomCookie = new PhantomCookie(header.getName(),header.getValue());
+                        PhantomCookie phantomCookie = new PhantomCookie(header.getName(), header.getValue());
                         phantomCookies.add(phantomCookie);
                     });
-                    pageCookieService.deleteCookieBySiteId(pageSite.getId());
-                    if (pageCookieService.saveCookies(UrlUtils.getDomain(pageUrl),pageSite.getId(),phantomCookies)) {
+                    String loginName = pageRequest.getExtra("loginName") != null? pageRequest.getExtra("loginName").toString():"";
+                    pageCookieService.deleteCookieBySiteId(pageSite.getId(),loginName);
+                    if (pageCookieService.saveCookies(UrlUtils.getDomain(pageUrl), pageSite.getId(), phantomCookies,loginName)) {
                         logger.info("保存新的cookie成功！");
                     } else
                         logger.info("保存新的cookie失败！");
@@ -377,6 +365,7 @@ public class GenericPageProcessor implements PageProcessor {
         }
         return doRecovery;
     }
+
     /**
      * 验证是否正确的页面
      *

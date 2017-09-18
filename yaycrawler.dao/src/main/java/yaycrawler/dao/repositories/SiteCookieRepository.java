@@ -14,11 +14,11 @@ import javax.transaction.Transactional;
 @Repository
 public interface SiteCookieRepository extends CrudRepository<SiteCookie, String> {
 
-    @Query(value = "select *  from res_site_cookie where domain=?  limit 1", nativeQuery = true)
-    SiteCookie findOneByDomain(String domain);
+    @Query(value = "select *  from res_site_cookie sc where sc.domain=? and sc.login_name = ? limit 1", nativeQuery = true)
+    SiteCookie findOneByDomain(String domain,String loginName);
 
     @Modifying
     @Transactional
-    @Query(value = "delete from SiteCookie sc where sc.siteId = ?1")
-    Integer deleteBySiteId(String siteId);
+    @Query(value = "delete from res_site_cookie where site_id = ? and login_name = ?",nativeQuery = true)
+    Integer deleteBySiteId(String siteId,String loginName);
 }

@@ -29,6 +29,13 @@ public class SiteCookie implements Serializable {
         this.cookie = cookie;
     }
 
+    public SiteCookie(String cookie, String siteId, String domain, String loginName) {
+        this.cookie = cookie;
+        this.siteId = siteId;
+        this.domain = domain;
+        this.loginName = loginName;
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -49,11 +56,23 @@ public class SiteCookie implements Serializable {
     @Column(name = "available",insertable = false,columnDefinition = "char default '1'")
     private String  available;
 
-    @Column(name = "createdDate", columnDefinition = "timestamp default now()")
+    @Column(name = "createdDate", columnDefinition = "timestamp default (now())")
     private Date createdDate;
 
-    @Column(name = "lastUpdatedDate", columnDefinition = "timestamp default now()")
+    @Column(name = "lastUpdatedDate", columnDefinition = "timestamp default (now())")
     private Date lastUpdatedDate;
+
+    @NotNull
+    @Column(name = "loginName",columnDefinition = "varchar(38)")
+    private String loginName;
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
+    }
 
     public String getId() {
         return id;

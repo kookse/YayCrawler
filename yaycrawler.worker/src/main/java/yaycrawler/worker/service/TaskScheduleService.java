@@ -114,8 +114,12 @@ public class TaskScheduleService {
         }
     }
 
-    private Request convertCrawlerRequestToSpiderRequest(CrawlerRequest CrawlerRequest) {
-        return RequestHelper.createRequest(CrawlerRequest.getUrl(), CrawlerRequest.getMethod().toUpperCase(), CrawlerRequest.getData());
+    private Request convertCrawlerRequestToSpiderRequest(CrawlerRequest crawlerRequest) {
+        Request request = new Request();
+        request.setUrl(crawlerRequest.getUrl());
+        request.setExtras(crawlerRequest.getData());
+        request.setMethod(crawlerRequest.getMethod());
+        return request;
     }
 
     private YaySpider createSpider(String domain) {

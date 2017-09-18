@@ -40,17 +40,17 @@ public class PageCookieService {
     }
 
     @CacheEvict(value = DEMO_CACHE_NAME)
-    public void deleteCookieBySiteId(String siteId) {
+    public void deleteCookieBySiteId(String siteId,String loginName) {
         try {
             if (StringUtils.isBlank(siteId)) return;
-            cookieRepository.deleteBySiteId(siteId);
+            cookieRepository.deleteBySiteId(siteId,loginName);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     @CacheEvict(value = DEMO_CACHE_NAME)
-    public boolean saveCookies(String domain,String siteId, List<PhantomCookie> cookies) {
+    public boolean saveCookies(String domain,String siteId, List<PhantomCookie> cookies,String loginName) {
         if (cookies == null || cookies.size() == 0) return false;
         try {
             StringBuilder cookieBuild = new StringBuilder();
@@ -61,7 +61,7 @@ public class PageCookieService {
                         else
                             cookieBuild.append(String.format("%s=%s;",phantomCookie.getName(),phantomCookie.getValue()));
                     });
-            return cookieRepository.save(new SiteCookie(siteId,domain,cookieBuild.toString())) != null;
+            return cookieRepository.save(new SiteCookie(cookieBuild.toString(),siteId,domain,loginName)) != null;
         } catch (Exception ex) {
             return false;
         }
@@ -79,13 +79,13 @@ public class PageCookieService {
         }
     }
 
-    @Cacheable(value = DEMO_CACHE_NAME, keyGenerator = "wiselyKeyGenerator")
-    public SiteCookie getCookieByUrl(String url) {
+    @Cacheable(value = DEMO_CACHE_NAME)
+    public SiteCookie getCookieByUrl(String url,String loginName) {
         if (StringUtils.isBlank(url)) return null;
-        return cookieRepository.findOneByDomain(UrlUtils.getDomain(url));
+        return cookieRepository.findOneByDomain(UrlUtils.getDomain(url),loginName);
     }
 
-    @Cacheable(value = DEMO_CACHE_NAME, keyGenerator = "wiselyKeyGenerator")
+    @Cacheable(value = DEMO_CACHE_NAME)
     public String getCookieValueById(String cookieId) {
         SiteCookie siteCookie = cookieRepository.findOne(cookieId);
         return siteCookie == null ? "" : siteCookie.getCookie();

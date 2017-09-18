@@ -24,6 +24,14 @@ public class SiteCookie implements Serializable {
         this.domain = domain;
         this.cookie = cookie;
     }
+
+    public SiteCookie(String cookie, String siteId, String domain, String loginName) {
+        this.cookie = cookie;
+        this.siteId = siteId;
+        this.domain = domain;
+        this.loginName = loginName;
+    }
+
     public SiteCookie(String domain, String cookie) {
         this.domain = domain;
         this.cookie = cookie;
@@ -54,6 +62,18 @@ public class SiteCookie implements Serializable {
 
     @Column(name = "lastUpdatedDate", columnDefinition = "timestamp default now()")
     private Date lastUpdatedDate;
+
+    @NotNull
+    @Column(name = "login_name",columnDefinition = "varchar(500)")
+    private String loginName;
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
+    }
 
     public String getId() {
         return id;
