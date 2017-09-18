@@ -82,7 +82,7 @@ public class ConfigSpiderService {
             return null;
         }
         List<CrawlerRequest> childRequestList = new LinkedList<>();
-        Map<String, Object> data = pageProcessor.parseOneRegion(page, parseRegion, childRequestList);
+        Object data = pageProcessor.parseOneRegion(page, parseRegion, childRequestList);
         Map<String, Object> result = new HashMap<>();
         if (data != null)
             result.put("data", data);

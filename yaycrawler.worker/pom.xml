@@ -92,12 +92,10 @@ http://www.w3.org/2001/XMLSchema-instance ">
         <dependency>
             <groupId>com.yaycrawler</groupId>
             <artifactId>yaycrawler-common</artifactId>
-            <version>${yaycrawler.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yaycrawler</groupId>
             <artifactId>yaycrawler-spider</artifactId>
-            <version>${yaycrawler.version}</version>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>

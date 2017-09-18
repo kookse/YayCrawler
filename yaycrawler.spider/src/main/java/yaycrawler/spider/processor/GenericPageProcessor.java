@@ -1,6 +1,7 @@
 package yaycrawler.spider.processor;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -74,9 +75,12 @@ public class GenericPageProcessor implements PageProcessor {
                 List<CrawlerRequest> childRequestList = new LinkedList<>();
                 Set<PageParseRegion> regionList = pageParserRuleService.getPageRegions(pageUrl);
                 for (PageParseRegion pageParseRegion : regionList) {
-                    Map<String, Object> result = parseOneRegion(page, pageParseRegion, childRequestList);
+                    Object result = parseOneRegion(page, pageParseRegion, childRequestList);
                     if (result != null) {
-                        result.put("dataType", pageParseRegion.getDataType());
+                        if(result instanceof List)
+                            ((List) result).add(pageParseRegion.getDataType());
+                        else if(result instanceof Map)
+                            ((HashMap)result).put("dataType", pageParseRegion.getDataType());
                         page.putField(pageParseRegion.getName(), result);
                     }
                 }
@@ -96,7 +100,7 @@ public class GenericPageProcessor implements PageProcessor {
 
 
     @SuppressWarnings("all")
-    public Map<String, Object> parseOneRegion(Page page, PageParseRegion pageParseRegion, List<CrawlerRequest> childRequestList) {
+    public Object parseOneRegion(Page page, PageParseRegion pageParseRegion, List<CrawlerRequest> childRequestList) {
         Request request = page.getRequest();
         String selectExpression = pageParseRegion.getSelectExpression();
 
@@ -143,9 +147,10 @@ public class GenericPageProcessor implements PageProcessor {
      * @param fieldParseRuleList
      * @return
      */
-    private Map<String, Object> parseFieldRules(Selectable context, Request request, Collection<FieldParseRule> fieldParseRuleList,String dataType) {
+    private Object parseFieldRules(Selectable context, Request request, Collection<FieldParseRule> fieldParseRuleList,String dataType) {
         int i = 0;
         Map resultMap = new HashedMap();
+        List resultData = Lists.newArrayList();
         List<Selectable> nodes = getNodes(context);
         for (Selectable node : nodes) {
             Map childMap = new HashedMap();
@@ -165,7 +170,8 @@ public class GenericPageProcessor implements PageProcessor {
                     if (label == null && value != null && value instanceof Collection) {
                         for(Object val:(Collection)value) {
                             childMap.put("value",val);
-                            resultMap.put(String.valueOf(i++), childMap);
+//                            resultMap.put(String.valueOf(i++), childMap);
+                            resultData.add(childMap);
                         }
                     } else if (label != null && value != null && value instanceof Collection) {
                         i = 0;
@@ -177,10 +183,12 @@ public class GenericPageProcessor implements PageProcessor {
                     }
                     else if(label != null && value == null) {
                         childMap.put("label",label);
-                        resultMap.put(String.valueOf(i++), childMap);
+//                        resultMap.put(String.valueOf(i++), childMap);
+                        resultData.add(childMap);
                     } else if(label == null && value != null) {
                         childMap.put("value",value);
-                        resultMap.put(String.valueOf(i++), childMap);
+//                        resultMap.put(String.valueOf(i++), childMap);
+                        resultData.add(childMap);
                     } else if (label != null && value != null) {
                         resultMap.put(PinYinUtil.converterToFirstSpell(String.valueOf(label)),value);
                     }
@@ -188,12 +196,20 @@ public class GenericPageProcessor implements PageProcessor {
                     e.printStackTrace();
                 }
             } else {
-                resultMap.put(String.valueOf(i++), childMap);
+                resultData.add(childMap);
+//                resultMap.put(String.valueOf(i++), childMap);
             }
         }
-        if (nodes.size() > 1 || StringUtils.equalsIgnoreCase(dataType,"autoField"))
-            return resultMap;
-        else return (Map<String, Object>) resultMap.get("0");
+
+        if(resultData.size() == 0) {
+            resultData.add(resultMap);
+        }
+        if ((nodes.size() > 1 || StringUtils.equalsIgnoreCase(dataType,"autoField")) && resultData.size() > 0)
+            return resultData;
+        else {
+            resultData.add(resultMap);
+            return resultData;
+        }
     }
 
 

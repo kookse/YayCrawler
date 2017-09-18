@@ -310,7 +310,17 @@
             </dependency>
             <dependency>
                 <groupId>com.yaycrawler</groupId>
+                <artifactId>yaycrawler-cache</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yaycrawler</groupId>
                 <artifactId>yaycrawler-quartz</artifactId>
+                <version>${yaycrawler.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yaycrawler</groupId>
+                <artifactId>yaycrawler-api</artifactId>
                 <version>${yaycrawler.version}</version>
             </dependency>
             <!--项目依赖结束-->

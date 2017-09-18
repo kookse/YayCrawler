@@ -46,7 +46,6 @@
         <dependency>
             <groupId>com.yaycrawler</groupId>
             <artifactId>yaycrawler-cache</artifactId>
-            <version>${yaycrawler.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
