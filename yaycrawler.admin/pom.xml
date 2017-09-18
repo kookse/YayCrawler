@@ -103,9 +103,13 @@
             <!--<groupId>com.example</groupId>-->
             <!--<artifactId>yaycrawler-monitor</artifactId>-->
         <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.yaycrawler</groupId>-->
+            <!--<artifactId>yaycrawler-dao</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.yaycrawler</groupId>
-            <artifactId>yaycrawler-dao</artifactId>
+            <artifactId>yaycrawler-dataapi</artifactId>
         </dependency>
     </dependencies>
 

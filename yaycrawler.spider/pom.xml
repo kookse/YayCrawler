@@ -70,11 +70,18 @@
 			<artifactId>yaycrawler-common</artifactId>
 			<version>${yaycrawler.version}</version>
 		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.yaycrawler</groupId>-->
+			<!--<artifactId>yaycrawler-dao</artifactId>-->
+			<!--<version>${yaycrawler.version}</version>-->
+		<!--</dependency>-->
+
 		<dependency>
 			<groupId>com.yaycrawler</groupId>
-			<artifactId>yaycrawler-dao</artifactId>
+			<artifactId>yaycrawler-dataapi</artifactId>
 			<version>${yaycrawler.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.example</groupId>
 			<artifactId>yaycrawler-monitor</artifactId>

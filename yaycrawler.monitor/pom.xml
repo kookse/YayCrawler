@@ -26,9 +26,13 @@
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
 		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.yaycrawler</groupId>-->
+			<!--<artifactId>yaycrawler-dao</artifactId>-->
+		<!--</dependency>-->
 		<dependency>
 			<groupId>com.yaycrawler</groupId>
-			<artifactId>yaycrawler-dao</artifactId>
+			<artifactId>yaycrawler-dataapi</artifactId>
 		</dependency>
 	</dependencies>
 

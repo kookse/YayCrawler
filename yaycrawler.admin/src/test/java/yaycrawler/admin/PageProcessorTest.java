@@ -123,8 +123,4 @@ public class PageProcessorTest {
         request.putExtra("loginPassword","123456789");
         page.setRequest(request);
         pageProcessor.process(page);
-    }
-
-
-
-}
+    `

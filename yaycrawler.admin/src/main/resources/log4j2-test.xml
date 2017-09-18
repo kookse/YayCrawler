@@ -62,10 +62,10 @@
         <logger name="org.mybatis" level="DEBUG"  ></logger>
         <root level="debug">
             <appender-ref ref="Console"/>
-            <!--<appender-ref ref="RollingFileDebug"/>-->
-            <!--<appender-ref ref="RollingFileInfo"/>-->
-            <!--<appender-ref ref="RollingFileWarn"/>-->
-            <!--<appender-ref ref="RollingFileError"/>-->
+            <appender-ref ref="RollingFileDebug"/>
+            <appender-ref ref="RollingFileInfo"/>
+            <appender-ref ref="RollingFileWarn"/>
+            <appender-ref ref="RollingFileError"/>
         </root>
     </loggers>
 </configuration>
