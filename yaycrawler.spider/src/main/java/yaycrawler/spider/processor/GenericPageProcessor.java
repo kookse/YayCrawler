@@ -322,8 +322,10 @@ public class GenericPageProcessor implements PageProcessor {
                 } else {
                     paramData = JSON.parseObject(param, Map.class);
                 }
-                if (pageRequest.getExtras() != null)
+                if (pageRequest.getExtras() != null) {
                     paramData.putAll(pageRequest.getExtras());
+                    paramData.remove("$pageInfo");
+                }
                 EngineResult engineResult = encryptEngine.execute(paramData);
                 LoginParam loginParam = engineResult.getLoginParam();
                 engineResult = loginEngine.execute(loginParam);

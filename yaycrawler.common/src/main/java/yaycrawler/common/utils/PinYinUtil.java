@@ -29,6 +29,9 @@ public class PinYinUtil {
             buffer.append(String.valueOf(ch));
             i++;
         }
-        return buffer.toString();
+        String regEx ="[^a-zA-Z0-9]";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(buffer.toString());
+        return m.replaceAll("").trim();
     }
 }

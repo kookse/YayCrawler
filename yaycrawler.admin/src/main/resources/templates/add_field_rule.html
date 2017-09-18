@@ -91,7 +91,10 @@
             return false;
         });
         $("#remark").bind("change",function(){
-                $("#fieldName").val(pinyin.getFullChars($(this).val()));
+            var data = pinyin.getFullChars($(this).val());
+            var reg=new RegExp("[^a-zA-Z0-9]","g");
+            data = data.replace(reg,"");
+                $("#fieldName").val(data);
 //                $("#fieldName").val(pinyin.getCamelChars(cv));
         });
 

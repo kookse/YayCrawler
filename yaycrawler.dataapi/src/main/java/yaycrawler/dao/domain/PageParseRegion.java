@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,8 +46,8 @@ public class PageParseRegion implements Serializable {
     @OrderBy(value = "id ASC")
     private Set<UrlParseRule> urlParseRules;
 
-    @Column(name = "createdDate",columnDefinition = "timestamp default now()")
-    private Date createdDate;
+    @Column(name = "createdDate",columnDefinition = "timestamp default (now())")
+    private Date createdDate = new Date();
 
     public PageParseRegion() {
         fieldParseRules =new HashSet<>();

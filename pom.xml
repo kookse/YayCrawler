@@ -13,9 +13,9 @@
         <module>yaycrawler.master</module>
         <module>yaycrawler.worker</module>
         <!--mysql dataapi-->
-        <module>yaycrawler.dao</module>
+        <!--<module>yaycrawler.dao</module>-->
         <!--postgresql dao-->
-        <!--<module>yaycrawler.dataapi</module>-->
+        <module>yaycrawler.dataapi</module>
         <module>yaycrawler.quartz</module>
         <module>yaycrawler.proxy</module>
         <module>yaycrawler.ftpserver</module>
@@ -288,16 +288,16 @@
                 <artifactId>yaycrawler-common</artifactId>
                 <version>${yaycrawler.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.yaycrawler</groupId>
-                <artifactId>yaycrawler-dao</artifactId>
-                <version>${yaycrawler.version}</version>
-            </dependency>
             <!--<dependency>-->
                 <!--<groupId>com.yaycrawler</groupId>-->
-                <!--<artifactId>yaycrawler-dataapi</artifactId>-->
+                <!--<artifactId>yaycrawler-dao</artifactId>-->
                 <!--<version>${yaycrawler.version}</version>-->
             <!--</dependency>-->
+            <dependency>
+                <groupId>com.yaycrawler</groupId>
+                <artifactId>yaycrawler-dataapi</artifactId>
+                <version>${yaycrawler.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.yaycrawler</groupId>
                 <artifactId>yaycrawler-spider</artifactId>

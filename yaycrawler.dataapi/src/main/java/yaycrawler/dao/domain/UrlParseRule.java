@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -36,8 +36,8 @@ public class UrlParseRule implements Serializable {
     @JoinColumn(name = "urlRuleId", insertable = false, updatable = false)
     private Set<UrlRuleParam> urlRuleParams;
 
-    @Column(name = "createdDate", columnDefinition = "timestamp default now()")
-    private Date createdDate;
+    @Column(name = "createdDate", columnDefinition = "timestamp default (now())")
+    private Date createdDate = new Date();
 
     public UrlParseRule() {
         method = "GET";

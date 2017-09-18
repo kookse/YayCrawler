@@ -18,6 +18,8 @@ import yaycrawler.common.model.RestFulResult;
 import yaycrawler.common.utils.UrlUtils;
 import yaycrawler.dao.domain.PageInfo;
 import yaycrawler.dao.domain.PageParseRegion;
+import yaycrawler.dao.domain.PageSite;
+import yaycrawler.dao.service.PageCookieService;
 import yaycrawler.spider.downloader.GenericCrawlerDownLoader;
 import yaycrawler.spider.processor.GenericPageProcessor;
 import yaycrawler.spider.resolver.SelectorExpressionResolver;
@@ -38,9 +40,10 @@ public class ConfigSpiderService {
     private GenericCrawlerDownLoader downloader;
     @Autowired
     private GenericPageProcessor pageProcessor;
-
     @Autowired
     private PageSiteService pageSiteService;
+    @Autowired
+    private PageCookieService pageCookieService;
 
     public ConfigSpiderService() {
 
@@ -69,6 +72,8 @@ public class ConfigSpiderService {
         int i = 0;
         while(i < 5 && !pageProcessor.pageValidated(page,pageInfo.getPageValidationRule())) {
             pageMap.remove(request.getUrl());
+            PageSite pageSite = pageSiteService.getPageSiteByUrl(request.getUrl());
+            pageCookieService.deleteCookieBySiteId(pageSite.getId(),request.getExtra("loginName").toString());
             page.setRequest(request);
             final Site finalSite = site;
             page = downloadPage(request, finalSite);

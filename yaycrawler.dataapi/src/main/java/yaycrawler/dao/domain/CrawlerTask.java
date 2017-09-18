@@ -44,9 +44,9 @@ public class CrawlerTask {
     @Column(name = "extend_data", columnDefinition = "text")
     private String extendData;
 
-    @Column(name = "created_time",columnDefinition = "timestamp default now()")
+    @Column(name = "created_time",columnDefinition = "timestamp default (now())")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdTime;
+    private Date createdTime = new Date();;
 
     @Column(name = "started_time")
     @Temporal(TemporalType.TIMESTAMP)

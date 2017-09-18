@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * Created by yuananyun on 2016/5/1.
@@ -34,8 +34,9 @@ public class FieldParseRule implements Serializable {
     private String rule;
     @Column(name = "valueType")
     private String valueType;
-    @Column(name = "createdDate", columnDefinition = "timestamp default now()")
-    private Date createdDate;
+
+    @Column(name = "createdDate", columnDefinition = "timestamp default (now())")
+    private Date createdDate = new Date();;
 
     public FieldParseRule() {
         valueType = "string";
