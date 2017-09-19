@@ -16,7 +16,7 @@ import javax.persistence.OrderBy;
 @Repository
 public  interface PageInfoRepository extends CrudRepository<PageInfo, String> {
 
-    @Query(value="select *  from conf_page_info pi where ? LIKE  pi.url_rgx",nativeQuery = true)
+    @Query(value="select *  from conf_page_info pi where ?  ~  pi.url_rgx",nativeQuery = true)
     PageInfo findOneByUrlRgx(String url);
 
     @OrderBy("createdDate desc ")

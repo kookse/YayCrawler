@@ -154,14 +154,14 @@ public class GenericPageProcessor implements PageProcessor {
                 } else if (StringUtils.equalsIgnoreCase(fieldParseRule.getFieldName(), "value")) {
                     value = CrawlerExpressionResolver.resolve(request, node, fieldParseRule.getRule());
                 } else {
-                    childMap.put(fieldParseRule.getFieldName(), CrawlerExpressionResolver.resolve(request, node, fieldParseRule.getRule()));
+                    childMap.put(fieldParseRule.getFieldName(), StringUtils.trimToEmpty(CrawlerExpressionResolver.resolve(request, node, fieldParseRule.getRule()).toString()));
                 }
             }
             if (StringUtils.equalsIgnoreCase(dataType, "autoField")) {
                 try {
                     if (label == null && value != null && value instanceof Collection) {
                         for (Object val : (Collection) value) {
-                            childMap.put("value", val);
+                            childMap.put("value", StringUtils.trimToEmpty(val.toString()));
                             resultData.add(childMap);
                         }
                     } else if (label != null && value != null && value instanceof Collection) {
@@ -173,16 +173,18 @@ public class GenericPageProcessor implements PageProcessor {
                         }
                         for (Object val : (Collection) value) {
                             childMap = resultData.get(i++);
-                            childMap.put(PinYinUtil.converterToFirstSpell(String.valueOf(label)), val);
+                            childMap.put(PinYinUtil.converterToFirstSpell(label.toString()), StringUtils.trimToEmpty(val.toString()));
                         }
                     } else if (label != null && value == null) {
                         childMap.put("label", label);
                         resultData.add(childMap);
                     } else if (label == null && value != null) {
-                        childMap.put("value", value);
+                        childMap.put("value", StringUtils.trimToEmpty(value.toString()));
                         resultData.add(childMap);
                     } else if (label != null && value != null) {
-                        resultMap.put(PinYinUtil.converterToFirstSpell(String.valueOf(label)), value);
+                        label = PinYinUtil.converterToFirstSpell(label.toString());
+                        if(StringUtils.isNotEmpty(label.toString()))
+                            resultMap.put(label,StringUtils.trimToEmpty(value.toString()));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

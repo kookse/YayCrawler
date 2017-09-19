@@ -92,7 +92,7 @@
         });
         $("#remark").bind("change",function(){
             var data = pinyin.getFullChars($(this).val());
-            var reg=new RegExp("[^a-zA-Z0-9]","g");
+            var reg=new RegExp("[^a-zA-Z0-9\-_]","g");
             data = data.replace(reg,"");
                 $("#fieldName").val(data);
 //                $("#fieldName").val(pinyin.getCamelChars(cv));

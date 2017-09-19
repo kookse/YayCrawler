@@ -29,7 +29,7 @@ public class PinYinUtil {
             buffer.append(String.valueOf(ch));
             i++;
         }
-        String regEx ="[^a-zA-Z0-9]";
+        String regEx ="[^a-zA-Z0-9\\-_]";
         Pattern p = Pattern.compile(regEx);
         Matcher m = p.matcher(buffer.toString());
         return m.replaceAll("").trim();
