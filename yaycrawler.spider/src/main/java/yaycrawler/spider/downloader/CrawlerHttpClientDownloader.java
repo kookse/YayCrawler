@@ -116,6 +116,16 @@ public class CrawlerHttpClientDownloader extends AbstractDownloader {
     }
 
     @Override
+    protected void onSuccess(Request request) {
+        super.onSuccess(request);
+    }
+
+    @Override
+    protected void onError(Request request) {
+        super.onError(request);
+    }
+
+    @Override
     public Page download(Request request, Task task) {
         return download(request, task, null);
     }

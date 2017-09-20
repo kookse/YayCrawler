@@ -2,9 +2,12 @@ package yaycrawler.admin;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.lang.Math.min;
 
@@ -114,5 +117,23 @@ public class Solution {
         param.put("loginName","15626241465");
         param.put("loginPassword","jaB4Gz143AtQ");
         System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
+    public void testParam() {
+        String param = "grsds";
+        String url = "http://mtax.gdltax.gov.cn/appserver/zrr/grsds/queryGrsdsNsmx.do?startdate=20170601&enddate=20170930&callback=jsonp_callback4&time=1505464152982&timeOut=60000&loginName=15626241465&loginPassword=123432435";
+        Pattern pattern = Pattern.compile(String.format("%s=(.*)&|%s=(.*)|/%s/(.*)/|/%s/(.*)",param,param,param,param));
+        Matcher matcher = pattern.matcher(url);
+        String value = "";
+        while (matcher.find()) {
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                value = matcher.group(i);
+                if(StringUtils.isNotEmpty(value)) {
+                    break;
+                }
+            }
+        }
+        System.out.println(value);
     }
 }

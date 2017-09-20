@@ -7,6 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import yaycrawler.dao.domain.PageInfo;
+import yaycrawler.dao.repositories.PageInfoRepository;
 import yaycrawler.dao.service.PageParserRuleService;
 import yaycrawler.spider.pipeline.GenericPipeline;
 import yaycrawler.spider.service.PageSiteService;
@@ -27,6 +29,9 @@ public class ApplicationTests {
 	private PageParserRuleService parserRuleService;
 	@Autowired
 	private PageSiteService pageSiteService;
+
+	@Autowired
+	private PageInfoRepository pageInfoRepository;
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -71,6 +76,12 @@ public class ApplicationTests {
 			}
 		}
 
+	}
+
+	@Test
+	public void findOnePageInfoByRgx() {
+		PageInfo pageInfo = pageInfoRepository.findOneByUrlRgx("http://mtax.gdltax.gov.cn/appserver/zrr/grsds/queryGrsdsNsmx.do?startdate=20170601&enddate=20170930&callback=jsonp_callback4&time=1505464152982&timeOut=60000");
+		System.out.println(pageInfo);
 	}
 
 }

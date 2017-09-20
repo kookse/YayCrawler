@@ -66,6 +66,17 @@ public class SiteCookie implements Serializable {
     @Column(name = "loginName",columnDefinition = "varchar(38)")
     private String loginName;
 
+    @Column(name = "password",columnDefinition = "varchar(38)")
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getLoginName() {
         return loginName;
     }

@@ -31,6 +31,8 @@ import yaycrawler.monitor.captcha.CaptchaIdentificationProxy;
 import yaycrawler.monitor.login.AutoLoginProxy;
 import yaycrawler.spider.listener.IPageParseListener;
 import yaycrawler.spider.service.PageSiteService;
+import yaycrawler.spider.utils.RequestHelper;
+
 import java.util.*;
 
 /**
@@ -324,9 +326,12 @@ public class GenericPageProcessor implements PageProcessor {
                 } else {
                     paramData = JSON.parseObject(param, Map.class);
                 }
-                if (pageRequest.getExtras() != null) {
+                if (pageRequest.getExtras() != null && pageRequest.getExtras().size() > 0) {
                     paramData.putAll(pageRequest.getExtras());
                     paramData.remove("$pageInfo");
+                } else {
+                    paramData.put("loginName", RequestHelper.getParam(pageRequest.getUrl(),"loginName"));
+                    paramData.put("loginPassword", RequestHelper.getParam(pageRequest.getUrl(),"loginPassword"));
                 }
                 EngineResult engineResult = encryptEngine.execute(paramData);
                 LoginParam loginParam = engineResult.getLoginParam();

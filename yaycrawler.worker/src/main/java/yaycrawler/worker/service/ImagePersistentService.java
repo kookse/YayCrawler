@@ -55,7 +55,7 @@ public class ImagePersistentService implements IResultPersistentService {
     /**
      * param data {id:"",srcList:""}
      */
-    public boolean saveCrawlerResult(String pageUrl, Map<String, Object> data) {
+    public boolean saveCrawlerResult(String pageUrl, List<Map<String, Object>> regionDataList) {
         //TODO 下载图片
         try {
             List<String> srcList = new ArrayList<>();
@@ -63,8 +63,7 @@ public class ImagePersistentService implements IResultPersistentService {
             //HttpUtil httpUtil = HttpUtil.getInstance();
 //            List<Header> headers = new ArrayList<>();
 //            headers.add(new BasicHeader("",""));
-            for (Object o : data.values()) {
-                Map<String,Object> regionData=(Map<String,Object>)o;
+            for (Map<String,Object> regionData : regionDataList) {
                 if(regionData==null) continue;
                 for (Object src : regionData.values()) {
                     if (src instanceof List)

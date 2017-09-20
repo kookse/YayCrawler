@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+    <!--<bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">-->
+    <!--<property name="mergeSql" value="true"/>-->
+    <!--&lt;!&ndash;慢记录&ndash;&gt;-->
+    <!--<property name="slowSqlMillis" value="5000"/>-->
+    <!--<property name="logSlowSql" value="true"/>-->
+    <!--</bean>-->
+
+    <!-- 数据源配置, 使用的druid数据库连接池 -->
+    <bean id="baseDataSourceConfig" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+          destroy-method="close" abstract="true">
+        <!-- 初始化时建立物理连接的个数。初始化发生在显示调用init方法，或者第一次getConnection时 -->
+        <property name="initialSize" value="1"/>
+        <!-- 连接池最大连接 -->
+        <property name="maxActive" value="500"/>
+        <!-- 最小连接池数量 -->
+        <property name="minIdle" value="1"/>
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="10000"/>
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <!--用来检测连接是否有效的sql，要求是一个查询语句-->
+        <property name="validationQuery" value="SELECT 1"/>
+        <!--建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。-->
+        <property name="testWhileIdle" value="true"/>
+        <!--申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。-->
+        <property name="testOnBorrow" value="false"/>
+        <!--归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能-->
+        <property name="testOnReturn" value="false"/>
+
+        <!-- 是否缓存preparedStatement，也就是PSCache。PSCache对支持游标的数据库性能提升巨大，比如说oracle。在mysql下建议关闭。 -->
+        <property name="poolPreparedStatements" value="false"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="100"/>
+
+        <!--物理连接初始化的时候执行的sql-->
+        <!--<property name="connectionInitSqls" value=""/>-->
+
+        <!-- 配置监控统计拦截的filters wall防止sql注入-->
+        <!--<property name="filters" value="wall"/>-->
+        <!--<property name="proxyFilters">-->
+            <!--<list>-->
+                <!--<ref bean="stat-filter"/>-->
+            <!--</list>-->
+        <!--</property>-->
+
+    </bean>
+
+    <bean id="primaryDataSource" parent="baseDataSourceConfig">
+        <property name="driverClassName" value="${primary.datasource.driver-class-name}"/>
+        <property name="url" value="${primary.datasource.url}"/>
+        <property name="username" value="${primary.datasource.username}"/>
+        <property name="password" value="${primary.datasource.password}"/>
+        <property name="dbType" value="${primary.datasource.dbType}"/>
+    </bean>
+
+    <bean id="secondDataSource" parent="baseDataSourceConfig">
+        <property name="driverClassName" value="${second.datasource.driver-class-name}"/>
+        <property name="url" value="${second.datasource.url}"/>
+        <property name="username" value="${second.datasource.username}"/>
+        <property name="password" value="${second.datasource.password}"/>
+        <property name="dbType" value="${second.datasource.dbType}"/>
+    </bean>
+
+    <bean id="analysisDataSource" parent="baseDataSourceConfig">
+        <property name="driverClassName" value="${analysis.datasource.driver-class-name}"/>
+        <property name="url" value="${analysis.datasource.url}"/>
+        <property name="username" value="${analysis.datasource.username}"/>
+        <property name="password" value="${analysis.datasource.password}"/>
+        <property name="dbType" value="${analysis.datasource.dbType}"/>
+    </bean>
+
+    <!--配置数据源-->
+    <bean id="dataSource" primary="true" scope="singleton" class="yaycrawler.dao.datasource.DynamicDataSource">
+        <property name="targetDataSources">
+            <map>
+                <entry key="primary" value-ref="primaryDataSource"/>
+                <entry key="second" value-ref="secondDataSource"/>
+                <entry key="analysis" value-ref="analysisDataSource"/>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="primaryDataSource"/>
+        <!--默认切换的数据源-->
+        <property name="defaultDbType" value="primary"/>
+    </bean>
+
+    <!-- 初始化数据表结构 -->
+    <!--<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">-->
+    <!--<jdbc:script location="classpath*:sql/init.sql" />-->
+    <!--</jdbc:initialize-database>-->
+
+</beans>

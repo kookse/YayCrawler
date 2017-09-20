@@ -42,11 +42,16 @@ public class RequestHelper {
     }
 
     public static String getParam(String url,String param) {
-        Pattern pattern = Pattern.compile(String.format("%s=(.*?)&|/%s/(.*?)/",param,param));
+        Pattern pattern = Pattern.compile(String.format("%s=(.*)&|%s=(.*)|/%s/(.*)/|/%s/(.*)",param,param,param,param));
         Matcher matcher = pattern.matcher(url);
         String value = "";
         while (matcher.find()) {
-            value = matcher.group(1) != null ? matcher.group(1):matcher.group(2);
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                value = matcher.group(i);
+                if(StringUtils.isNotEmpty(value)) {
+                    break;
+                }
+            }
         }
         return value;
     }
