@@ -13,10 +13,10 @@ public interface IResultPersistentService {
      * 保存某个页面的爬取结果
      *
      * @param pageUrl 页面的URL
-     * @param regionDataList    爬取的结果数据
+     * @param regionDataMap    爬取的结果数据
      * @return 是否保存成功
      */
-    boolean saveCrawlerResult(String pageUrl, List<Map<String, Object>>  regionDataList);
+    boolean saveCrawlerResult(String pageUrl, Map<String, Object> regionDataMap);
 
     /**
      * 获取支持的持久化数据类型（普通数据，图片，文档等）

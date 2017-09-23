@@ -64,7 +64,7 @@ public class DocumentPersistentService implements IResultPersistentService {
      * param data {id:"",srcList:""}
      */
     @Override
-    public boolean saveCrawlerResult(String pageUrl, List<Map<String, Object>> regionDataList) {
+    public boolean saveCrawlerResult(String pageUrl, Map<String, Object> regionDataMap) {
         //List<String> childRequestList = new LinkedList<>();
         try {
             List<String> srcList = new ArrayList<>();
@@ -72,7 +72,8 @@ public class DocumentPersistentService implements IResultPersistentService {
             //HttpUtil httpUtil = HttpUtil.getInstance();
 //            List<Header> headers = new ArrayList<>();
 //            headers.add(new BasicHeader("",""));
-            for (Map<String,Object> regionData : regionDataList) {
+            for (Object o : regionDataMap.values()) {
+                Map<String,Object> regionData=(Map<String,Object>)o;
                 if(regionData==null) continue;
                 for (Object src : regionData.values()) {
                     if (src instanceof List)

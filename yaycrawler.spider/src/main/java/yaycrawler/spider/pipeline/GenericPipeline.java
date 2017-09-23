@@ -5,12 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.Pipeline;
 import yaycrawler.spider.persistent.IResultPersistentService;
 import yaycrawler.spider.persistent.PersistentDataType;
 import yaycrawler.spider.persistent.PersistentServiceFactory;
+import yaycrawler.spider.utils.RequestHelper;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,7 +36,8 @@ public class GenericPipeline implements Pipeline {
             return;
         }
         try {
-            String pageUrl = resultItems.getRequest().getUrl();
+            Request request = resultItems.getRequest();
+            String pageUrl = request.getUrl();
             Map<String, Object> pageDataMap = resultItems.getAll();
 
             /**
@@ -47,7 +50,7 @@ public class GenericPipeline implements Pipeline {
                 if (regionDataValue instanceof Collection) {
                     dataType = ((List) regionDataValue).remove(((List) regionDataValue).size() -1).toString();
                 }
-                addToDataTypeGroup(groupedRegionDataMap, dataType, regionDataValue);
+                addToDataTypeGroup(groupedRegionDataMap, dataType, regionDataMapEntry);
             }
 
             /**
@@ -58,8 +61,9 @@ public class GenericPipeline implements Pipeline {
                     IResultPersistentService persistentService = persistentServiceFactory.getPersistentServiceByDataType(groupedDataEntry.getKey());
                     if (persistentService != null) {
                         logger.debug("开始持久化{}到{}", groupedDataEntry.getKey(), persistentService.toString());
-                        List regionDataList = (List) groupedDataEntry.getValue();
-                        if (!persistentService.saveCrawlerResult(pageUrl, regionDataList))
+                        Map dataMap = groupedDataEntry.getValue();
+                        dataMap.put("loginParams",request.getExtras());
+                        if (!persistentService.saveCrawlerResult(pageUrl, dataMap))
                             logger.error("可能持久化{}到{}失败！", groupedDataEntry.getKey(), persistentService.toString());
                     }
                 } catch (Exception ex) {
@@ -71,7 +75,7 @@ public class GenericPipeline implements Pipeline {
         }
     }
 
-    private void addToDataTypeGroup(Map<String, Map<String, Object>> groupedDataMapList, String dataType, Object regionDataList) {
+    private void addToDataTypeGroup(Map<String, Map<String, Object>> groupedDataMapList, String dataType,Map.Entry<String, Object> regionDataMap) {
         if (StringUtils.isBlank(dataType)) return;
         if (StringUtils.equalsIgnoreCase(dataType, "autoField") || StringUtils.equalsIgnoreCase(dataType, "autoRowField"))
             dataType = PersistentDataType.MAP;
@@ -80,7 +84,7 @@ public class GenericPipeline implements Pipeline {
             groupedMap = new HashMap<>();
             groupedDataMapList.put(dataType, groupedMap);
         }
-        groupedMap.put(dataType, regionDataList);
+        groupedMap.put(regionDataMap.getKey(), regionDataMap.getValue());
     }
 
 

@@ -26,16 +26,14 @@ public class MongDBPersistentService implements IResultPersistentService {
 
     @Override
 
-    public boolean saveCrawlerResult(String pageUrl, List<Map<String, Object>> regionDataList) {
+    public boolean saveCrawlerResult(String pageUrl, Map<String, Object> regionDataMap) {
         try {
             String _id = DigestUtils.sha1Hex(pageUrl);
-            Map data = Maps.newHashMap();
-            data.put("pageUrl", pageUrl);
-            data.put("_id", _id);
-            data.put("timestamp", System.currentTimeMillis());
-            data.put("data",regionDataList);
+            regionDataMap.put("pageUrl", pageUrl);
+            regionDataMap.put("_id", _id);
+            regionDataMap.put("timestamp", System.currentTimeMillis());
             String collectionName = UrlUtils.getDomain(pageUrl).replace(".", "_");
-            mongoTemplate.save(data, collectionName);
+            mongoTemplate.save(regionDataMap, collectionName);
             return true;
         } catch (Exception ex) {
             logger.error(ex.getMessage());

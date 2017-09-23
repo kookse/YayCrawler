@@ -1,12 +1,12 @@
 package yaycrawler.spider.downloader;
-
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.annotation.ThreadSafe;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +23,8 @@ import us.codecraft.webmagic.proxy.ProxyProvider;
 import us.codecraft.webmagic.selector.PlainText;
 import us.codecraft.webmagic.utils.CharsetUtils;
 import us.codecraft.webmagic.utils.HttpClientUtils;
+import yaycrawler.common.model.PhantomCookie;
+import yaycrawler.spider.utils.RequestHelper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -33,7 +35,6 @@ import java.util.regex.Pattern;
  * Created by ucs_yuananyun on 2016/5/23.
  * modify by bill on 2017/3/30
  */
-@ThreadSafe
 public class CrawlerHttpClientDownloader extends AbstractDownloader {
 
     private static Pattern UNICODE_PATTERN = Pattern.compile("\\\\u([0-9a-fA-F]{4})");
@@ -83,6 +84,9 @@ public class CrawlerHttpClientDownloader extends AbstractDownloader {
             throw new NullPointerException("task or site can not be null");
         }
         Site site = task.getSite();
+        if (site == null) {
+            throw new NullPointerException("task or site can not be null");
+        }
         CloseableHttpResponse httpResponse = null;
 
         if (site != null && StringUtils.isNotBlank(cookie)) {
@@ -90,17 +94,18 @@ public class CrawlerHttpClientDownloader extends AbstractDownloader {
         }
         CloseableHttpClient httpClient = getHttpClient(site);
         Proxy proxy = proxyProvider != null ? proxyProvider.getProxy(task) : null;
-//        proxy = new Proxy("127.0.0.1",8888);
+        proxy = new Proxy("127.0.0.1",8888);
+        final Request finalRequest = RequestHelper.createRequest(request.getUrl(),request.getMethod(),request.getExtras());
         HttpClientRequestContext requestContext = httpUriRequestConverter.convert(request, site, proxy);
         Page page = Page.fail();
         try {
             httpResponse = httpClient.execute(requestContext.getHttpUriRequest(), requestContext.getHttpClientContext());
             page = handleResponse(request, request.getCharset() != null ? request.getCharset() : site.getCharset(), httpResponse, task);
             onSuccess(request);
-            logger.info("downloading page success {}", request.getUrl());
+            logger.info("downloading page success {}", finalRequest.getUrl());
             return page;
         } catch (IOException e) {
-            logger.warn("download page {} error", request.getUrl(), e);
+            logger.warn("download page {} error", finalRequest.getUrl(), e);
             onError(request);
             return page;
         } finally {

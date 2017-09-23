@@ -47,16 +47,6 @@ public class GenericPageProcessor implements PageProcessor {
     private IPageParseListener pageParseListener;
     @Autowired
     private PageParserRuleService pageParserRuleService;
-    @Autowired
-    private PageSiteService pageSiteService;
-    @Autowired
-    private AutoLoginProxy autoLoginProxy;
-
-    @Autowired
-    private CaptchaIdentificationProxy captchaIdentificationProxy;
-
-    @Autowired
-    private PageCookieService pageCookieService;
 
     @Override
     public void process(Page page) {
@@ -67,7 +57,7 @@ public class GenericPageProcessor implements PageProcessor {
         PageInfo pageInfo = pageParserRuleService.findOnePageInfoByRgx(pageUrl);
         if (pageInfo == null) return;
         String pageValidationExpression = pageInfo.getPageValidationRule();
-        if (pageValidated(page, pageValidationExpression)) {
+//        if (pageValidated(page, pageValidationExpression)) {
             try {
                 List<CrawlerRequest> childRequestList = new LinkedList<>();
                 Set<PageParseRegion> regionList = pageParserRuleService.getPageRegions(pageUrl);
@@ -86,11 +76,12 @@ public class GenericPageProcessor implements PageProcessor {
                 if (pageParseListener != null)
                     pageParseListener.onError(pageRequest, "页面解析失败");
             }
-        } else {
-            //页面下载错误，验证码或cookie失效
-            if (pageParseListener != null)
-                pageParseListener.onError(pageRequest, "下载的页面不是我想要的");
-        }
+//        }
+//        else {
+//            //页面下载错误，验证码或cookie失效
+//            if (pageParseListener != null)
+//                pageParseListener.onError(pageRequest, "下载的页面不是我想要的");
+//        }
     }
 
 
@@ -123,7 +114,7 @@ public class GenericPageProcessor implements PageProcessor {
      * @param regionSelectExpression
      * @return
      */
-    private Selectable getPageRegionContext(Page page, Request request, String regionSelectExpression) {
+    public Selectable getPageRegionContext(Page page, Request request, String regionSelectExpression) {
         Selectable context;
         if (StringUtils.isBlank(regionSelectExpression) || DEFAULT_PAGE_SELECTOR.equals(regionSelectExpression))
             context = page.getHtml();
@@ -293,104 +284,6 @@ public class GenericPageProcessor implements PageProcessor {
 //        return doRecovery;
 //    }
 
-    /**
-     * 页面自动恢复
-     *
-     * @param page
-     * @param pageRequest
-     * @param pageUrl
-     */
-    public boolean doAutomaticRecovery(Page page, Request pageRequest, String pageUrl) {
-        boolean doRecovery = false;
-        PageSite pageSite = pageSiteService.getPageSiteByUrl(pageUrl);
-        if (pageSite != null) {
-            String login = pageSite.getLoginEngine();
-            String encrypt = pageSite.getEncryptEngine();
-            int status = pageSite.getStatus();
-            String loginJudgeExpression = pageSite.getLoginJudgeExpression();
-            String captchaJudgeExpression = pageSite.getCaptchaJudgeExpression();
-            String loginJsFileName = pageSite.getLoginJsFileName();
-            String captchaJsFileName = pageSite.getCaptchaJsFileName();
-            String param = pageSite.getLoginParam() != null ? pageSite.getLoginParam() : "";
-            String oldCookieId = String.valueOf(pageRequest.getExtra("cookieId"));
-            if (status == 0) {
-                if (StringUtils.isEmpty(encrypt))
-                    encrypt = "encryptEngine";
-                if (StringUtils.isEmpty(login))
-                    login = "loginEngine";
-                Engine loginEngine = (Engine) SpringContextUtil.getBean(login);
-                Engine encryptEngine = (Engine) SpringContextUtil.getBean(encrypt);
-                Map paramData = null;
-                if (StringUtils.isEmpty(param)) {
-                    paramData = Maps.newHashMap();
-                } else {
-                    paramData = JSON.parseObject(param, Map.class);
-                }
-                if (pageRequest.getExtras() != null && pageRequest.getExtras().size() > 0) {
-                    paramData.putAll(pageRequest.getExtras());
-                    paramData.remove("$pageInfo");
-                } else {
-                    paramData.put("loginName", RequestHelper.getParam(pageRequest.getUrl(),"loginName"));
-                    paramData.put("loginPassword", RequestHelper.getParam(pageRequest.getUrl(),"loginPassword"));
-                }
-                EngineResult engineResult = encryptEngine.execute(paramData);
-                LoginParam loginParam = engineResult.getLoginParam();
-                engineResult = loginEngine.execute(loginParam);
-                if (engineResult.getStatus()) {
-                    doRecovery = Boolean.TRUE;
-                    //需要登录了
-                    List<PhantomCookie> phantomCookies = new ArrayList<>();
-                    engineResult.getHeaders().forEach(header -> {
-                        PhantomCookie phantomCookie = new PhantomCookie(header.getName(), header.getValue());
-                        phantomCookies.add(phantomCookie);
-                    });
-                    String loginName = pageRequest.getExtra("loginName") != null? pageRequest.getExtra("loginName").toString():"";
-                    pageCookieService.deleteCookieBySiteId(pageSite.getId(),loginName);
-                    if (pageCookieService.saveCookies(UrlUtils.getDomain(pageUrl), pageSite.getId(), phantomCookies,loginName)) {
-                        logger.info("保存新的cookie成功！");
-                    } else
-                        logger.info("保存新的cookie失败！");
-                    //重新加入队列
-                    page.addTargetRequest(pageRequest);
-                }
-            } else {
-                Selectable judgeContext = StringUtils.isNotBlank(loginJsFileName) ? getPageRegionContext(page, pageRequest, loginJudgeExpression) : null;
-                if (judgeContext != null && judgeContext.match()) {
-                    doRecovery = true;
-                    //需要登录了
-                    autoLoginProxy.login(pageUrl, loginJsFileName, page.getRawText(), oldCookieId);
-                    //重新加入队列
-                    page.addTargetRequest(pageRequest);
-                } else {
-                    judgeContext = StringUtils.isNotBlank(captchaJsFileName) ? getPageRegionContext(page, pageRequest, captchaJudgeExpression) : null;
-                    if (judgeContext != null && judgeContext.match()) {
-                        doRecovery = true;
-                        //需要刷新验证码了
-                        captchaIdentificationProxy.recognition(pageUrl, captchaJsFileName, page.getRawText(), oldCookieId);
-                    }
-                }
-            }
 
-        }
-        return doRecovery;
-    }
 
-    /**
-     * 验证是否正确的页面
-     *
-     * @param page
-     * @param pageValidationExpression
-     * @return
-     */
-    public boolean pageValidated(Page page, String pageValidationExpression) {
-        if (StringUtils.isEmpty(pageValidationExpression)) return true;
-        Request request = page.getRequest();
-        Object result = getPageRegionContext(page, request, pageValidationExpression);
-        if (result == null) return false;
-        if (result instanceof Selectable)
-            return ((Selectable) result).match();
-        else
-            return StringUtils.isNotEmpty(String.valueOf(result));
-
-    }
 }

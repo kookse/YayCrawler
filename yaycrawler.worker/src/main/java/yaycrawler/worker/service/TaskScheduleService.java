@@ -53,7 +53,7 @@ public class TaskScheduleService {
     @Autowired
     private IPageParseListener pageParseListener;
 
-    @Value("${worker.spider.threadCount}")
+    @Value("${worker.spider.threadCount:10}")
     private int spiderThreadCount;
 
     private Map<String, YaySpider> spiderMap = new HashMap<>();

@@ -40,8 +40,8 @@ public class PageSiteService {
         site.setSleepTime(500);
         site.setDomain(domain);
         site.addHeader("host", domain);
-        site.setUserAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36");
-        site.setCharset("utf8");
+        site.setUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36");
+        site.setCharset("utf-8");
         //默认重试3次
         site.setRetryTimes(3);
         site.setCycleRetryTimes(4);

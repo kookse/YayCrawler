@@ -58,7 +58,8 @@ public class LoginEngine implements Engine<LoginParam> {
         Pattern pattern = Pattern.compile(info.getValideLogin());
         Matcher matcher;
         Engine encryptEngine = (Engine) SpringContextUtil.getBean("encryptEngine");
-        while (true) {
+        int i = 0;
+        while (i < 20) {
             try {
                 HttpResponse response = httpUtil.doPost(loginUrl, null, params, headerList);
                 String content = EntityUtils.toString(response.getEntity());
@@ -99,6 +100,10 @@ public class LoginEngine implements Engine<LoginParam> {
 
             info = encryptEngine.execute(info.getOldParams()).getLoginParam();
             params = info.getNewParams();
+            i++;
+        }
+        if ( i == 20){
+            logger.info("登陆失败！");
         }
         return engineResult;
     }

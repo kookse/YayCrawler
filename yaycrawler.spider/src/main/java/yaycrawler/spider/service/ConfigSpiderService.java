@@ -42,8 +42,6 @@ public class ConfigSpiderService {
     private GenericPageProcessor pageProcessor;
     @Autowired
     private PageSiteService pageSiteService;
-    @Autowired
-    private PageCookieService pageCookieService;
 
     public ConfigSpiderService() {
 
@@ -69,24 +67,24 @@ public class ConfigSpiderService {
             page = downloadPage(request, finalSite);
         }
         if (page == null) return null;
-        int i = 0;
-        while(i < 5 && !pageProcessor.pageValidated(page,pageInfo.getPageValidationRule())) {
-            pageMap.remove(request.getUrl());
-            PageSite pageSite = pageSiteService.getPageSiteByUrl(request.getUrl());
-            pageCookieService.deleteCookieBySiteId(pageSite.getId(),request.getExtra("loginName").toString());
-            page.setRequest(request);
-            final Site finalSite = site;
-            page = downloadPage(request, finalSite);
-            i++;
-        }
-        if(i < 5) {
-            Map<String, Object> m = new HashMap<>();
-            m.put("inputTime", System.currentTimeMillis());
-            m.put("page", page);
-            pageMap.put(request.getUrl(), m);
-        } else {
-            return null;
-        }
+//        int i = 0;
+//        while(i < 5 && !pageProcessor.pageValidated(page,pageInfo.getPageValidationRule())) {
+//            pageMap.remove(request.getUrl());
+//            PageSite pageSite = pageSiteService.getPageSiteByUrl(request.getUrl());
+//            pageCookieService.deleteCookieBySiteId(pageSite.getId(),request.getExtra("loginName").toString());
+//            page.setRequest(request);
+//            final Site finalSite = site;
+//            page = downloadPage(request, finalSite);
+//            i++;
+//        }
+//        if(i < 5) {
+//            Map<String, Object> m = new HashMap<>();
+//            m.put("inputTime", System.currentTimeMillis());
+//            m.put("page", page);
+//            pageMap.put(request.getUrl(), m);
+//        } else {
+//            return null;
+//        }
         List<CrawlerRequest> childRequestList = new LinkedList<>();
         Object data = pageProcessor.parseOneRegion(page, parseRegion, childRequestList);
         Map<String, Object> result = new HashMap<>();
@@ -110,22 +108,22 @@ public class ConfigSpiderService {
         request.putExtra("$pageInfo",pageInfo);
         Page page = downloadPage(request, null);
         if (page == null) return RestFulResult.failure("页面下载失败！");
-        int i = 0;
-        while(i < 5 && !pageProcessor.pageValidated(page,pageInfo.getPageValidationRule())) {
-            pageMap.remove(request.getUrl());
-            page.setRequest(request);
-            page = downloadPage(request, null);
-            i++;
-        }
-        if(i < 5) {
-            Map<String, Object> m = new HashMap<>();
-            m.put("inputTime", System.currentTimeMillis());
-            m.put("page", page);
-            pageMap.put(request.getUrl(), m);
-        } else {
-            pageMap.remove(request.getUrl());
-            return RestFulResult.failure("页面内容不正确!");
-        }
+//        int i = 0;
+//        while(i < 5 && !pageProcessor.pageValidated(page,pageInfo.getPageValidationRule())) {
+//            pageMap.remove(request.getUrl());
+//            page.setRequest(request);
+//            page = downloadPage(request, null);
+//            i++;
+//        }
+//        if(i < 5) {
+//            Map<String, Object> m = new HashMap<>();
+//            m.put("inputTime", System.currentTimeMillis());
+//            m.put("page", page);
+//            pageMap.put(request.getUrl(), m);
+//        } else {
+//            pageMap.remove(request.getUrl());
+//            return RestFulResult.failure("页面内容不正确!");
+//        }
 
         Object result = null;
         if (expression.toLowerCase().contains("getjson()"))

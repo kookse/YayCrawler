@@ -158,23 +158,24 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
                 if (data != null)
                     tmp.put(data.keySet().iterator().next(), data.values().iterator().next());
             }
-            if (StringUtils.equalsIgnoreCase(crawlerRequest.getMethod(), "GET")) {
-                StringBuilder urlBuilder = new StringBuilder(request.getUrl());
-                for (Map.Entry<Object, Object> entry : tmp.entrySet()) {
-                    try {
-                        if (entry.getKey() == null || StringUtils.isEmpty(entry.getKey().toString())) {
-                            urlBuilder.append(String.format("%s/%s", "/", URLEncoder.encode(String.valueOf(entry.getValue()), "utf-8")));
-                        } else
-                            urlBuilder.append(String.format("%s%s=%s", urlBuilder.indexOf("?") > 0 ? "&" : "?", entry.getKey(), URLEncoder.encode(String.valueOf(entry.getValue()), "utf-8")));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                }
-                request.setUrl(urlBuilder.toString());
-                request.setData(dataTmp);
-            } else {
-                request.setData(tmp);
-            }
+//            if (StringUtils.equalsIgnoreCase(crawlerRequest.getMethod(), "GET")) {
+//                StringBuilder urlBuilder = new StringBuilder(request.getUrl());
+//                for (Map.Entry<Object, Object> entry : tmp.entrySet()) {
+//                    try {
+//                        if (entry.getKey() == null || StringUtils.isEmpty(entry.getKey().toString())) {
+//                            urlBuilder.append(String.format("%s/%s", "/", URLEncoder.encode(String.valueOf(entry.getValue()), "utf-8")));
+//                        } else
+//                            urlBuilder.append(String.format("%s%s=%s", urlBuilder.indexOf("?") > 0 ? "&" : "?", entry.getKey(), URLEncoder.encode(String.valueOf(entry.getValue()), "utf-8")));
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                request.setUrl(urlBuilder.toString());
+//                request.setData(dataTmp);
+//            } else {
+//                request.setData(tmp);
+//            }
+            request.setData(tmp);
             requestTmps.add(request);
         }
     }
