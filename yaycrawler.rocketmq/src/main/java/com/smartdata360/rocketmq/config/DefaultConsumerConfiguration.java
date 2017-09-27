@@ -2,6 +2,7 @@ package com.smartdata360.rocketmq.config;
 
 import com.alibaba.rocketmq.client.consumer.DefaultMQPushConsumer;
 import com.alibaba.rocketmq.client.exception.MQClientException;
+import com.alibaba.rocketmq.common.consumer.ConsumeFromWhere;
 import com.smartdata360.rocketmq.exception.RocketMQException;
 import com.smartdata360.rocketmq.listener.MessageListener;
 import com.smartdata360.rocketmq.processor.IMessageProcessor;
@@ -57,6 +58,7 @@ public class DefaultConsumerConfiguration {
         }
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(groupName);
         consumer.setNamesrvAddr(namesrvAddr);
+        consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
         consumer.setConsumeThreadMin(properties.getConsumeThreadMin());
         consumer.setConsumeThreadMax(properties.getConsumeThreadMax());
         MessageListener messageListener = new MessageListener();

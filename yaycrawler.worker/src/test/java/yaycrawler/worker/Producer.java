@@ -20,7 +20,7 @@ public class Producer {
          */
         DefaultMQProducer producer = new DefaultMQProducer("ProducerGroupTest");
 
-        producer.setNamesrvAddr("ip:port");
+        producer.setNamesrvAddr("127.0.0.1:9876");
         /**
          * Producer对象在使用之前必须要调用start初始化，初始化一次即可<br>
          * 注意：切记不可以在每次发送消息时，都调用start方法
@@ -35,10 +35,10 @@ public class Producer {
          */
         try {
             {
-                Message msg = new Message("broker-a",// topic
-                        "TagB",// tag
+                Message msg = new Message("TP_CRAWLER_REQUEST",// topic
+                        "portal",// tag
                         "OrderID002",// key
-                        ("Hello MetaQ2").getBytes());// body
+                        ("Hello MetaQ2 突然让人").getBytes());// body
                 SendResult sendResult = producer.send(msg);
                 System.out.println(sendResult);
             }

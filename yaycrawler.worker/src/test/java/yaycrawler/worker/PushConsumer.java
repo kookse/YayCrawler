@@ -28,7 +28,7 @@ public class PushConsumer {
          * 注意：ConsumerGroupName需要由应用来保证唯一
          */
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("testmerchantLeagueConsumerGroup");
-        consumer.setNamesrvAddr("172.16.1.89:9876;172.16.1.221:9876");
+        consumer.setNamesrvAddr("127.0.0.1:9876");
 
         /**
          * 订阅指定topic下tags分别等于TagA或TagB
