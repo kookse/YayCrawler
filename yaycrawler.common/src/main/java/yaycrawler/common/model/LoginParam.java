@@ -20,7 +20,7 @@ public class LoginParam {
     private String cookie;
     private String valideLogin;
     private String content;
-
+    private String url;
 
     /**
      *
@@ -55,6 +55,14 @@ public class LoginParam {
         this.newParams = newParams;
         this.cookie = cookie;
         this.valideLogin = valideLogin;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getBinaryEngine() {

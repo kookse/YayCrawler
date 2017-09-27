@@ -11,6 +11,7 @@ import yaycrawler.common.model.WorkerHeartbeat;
 import yaycrawler.common.model.WorkerRegistration;
 import yaycrawler.master.communication.WorkerActor;
 import yaycrawler.master.model.MasterContext;
+import yaycrawler.master.service.CrawlerQueueServiceFactory;
 import yaycrawler.master.service.ICrawlerQueueService;
 
 import java.util.List;
@@ -28,21 +29,24 @@ public class CrawlerTaskDispatcher {
     @Value("${worker.task.batchSize}")
     private Integer batchSize;
 
-
     @Autowired
-    private ICrawlerQueueService queueService;
+    private CrawlerQueueServiceFactory crawlerQueueServiceFactory;
+
+    @Value("${crawler.queue.dataType:redis}")
+    private String dataType;
 
     @Autowired
     private WorkerActor workerActor;
 
     public void dealResultNotify(CrawlerResult crawlerResult) {
         if(crawlerResult==null) return;
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         if (crawlerResult.isSuccess()) {
             if (crawlerResult.getCrawlerRequestList().size() > 0)
-                queueService.pushTasksToWaitingQueue(crawlerResult.getCrawlerRequestList(), false);
-            queueService.moveRunningTaskToSuccessQueue(crawlerResult);
+                crawlerQueueService.pushTasksToWaitingQueue(crawlerResult.getCrawlerRequestList(), false);
+            crawlerQueueService.moveRunningTaskToSuccessQueue(crawlerResult);
         } else {
-            queueService.moveRunningTaskToFailQueue(crawlerResult.getKey(), crawlerResult.getMessage());
+            crawlerQueueService.moveRunningTaskToFailQueue(crawlerResult.getKey(), crawlerResult.getMessage());
         }
     }
 
@@ -57,16 +61,16 @@ public class CrawlerTaskDispatcher {
         ConcurrentHashMap<String, WorkerRegistration> workerListMap = MasterContext.workerRegistrationMap;
         WorkerRegistration workerRegistration = workerListMap.get(workerHeartbeat.getWorkerContextPath());
         if (workerRegistration == null) return;
-
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         logger.info("worker:{}剩余任务数:{}", workerHeartbeat.getWorkerId(), workerHeartbeat.getWaitTaskCount());
         int canAssignCount = batchSize - workerHeartbeat.getWaitTaskCount();
         if (canAssignCount <= 0) return;
-        List<CrawlerRequest> crawlerRequests = queueService.fetchTasksFromWaitingQueue(canAssignCount);
+        List<CrawlerRequest> crawlerRequests = crawlerQueueService.fetchTasksFromWaitingQueue(canAssignCount);
         if (crawlerRequests.size() == 0) return;
         boolean flag = workerActor.assignTasks(workerRegistration, crawlerRequests);
         if (flag) {
             logger.info("给worker:{}分派了{}个任务", workerHeartbeat.getWorkerId(), crawlerRequests.size());
-            queueService.moveWaitingTaskToRunningQueue(workerHeartbeat.getWorkerId(), crawlerRequests);
+            crawlerQueueService.moveWaitingTaskToRunningQueue(workerHeartbeat.getWorkerId(), crawlerRequests);
         }
     }
 

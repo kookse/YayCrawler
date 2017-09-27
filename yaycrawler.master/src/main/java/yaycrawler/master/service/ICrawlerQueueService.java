@@ -86,4 +86,10 @@ public interface ICrawlerQueueService {
      * @return
      */
     QueueQueryResult querySuccessQueues(QueueQueryParam queryParam);
+
+    /**
+     * 获取支持的队列类型（mq，redis，mysql等）
+     * @return
+     */
+    String getSupportedDataType();
 }

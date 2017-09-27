@@ -112,6 +112,10 @@ http://www.w3.org/2001/XMLSchema-instance ">
             <artifactId>spring-data-redis</artifactId>
             <version>1.8.1.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>com.yaycrawler</groupId>
+            <artifactId>yaycrawler-rocketmq</artifactId>
+        </dependency>
 
         <!--<dependency>-->
             <!--<groupId>com.zaxxer</groupId>-->

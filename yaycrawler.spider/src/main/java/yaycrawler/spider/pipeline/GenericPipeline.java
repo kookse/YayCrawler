@@ -46,10 +46,11 @@ public class GenericPipeline implements Pipeline {
             Map<String, Map<String, Object>> groupedRegionDataMap = new HashMap<>();
             for (Map.Entry<String, Object> regionDataMapEntry : pageDataMap.entrySet()) {
                 Object regionDataValue = regionDataMapEntry.getValue();
-                String dataType = PersistentDataType.MAP;
+                String dataType = PersistentDataType.ROCKETMQ;
                 if (regionDataValue instanceof Collection) {
                     dataType = ((List) regionDataValue).remove(((List) regionDataValue).size() -1).toString();
                 }
+                dataType = PersistentDataType.ROCKETMQ;
                 addToDataTypeGroup(groupedRegionDataMap, dataType, regionDataMapEntry);
             }
 
@@ -77,8 +78,8 @@ public class GenericPipeline implements Pipeline {
 
     private void addToDataTypeGroup(Map<String, Map<String, Object>> groupedDataMapList, String dataType,Map.Entry<String, Object> regionDataMap) {
         if (StringUtils.isBlank(dataType)) return;
-        if (StringUtils.equalsIgnoreCase(dataType, "autoField") || StringUtils.equalsIgnoreCase(dataType, "autoRowField"))
-            dataType = PersistentDataType.MAP;
+        if (StringUtils.equalsIgnoreCase(dataType, "rocketmq") || StringUtils.equalsIgnoreCase(dataType, "autoField") || StringUtils.equalsIgnoreCase(dataType, "autoRowField"))
+            dataType = PersistentDataType.ROCKETMQ;
         Map<String, Object> groupedMap = groupedDataMapList.get(dataType);
         if (groupedMap == null) {
             groupedMap = new HashMap<>();

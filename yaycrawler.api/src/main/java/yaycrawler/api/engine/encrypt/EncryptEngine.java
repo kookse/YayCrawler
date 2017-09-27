@@ -69,12 +69,14 @@ public class EncryptEngine implements Engine<Map<String, Object>> {
         LoginParam loginParam = new LoginParam();
         loginParam.setOldParams(info);
         HttpUtil httpUtil = HttpUtil.getInstance();
+        Map newParam = new HashMap();
+        String loginUrl = String.valueOf(info.get("$loginUrl"));
+        String cookie = info.get("$Cookie") != null ? String.valueOf(info.get("$Cookie")) : "";
+        loginParam.setCookie(cookie);
+        List<Header> headerList = Lists.newArrayList();
         try {
-            Map newParam = new HashMap();
-            String loginUrl = String.valueOf(info.get("$loginUrl"));
-            String cookie = info.get("$Cookie") != null ? String.valueOf(info.get("$Cookie")) : "";
-            loginParam.setCookie(cookie);
-            List<Header> headerList = Lists.newArrayList(new BasicHeader("Cookie", cookie));
+            if(StringUtils.isNotEmpty(cookie))
+                headerList.add(new BasicHeader("Cookie", cookie));
             headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"));
             HttpResponse response = httpUtil.doGet(loginUrl, null, headerList);
             Header[] headers = response.getHeaders("Set-Cookie");
@@ -96,6 +98,8 @@ public class EncryptEngine implements Engine<Map<String, Object>> {
                         loginParam.setValideLogin(String.valueOf(value));
                     else if (name.equalsIgnoreCase("$loginUrl"))
                         loginParam.setLoginUrl(String.valueOf(value));
+                    else if (name.equalsIgnoreCase("$requestUrl"))
+                        loginParam.setUrl(String.valueOf(value));
                     else if (name.equalsIgnoreCase("$Cookie")) {
                         info.put("$Cookie", loginParam.getCookie());
                     }else if (name.equalsIgnoreCase("$content")) {
@@ -113,10 +117,11 @@ public class EncryptEngine implements Engine<Map<String, Object>> {
             });
             loginParam.setNewParams(newParam);
             loginParam.setLoginUrl(loginUrl);
+            engineResult.setStatus(Boolean.TRUE);
             engineResult.setLoginParam(loginParam);
         } catch (Exception e) {
             engineResult = failureCallback(info, e);
-            e.printStackTrace();
+            logger.error("pageUrl {} Exception {}",loginUrl,e);
         }
         return engineResult;
     }

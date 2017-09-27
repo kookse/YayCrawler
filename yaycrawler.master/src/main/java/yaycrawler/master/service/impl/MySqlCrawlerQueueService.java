@@ -15,6 +15,7 @@ import yaycrawler.common.model.QueueQueryParam;
 import yaycrawler.common.model.QueueQueryResult;
 import yaycrawler.dao.domain.CrawlerTask;
 import yaycrawler.dao.repositories.CrawlerTaskRepository;
+import yaycrawler.master.service.CrawlerQueueDataType;
 import yaycrawler.master.service.ICrawlerQueueService;
 
 import java.util.ArrayList;
@@ -25,8 +26,8 @@ import java.util.List;
  * 基于mysql的队列服务
  * Created by  yuananyun on 2017/3/24.
  */
-//@Service(value = "mysqlQueueService")
-//@Transactional
+@Service(value = "mysqlQueueService")
+@Transactional
 public class MySqlCrawlerQueueService implements ICrawlerQueueService {
 
     private static final Logger logger  = LoggerFactory.getLogger(MySqlCrawlerQueueService.class);
@@ -201,6 +202,9 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
         return requestList;
     }
 
-
+    @Override
+    public String getSupportedDataType() {
+        return CrawlerQueueDataType.MYSQL;
+    }
 
 }

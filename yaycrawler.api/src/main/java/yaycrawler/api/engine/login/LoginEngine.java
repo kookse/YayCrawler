@@ -90,14 +90,17 @@ public class LoginEngine implements Engine<LoginParam> {
                     });
                     engineResult.setHeaders(headerList1);
                     engineResult.setStatus(Boolean.TRUE);
+                    response = httpUtil.doGet(info.getUrl(),null,headerList);
+                    engineResult.setResult(EntityUtils.toString(response.getEntity()));
                     break;
                 } else {
                     engineResult.setStatus(Boolean.FALSE);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                engineResult = failureCallback(info, e);
+                logger.error("pageUrl {} Exception {}",loginUrl,e);
             }
-
+            info.getOldParams().put("$requestUrl",info.getUrl());
             info = encryptEngine.execute(info.getOldParams()).getLoginParam();
             params = info.getNewParams();
             i++;

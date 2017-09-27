@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
@@ -12,9 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
+import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.downloader.AbstractDownloader;
+import us.codecraft.webmagic.selector.PlainText;
 import us.codecraft.webmagic.selector.Selectable;
+import us.codecraft.webmagic.utils.HttpClientUtils;
 import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.api.engine.Engine;
 import yaycrawler.api.process.SpringContextUtil;
@@ -69,6 +74,8 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
     private CrawlerHttpClientDownloader httpClientDownloader;
     private PhantomJsMockDonwnloader mockDonwnloader;
 
+    private static Pattern UNICODE_PATTERN = Pattern.compile("\\\\u([0-9a-fA-F]{4})");
+
     public GenericCrawlerDownLoader() {
         httpClientDownloader = new CrawlerHttpClientDownloader();
         mockDonwnloader = new PhantomJsMockDonwnloader();
@@ -81,48 +88,73 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
         int i = 0;
         Page page = Page.fail();
         PageInfo pageInfo = pageParserRuleService.findOnePageInfoByRgx(request.getUrl());
-        while(i < 5 && !pageValidated(page,pageInfo.getPageValidationRule())) {
+        boolean doRecovery = false;
+        try {
+            Site site = task.getSite();
+            while (i < 5 && !pageValidated(page, pageInfo.getPageValidationRule())) {
 
-            if(pageInfo == null && request.getExtra("$pageInfo") != null) {
-                pageInfo = (PageInfo) request.getExtra("$pageInfo");
-            }
-            boolean isJsRendering = pageInfo != null && "1".equals(pageInfo.getIsJsRendering());
-            String pageUrl = request.getUrl();
-            String loginName = request.getExtra("loginName") != null? request.getExtra("loginName").toString(): RequestHelper.getParam(request.getUrl(),"loginName");
+                if (pageInfo == null && request.getExtra("$pageInfo") != null) {
+                    pageInfo = (PageInfo) request.getExtra("$pageInfo");
+                }
+                boolean isJsRendering = pageInfo != null && "1".equals(pageInfo.getIsJsRendering());
+                String pageUrl = request.getUrl();
+                String loginName = request.getExtra("loginName") != null ? request.getExtra("loginName").toString() : RequestHelper.getParam(request.getUrl(), "loginName");
 
-            SiteCookie siteCookie = pageCookieService.getCookieByUrl(pageUrl,loginName);
-            if(i >= 1 && page.getRawText() != null) {
-                //pageCookieService.deleteCookieById(siteCookie.getId());
-                siteCookie = null;
-            }
-            String cookie ="";
-            while (StringUtils.isNotEmpty(loginName) && siteCookie == null) {
-                boolean doRecovery = doAutomaticRecovery(Page.fail(),request,request.getUrl());
-                if(doRecovery)
-                    siteCookie = pageCookieService.getCookieByUrl(pageUrl,loginName);
-            }
-            if(siteCookie!=null) {
-                cookie=siteCookie.getCookie();
+                SiteCookie siteCookie = pageCookieService.getCookieByUrl(pageUrl, loginName);
+                if ((i >= 1 && StringUtils.isNotEmpty(page.getRawText())) || (i > 2 && page.getRawText() == null)) {
+                    siteCookie = null;
+                }
+                String cookie = "";
+                int j = 0;
+                while (StringUtils.isNotEmpty(loginName) && siteCookie == null && j <= 5) {
+                    EngineResult engineResult = doAutomaticRecovery(Page.fail(), request, request.getUrl());
+                    if (engineResult != null && engineResult.getStatus()) {
+                        byte[] bytes = IOUtils.toByteArray(engineResult.getResult());
+                        page.setBytes(bytes);
+                        if (!request.isBinaryContent()) {
+                            page.setCharset(site.getCharset());
+                            String content = new String(bytes, site.getCharset());
+                            //unicode编码处理
+                            if (UNICODE_PATTERN.matcher(content).find())
+                                content = StringEscapeUtils.unescapeJava(content.replace("\"", "\\\""));
+                            page.setRawText(content);
+                        }
+                        page.setUrl(new PlainText(request.getUrl()));
+                        page.setRequest(request);
+                        doRecovery = engineResult.getStatus();
+                        break;
+                    }
+                    j++;
+                }
+                if(doRecovery) {
+                    continue;
+                }
+                if (siteCookie != null) {
+                    cookie = siteCookie.getCookie();
 //                String cookieId = siteCookie.getId();
 //                request.putExtra("cookieId", cookieId);
-            }
-            //获取动态的cookies
-            List<CrawlerCookie> dynamicCookieList = dynamicCookieManager.getCookiesByDomain(UrlUtils.getDomain(pageUrl));
-            if(dynamicCookieList!=null){
-                cookie += ";";
-                for (CrawlerCookie crawlerCookie : dynamicCookieList) {
-                    cookie += String.format("%s=%s", crawlerCookie.getName(), crawlerCookie.getValue());
                 }
-            }
+                //获取动态的cookies
+                List<CrawlerCookie> dynamicCookieList = dynamicCookieManager.getCookiesByDomain(UrlUtils.getDomain(pageUrl));
+                if (dynamicCookieList != null) {
+                    cookie += ";";
+                    for (CrawlerCookie crawlerCookie : dynamicCookieList) {
+                        cookie += String.format("%s=%s", crawlerCookie.getName(), crawlerCookie.getValue());
+                    }
+                }
 //            request = RequestHelper.createRequest(request.getUrl(),request.getMethod(),request.getExtras());
-            page = !isJsRendering ? httpClientDownloader.download(request, task, cookie) : mockDonwnloader.download(request, task, cookie);
-            if (!isJsRendering && (!"post".equalsIgnoreCase(request.getMethod())&&page != null) && page.getRawText() != null && redirectPattern.matcher(page.getRawText()).find())
-                page = mockDonwnloader.download(request, task, cookie);
-            i++;
+                page = !isJsRendering ? httpClientDownloader.download(request, task, cookie) : mockDonwnloader.download(request, task, cookie);
+                if (!isJsRendering && (!"post".equalsIgnoreCase(request.getMethod()) && page != null) && page.getRawText() != null && redirectPattern.matcher(page.getRawText()).find())
+                    page = mockDonwnloader.download(request, task, cookie);
+                i++;
+            }
+        } catch (Exception e) {
+            logger.error("pageUrl {},Exception",request.getUrl(),e);
+            page = Page.fail();
         }
-
         if(page != null && page.getRawText() == null)
             return null;
+
         return page;
     }
 
@@ -159,9 +191,9 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
      * @param pageRequest
      * @param pageUrl
      */
-    public boolean doAutomaticRecovery(Page page, Request pageRequest, String pageUrl) {
-        boolean doRecovery = false;
+    public EngineResult doAutomaticRecovery(Page page, Request pageRequest, String pageUrl) {
         PageSite pageSite = pageSiteService.getPageSiteByUrl(pageUrl);
+        EngineResult engineResult = null;
         if (pageSite != null) {
             String login = pageSite.getLoginEngine();
             String encrypt = pageSite.getEncryptEngine();
@@ -192,11 +224,13 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                     paramData.put("loginName", RequestHelper.getParam(pageRequest.getUrl(),"loginName"));
                     paramData.put("loginPassword", RequestHelper.getParam(pageRequest.getUrl(),"loginPassword"));
                 }
-                EngineResult engineResult = encryptEngine.execute(paramData);
+                engineResult = encryptEngine.execute(paramData);
+                if(engineResult.getStatus() == null || !engineResult.getStatus())
+                    return engineResult;
                 LoginParam loginParam = engineResult.getLoginParam();
+                loginParam.setUrl(pageRequest.getUrl());
                 engineResult = loginEngine.execute(loginParam);
                 if (engineResult.getStatus()) {
-                    doRecovery = Boolean.TRUE;
                     //需要登录了
                     List<PhantomCookie> phantomCookies = new ArrayList<>();
                     engineResult.getHeaders().forEach(header -> {
@@ -210,14 +244,14 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                     } else
                         logger.info("保存新的cookie失败！");
                     //重新加入队列
-                    page.addTargetRequest(pageRequest);
+//                    page.addTargetRequest(pageRequest);
                 } else {
                     logger.info("登陆失败{}",JSON.toJSONString(pageRequest));
                 }
             } else {
                 Selectable judgeContext = StringUtils.isNotBlank(loginJsFileName) ? getPageRegionContext(page, pageRequest, loginJudgeExpression) : null;
                 if (judgeContext != null && judgeContext.match()) {
-                    doRecovery = true;
+                   engineResult.setStatus(Boolean.TRUE);
                     //需要登录了
                     autoLoginProxy.login(pageUrl, loginJsFileName, page.getRawText(), oldCookieId);
                     //重新加入队列
@@ -225,7 +259,7 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                 } else {
                     judgeContext = StringUtils.isNotBlank(captchaJsFileName) ? getPageRegionContext(page, pageRequest, captchaJudgeExpression) : null;
                     if (judgeContext != null && judgeContext.match()) {
-                        doRecovery = true;
+                        engineResult.setStatus(Boolean.FALSE);
                         //需要刷新验证码了
                         captchaIdentificationProxy.recognition(pageUrl, captchaJsFileName, page.getRawText(), oldCookieId);
                     }
@@ -233,7 +267,7 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
             }
 
         }
-        return doRecovery;
+        return engineResult;
     }
 
     /**

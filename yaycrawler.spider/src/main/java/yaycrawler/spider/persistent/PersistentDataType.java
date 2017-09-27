@@ -31,4 +31,7 @@ public class PersistentDataType {
      * Map格式的页面数据(横形)
      */
     public final static String autoField = "autoField";
+
+    public final static String MQ = "mq";
+    public final static String ROCKETMQ = "rocketmq";
 }

@@ -3,6 +3,7 @@ package yaycrawler.master.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.model.QueueQueryParam;
 import yaycrawler.common.model.RestFulResult;
 import yaycrawler.master.model.MasterContext;
+import yaycrawler.master.service.CrawlerQueueServiceFactory;
 import yaycrawler.master.service.ICrawlerQueueService;
 
 import java.util.List;
@@ -26,12 +28,16 @@ public class AdminController {
     private static final Logger logger  = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
-    private ICrawlerQueueService crawlerQueueService;
+    private CrawlerQueueServiceFactory crawlerQueueServiceFactory;
+
+    @Value("${crawler.queue.dataType:redis}")
+    private String dataType;
 
     @RequestMapping("/registerQueues")
     @ResponseBody
     public RestFulResult acceptAdminTask(@RequestBody List<CrawlerRequest> crawlerRequests)
     {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         Boolean flag = crawlerQueueService.pushTasksToWaitingQueue(crawlerRequests,true);
         if(flag)
             return RestFulResult.success(flag);
@@ -50,6 +56,7 @@ public class AdminController {
     @ResponseBody
     public RestFulResult retrievedSuccessQueueRegistrations(@RequestBody QueueQueryParam queryParam)
     {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         return RestFulResult.success(crawlerQueueService.querySuccessQueues(queryParam));
     }
 
@@ -57,6 +64,7 @@ public class AdminController {
     @ResponseBody
     public RestFulResult retrievedFailQueueRegistrations(@RequestBody QueueQueryParam queryParam)
     {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         return RestFulResult.success(crawlerQueueService.queryFailQueues(queryParam));
     }
 
@@ -64,6 +72,7 @@ public class AdminController {
     @ResponseBody
     public RestFulResult retrievedRunningQueueRegistrations(@RequestBody QueueQueryParam queryParam)
     {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         return RestFulResult.success(crawlerQueueService.queryRunningQueues(queryParam));
     }
 
@@ -71,6 +80,7 @@ public class AdminController {
     @ResponseBody
     public RestFulResult retrievedWaitingQueueRegistrations(@RequestBody QueueQueryParam queryParam)
     {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         return RestFulResult.success(crawlerQueueService.queryWaitingQueues(queryParam));
     }
 

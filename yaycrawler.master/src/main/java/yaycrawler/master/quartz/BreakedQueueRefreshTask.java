@@ -2,6 +2,9 @@ package yaycrawler.master.quartz;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import yaycrawler.master.service.CrawlerQueueServiceFactory;
 import yaycrawler.master.service.ICrawlerQueueService;
 
 /**
@@ -9,19 +12,19 @@ import yaycrawler.master.service.ICrawlerQueueService;
  */
 public class BreakedQueueRefreshTask {
     private static final Logger logger = LoggerFactory.getLogger(BreakedQueueRefreshTask.class);
-    private ICrawlerQueueService queueService;
     private Long queueTimeOut;
+    @Autowired
+    private CrawlerQueueServiceFactory crawlerQueueServiceFactory;
+    @Value("${crawler.queue.dataType:redis}")
+    private String dataType;
 
     public void refreshBreakedQueue() {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         logger.info("开始刷新中断任务队列……");
-        queueService.refreshBreakedQueue(queueTimeOut);
+        crawlerQueueService.refreshBreakedQueue(queueTimeOut);
     }
 
     public void setQueueTimeOut(Long queueTimeOut) {
         this.queueTimeOut = queueTimeOut;
-    }
-
-    public void setQueueService(ICrawlerQueueService queueService) {
-        this.queueService = queueService;
     }
 }

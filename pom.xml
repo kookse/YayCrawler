@@ -21,6 +21,7 @@
         <module>yaycrawler.ftpserver</module>
         <module>yaycrawler.cache</module>
         <module>yaycrawler.api</module>
+        <module>yaycrawler.rocketmq</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -326,6 +327,11 @@
                 <artifactId>yaycrawler-api</artifactId>
                 <version>${yaycrawler.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.yaycrawler</groupId>
+                <artifactId>yaycrawler-rocketmq</artifactId>
+                <version>${yaycrawler.version}</version>
+            </dependency>
             <!--项目依赖结束-->
 
             <dependency>
@@ -415,6 +421,13 @@
                 <version>2.8.7</version>
             </dependency>
 
+            <!--RocketMQ客户端依赖开始-->
+            <dependency>
+                <groupId>com.alibaba.rocketmq</groupId>
+                <artifactId>rocketmq-client</artifactId>
+                <version>3.2.6</version>
+            </dependency>
+            <!--RocketMQ客户端依赖结束-->
         </dependencies>
     </dependencyManagement>
 

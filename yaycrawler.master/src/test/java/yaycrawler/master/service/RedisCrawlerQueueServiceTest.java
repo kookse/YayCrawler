@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -24,11 +25,15 @@ import java.util.Map;
 public class RedisCrawlerQueueServiceTest {
 
     @Autowired
-    private ICrawlerQueueService crawlerQueueService;
+    private CrawlerQueueServiceFactory crawlerQueueServiceFactory;
+
+    @Value("${crawler.queue.dataType:redis}")
+    private String dataType;
 
     @Test
     public  void testAddCrawlerReqeust()
     {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         List<CrawlerRequest> requestsList=new ArrayList<>();
         for(int i=0;i<300;i++) {
             CrawlerRequest request = new CrawlerRequest("www.baidu.com/id="+System.currentTimeMillis() , "baidu.com", "post");
@@ -44,18 +49,21 @@ public class RedisCrawlerQueueServiceTest {
     @Test
     public void fetchTasksFromWaitingQueueTest()
     {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         Assert.assertEquals(crawlerQueueService.fetchTasksFromWaitingQueue(100).size(), 100);
     }
 
     @Test
     public void moveWaitingTaskToRunningQueueTest()
     {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         Assert.assertTrue(crawlerQueueService.moveWaitingTaskToRunningQueue("", crawlerQueueService.fetchTasksFromWaitingQueue(100)));
     }
 
     @Test
     public void moveRunningTaskToFailQueueTest()
     {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         Assert.assertTrue(crawlerQueueService.moveRunningTaskToFailQueue("769b077660d7b995f9a84de53da67554c0c70238","执行失败！"));
     }
     @Test
@@ -66,6 +74,7 @@ public class RedisCrawlerQueueServiceTest {
     @Test
     public void refreshBreakedQueueTest()
     {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         crawlerQueueService.refreshBreakedQueue(60000L);
     }
 

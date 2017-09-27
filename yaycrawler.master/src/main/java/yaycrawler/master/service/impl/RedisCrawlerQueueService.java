@@ -17,6 +17,7 @@ import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.model.CrawlerResult;
 import yaycrawler.common.model.QueueQueryParam;
 import yaycrawler.common.model.QueueQueryResult;
+import yaycrawler.master.service.CrawlerQueueDataType;
 import yaycrawler.master.service.ICrawlerQueueService;
 
 import java.io.UnsupportedEncodingException;
@@ -465,5 +466,10 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
         }
         queryResult.setRows(crawlerRequestList);
         return queryResult;
+    }
+
+    @Override
+    public String getSupportedDataType() {
+        return CrawlerQueueDataType.REDIS;
     }
 }
