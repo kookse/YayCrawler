@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import yaycrawler.dao.domain.PageInfo;
 
 import javax.persistence.OrderBy;
+import java.util.List;
 
 
 /**
@@ -22,5 +23,6 @@ public  interface PageInfoRepository extends CrudRepository<PageInfo, String> {
     @OrderBy("createdDate desc ")
     Page<PageInfo> findAllByOrderByCreatedDateDesc(Pageable pageable);
 
+    List<PageInfo> findByCityCode(String cityCode);
 
 }

@@ -109,7 +109,8 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                 while (StringUtils.isNotEmpty(loginName) && siteCookie == null && j <= 5) {
                     EngineResult engineResult = doAutomaticRecovery(Page.fail(), request, request.getUrl());
                     if (engineResult != null && engineResult.getStatus()) {
-                        byte[] bytes = IOUtils.toByteArray(engineResult.getResult());
+                        page = new Page();
+                        byte[] bytes = engineResult.getResult().getBytes(site.getCharset());
                         page.setBytes(bytes);
                         if (!request.isBinaryContent()) {
                             page.setCharset(site.getCharset());

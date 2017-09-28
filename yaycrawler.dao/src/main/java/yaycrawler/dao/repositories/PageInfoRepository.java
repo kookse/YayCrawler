@@ -22,5 +22,6 @@ public  interface PageInfoRepository extends CrudRepository<PageInfo, String> {
     @OrderBy("createdDate desc ")
     Page<PageInfo> findAllByOrderByCreatedDateDesc(Pageable pageable);
 
+    List<PageInfo> findByCityCode(String cityCode);
 
 }

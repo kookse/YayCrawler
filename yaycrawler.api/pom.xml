@@ -25,7 +25,6 @@
         <start-class>yaycrawler.api.Application</start-class>
     </properties>
 
-    <artifactId>yaycrawler-api</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>

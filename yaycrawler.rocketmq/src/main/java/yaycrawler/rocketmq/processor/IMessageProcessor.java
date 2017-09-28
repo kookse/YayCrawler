@@ -1,4 +1,4 @@
-package com.smartdata360.rocketmq.processor;
+package yaycrawler.rocketmq.processor;
 
 import com.alibaba.rocketmq.common.message.MessageExt;
 

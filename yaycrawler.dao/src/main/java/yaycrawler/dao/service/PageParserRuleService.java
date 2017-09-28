@@ -190,5 +190,9 @@ public class PageParserRuleService {
         return true;
     }
 
+    public List<PageInfo> getPageInfoByCityCode(String cityCode) {
+        if(StringUtils.isBlank(cityCode)) return null;
+        return pageInfoRepository.findByCityCode(cityCode);
+    }
 
 }

@@ -1,9 +1,9 @@
-package com.smartdata360.rocketmq.config;
+package yaycrawler.rocketmq.config;
 
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.client.producer.DefaultMQProducer;
-import com.smartdata360.rocketmq.exception.RocketMQException;
-import com.smartdata360.rocketmq.properties.ProducerProperties;
+import yaycrawler.rocketmq.exception.RocketMQException;
+import yaycrawler.rocketmq.properties.ProducerProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

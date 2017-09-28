@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.ResultItems;
@@ -29,6 +30,9 @@ public class GenericPipeline implements Pipeline {
     @Autowired(required = false)
     private PersistentServiceFactory persistentServiceFactory;
 
+    @Value("${rocketmq.status:false}")
+    private Boolean rockeMQStatus;
+
     @Override
     public void process(ResultItems resultItems, Task task) {
         if (persistentServiceFactory == null) {
@@ -46,11 +50,10 @@ public class GenericPipeline implements Pipeline {
             Map<String, Map<String, Object>> groupedRegionDataMap = new HashMap<>();
             for (Map.Entry<String, Object> regionDataMapEntry : pageDataMap.entrySet()) {
                 Object regionDataValue = regionDataMapEntry.getValue();
-                String dataType = PersistentDataType.ROCKETMQ;
+                String dataType = PersistentDataType.MAP;
                 if (regionDataValue instanceof Collection) {
                     dataType = ((List) regionDataValue).remove(((List) regionDataValue).size() -1).toString();
                 }
-                dataType = PersistentDataType.ROCKETMQ;
                 addToDataTypeGroup(groupedRegionDataMap, dataType, regionDataMapEntry);
             }
 
@@ -66,6 +69,10 @@ public class GenericPipeline implements Pipeline {
                         dataMap.put("loginParams",request.getExtras());
                         if (!persistentService.saveCrawlerResult(pageUrl, dataMap))
                             logger.error("可能持久化{}到{}失败！", groupedDataEntry.getKey(), persistentService.toString());
+                        else if(rockeMQStatus) {
+                            IResultPersistentService rocketMQPersistentService = persistentServiceFactory.getPersistentServiceByDataType(PersistentDataType.ROCKETMQ);
+                            rocketMQPersistentService.saveCrawlerResult(pageUrl,dataMap);
+                        }
                     }
                 } catch (Exception ex) {
                     logger.error(ex.getMessage());
@@ -78,7 +85,7 @@ public class GenericPipeline implements Pipeline {
 
     private void addToDataTypeGroup(Map<String, Map<String, Object>> groupedDataMapList, String dataType,Map.Entry<String, Object> regionDataMap) {
         if (StringUtils.isBlank(dataType)) return;
-        if (StringUtils.equalsIgnoreCase(dataType, "rocketmq") || StringUtils.equalsIgnoreCase(dataType, "autoField") || StringUtils.equalsIgnoreCase(dataType, "autoRowField"))
+        if (StringUtils.equalsIgnoreCase(dataType, "autoField") || StringUtils.equalsIgnoreCase(dataType, "autoRowField"))
             dataType = PersistentDataType.ROCKETMQ;
         Map<String, Object> groupedMap = groupedDataMapList.get(dataType);
         if (groupedMap == null) {

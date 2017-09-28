@@ -1,10 +1,10 @@
-package com.smartdata360.rocketmq.service;
+package yaycrawler.rocketmq.service;
 
 import com.alibaba.rocketmq.client.producer.DefaultMQProducer;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.client.producer.SendStatus;
 import com.alibaba.rocketmq.common.message.Message;
-import com.smartdata360.rocketmq.exception.RocketMQException;
+import yaycrawler.rocketmq.exception.RocketMQException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

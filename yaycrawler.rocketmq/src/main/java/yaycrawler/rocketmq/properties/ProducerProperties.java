@@ -1,8 +1,8 @@
-package com.smartdata360.rocketmq.properties;
+package yaycrawler.rocketmq.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import static com.smartdata360.rocketmq.properties.ProducerProperties.PREFIX;
+import static yaycrawler.rocketmq.properties.ProducerProperties.PREFIX;
 
 /**
  * Created by  yuananyun on 2017/9/4.

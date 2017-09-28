@@ -1,7 +1,7 @@
 package yaycrawler.worker.service;
 
 import com.alibaba.fastjson.JSON;
-import com.smartdata360.rocketmq.service.MQProduceService;
+import yaycrawler.rocketmq.service.MQProduceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

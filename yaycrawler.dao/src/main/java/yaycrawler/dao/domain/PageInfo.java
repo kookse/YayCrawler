@@ -54,6 +54,17 @@ public class PageInfo {
     @Column(name = "pageValidationRule",columnDefinition = "varchar(500)")
     private String pageValidationRule;
 
+    @Column(name = "cityCode",columnDefinition = "varchar(50)")
+    private String cityCode;
+
+    public String getCityCode() {
+        return cityCode;
+    }
+
+    public void setCityCode(String cityCode) {
+        this.cityCode = cityCode;
+    }
+
     public String getPageValidationRule() {
         return pageValidationRule;
     }

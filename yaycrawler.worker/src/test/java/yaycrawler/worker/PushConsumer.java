@@ -1,5 +1,6 @@
 package yaycrawler.worker;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.rocketmq.client.consumer.DefaultMQPushConsumer;
 import com.alibaba.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import com.alibaba.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -7,7 +8,9 @@ import com.alibaba.rocketmq.client.consumer.listener.MessageListenerConcurrently
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.consumer.ConsumeFromWhere;
 import com.alibaba.rocketmq.common.message.MessageExt;
+import yaycrawler.worker.model.YayCrawlerRequest;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -28,12 +31,12 @@ public class PushConsumer {
          * 注意：ConsumerGroupName需要由应用来保证唯一
          */
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("testmerchantLeagueConsumerGroup");
-        consumer.setNamesrvAddr("127.0.0.1:9876");
+        consumer.setNamesrvAddr("172.16.1.89:9876;172.16.1.221:9876");
 
         /**
          * 订阅指定topic下tags分别等于TagA或TagB
          */
-        consumer.subscribe("TP_CRAWLER_REQUEST", "portal");
+        consumer.subscribe("TP_CRAWLER_RESPONSE", "portal");
 
 
         /**
@@ -52,11 +55,16 @@ public class PushConsumer {
                                                             ConsumeConcurrentlyContext context) {
                 System.out.println(Thread.currentThread().getName() + " Receive New Messages: " + msgs);
                 MessageExt msg = msgs.get(0);
-                if (msg.getTopic().equals("TP_CRAWLER_REQUEST")) {
+                if (msg.getTopic().equals("TP_CRAWLER_RESPONSE")) {
                     // 执行TopicTest1的消费逻辑
                     if (msg.getTags() != null && msg.getTags().equals("portal")) {
                         // 执行TagA的消费
-                        String message = new String(msg.getBody());
+                        String message = null;
+                        try {
+                            message = new String(msg.getBody(),"utf-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
                         System.out.println(message);
                     }
                     else if (msg.getTags() != null && msg.getTags().equals("TagB")) {

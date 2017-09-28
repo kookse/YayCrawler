@@ -1,4 +1,4 @@
-package com.smartdata360.rocketmq.exception;
+package yaycrawler.rocketmq.exception;
 
 /**
  * Created by  yuananyun on 2017/9/4.
