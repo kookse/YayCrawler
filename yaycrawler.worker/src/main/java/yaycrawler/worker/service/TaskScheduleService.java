@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.scheduler.PriorityScheduler;
+import yaycrawler.api.thread.DynamicThreadPoolExecutorMaintainer;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.dao.service.PageParserRuleService;
 import yaycrawler.spider.crawler.YaySpider;
@@ -25,6 +27,7 @@ import yaycrawler.worker.listener.TaskDownloadFailureListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created by ucs_yuananyun on 2016/5/13.
@@ -61,6 +64,8 @@ public class TaskScheduleService {
     @Autowired(required = false)
     private DownloadService downloadService;
 
+    private final ThreadPoolExecutor TASK_EXECUTOR_POOL = DynamicThreadPoolExecutorMaintainer.get(TaskScheduleService.class.getName(),32);
+
     public TaskScheduleService() {
     }
 
@@ -83,35 +88,37 @@ public class TaskScheduleService {
     }
 
     public void doSchedule(List<CrawlerRequest> taskList) {
-        try {
-            logger.info("worker接收到{}个任务", taskList.size());
-            List<CrawlerRequest> downList = Lists.newArrayList();
-            for (CrawlerRequest crawlerRequest : taskList) {
-                if(crawlerRequest==null) continue;
-                //如果查找不到与url相关的解析规则，则该任务不能执行
-                if(MapUtils.getString(crawlerRequest.getExtendMap(),"$DOWNLOAD") != null) {
-                    downList.add(crawlerRequest);
+        logger.info("worker接收到{}个任务", taskList.size());
+//        TASK_EXECUTOR_POOL.execute(() -> {
+            try {
+                List<CrawlerRequest> downList = Lists.newArrayList();
+                for (CrawlerRequest crawlerRequest : taskList) {
+                    if(crawlerRequest==null) continue;
+                    //如果查找不到与url相关的解析规则，则该任务不能执行
+                    if(MapUtils.getString(crawlerRequest.getExtendMap(),"$DOWNLOAD") != null) {
+                        downList.add(crawlerRequest);
+                    }
+                    if (pageParserRuleService.findOnePageInfoByRgx(crawlerRequest.getUrl()) == null) {
+                        logger.info("查找不到与{}匹配的解析规则，该任务失败！", crawlerRequest.getUrl());
+                        pageParseListener.onError(convertCrawlerRequestToSpiderRequest(crawlerRequest), "查找不到匹配的页面解析规则！");
+                        continue;
+                    }
+                    String domain = crawlerRequest.getDomain();
+                    YaySpider spider = spiderMap.get(domain);
+                    if (spider == null)
+                        spider = createSpider(domain);
+                    spider.addRequest(convertCrawlerRequestToSpiderRequest(crawlerRequest));
+                    if (spider.getStatus() != Spider.Status.Running)
+                        spider.runAsync();
                 }
-                if (pageParserRuleService.findOnePageInfoByRgx(crawlerRequest.getUrl()) == null) {
-                    logger.info("查找不到与{}匹配的解析规则，该任务失败！", crawlerRequest.getUrl());
-                    pageParseListener.onError(convertCrawlerRequestToSpiderRequest(crawlerRequest), "查找不到匹配的页面解析规则！");
-                    continue;
+                if(downList.size() > 0 ) {
+                    downloadService.startCrawlerDownload(downList);
                 }
-                String domain = crawlerRequest.getDomain();
-                YaySpider spider = spiderMap.get(domain);
-                if (spider == null)
-                    spider = createSpider(domain);
-                spider.addRequest(convertCrawlerRequestToSpiderRequest(crawlerRequest));
-                if (spider.getStatus() != Spider.Status.Running)
-                    spider.runAsync();
+                logger.info("worker任务分配完成！");
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(),ex);
             }
-            if(downList.size() > 0 ) {
-                downloadService.startCrawlerDownload(downList);
-            }
-            logger.info("worker任务分配完成！");
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(),ex);
-        }
+//        });
     }
 
     private Request convertCrawlerRequestToSpiderRequest(CrawlerRequest crawlerRequest) {

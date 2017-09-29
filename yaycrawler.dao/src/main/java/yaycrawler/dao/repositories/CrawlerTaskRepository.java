@@ -60,7 +60,7 @@ public interface CrawlerTaskRepository extends PagingAndSortingRepository<Crawle
      * @param timeout
      */
     @Modifying(clearAutomatically = true)
-    @Query("update CrawlerTask set status =-2 where status=2 and current_timestamp()-startedTime>:timeout")
+    @Query("update CrawlerTask set status =-2 where status=2 and UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(started_time)>:timeout")
     void refreshBreakedQueue(@Param("timeout") long timeout);
 
 

@@ -23,7 +23,7 @@ public interface CrawlerTaskRepository extends PagingAndSortingRepository<Crawle
      * @param workerId
      */
     @Modifying(clearAutomatically = true)
-    @Query("update CrawlerTask set status =-1,workerId=:workerId,startedTime=current_timestamp() where code =:code")
+    @Query("update CrawlerTask set status =-1,workerId=:workerId,startedTime=current_timestamp where code =:code")
     void updateTaskToRunningStatus(@Param("code") String code, @Param("workerId") String workerId);
 
 
@@ -33,7 +33,7 @@ public interface CrawlerTaskRepository extends PagingAndSortingRepository<Crawle
      * @param code
      */
     @Modifying(clearAutomatically = true)
-    @Query("update CrawlerTask set status =0,message=:message,completedTime=current_timestamp() where code =:code")
+    @Query("update CrawlerTask set status =0,message=:message,completedTime=current_timestamp where code =:code")
     void updateTaskToFailureStatus(@Param("code") String code, @Param("message") String message);
 
     /**
@@ -42,7 +42,7 @@ public interface CrawlerTaskRepository extends PagingAndSortingRepository<Crawle
      * @param code
      */
     @Modifying(clearAutomatically = true)
-    @Query("update CrawlerTask set status =1,completedTime=current_timestamp() where code =:code")
+    @Query("update CrawlerTask set status =1,completedTime=current_timestamp where code =:code")
     void updateTaskToSuccessStatus(@Param("code") String code);
 
     /**
@@ -60,9 +60,8 @@ public interface CrawlerTaskRepository extends PagingAndSortingRepository<Crawle
      * @param timeout
      */
     @Modifying(clearAutomatically = true)
-    @Query("update CrawlerTask set status =-2 where status=2 and current_timestamp()-startedTime>:timeout")
+    @Query(value = "UPDATE crawler_task set status = -2 where status = 2 and (extract(epoch from current_timestamp(0)) - extract(epoch from to_timestamp(to_char(started_time, 'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))) > :timeout",nativeQuery = true)
     void refreshBreakedQueue(@Param("timeout") long timeout);
-
 
     Page<CrawlerTask> findAllByStatus(int status, Pageable pageable);
 }
