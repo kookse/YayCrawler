@@ -121,6 +121,12 @@ http://www.w3.org/2001/XMLSchema-instance ">
             <!--<groupId>com.zaxxer</groupId>-->
             <!--<artifactId>HikariCP</artifactId>-->
         <!--</dependency>-->
+
+        <dependency>
+            <groupId>com.taobao.pamirs.schedule</groupId>
+            <artifactId>tbschedule</artifactId>
+            <version>3.3.3.2</version>
+        </dependency>
     </dependencies>
 
     <build>

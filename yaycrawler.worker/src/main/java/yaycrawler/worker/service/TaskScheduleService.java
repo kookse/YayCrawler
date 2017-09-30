@@ -87,7 +87,7 @@ public class TaskScheduleService {
         return count;
     }
 
-    public void doSchedule(List<CrawlerRequest> taskList) {
+    public Boolean doSchedule(List<CrawlerRequest> taskList) {
         logger.info("worker接收到{}个任务", taskList.size());
 //        TASK_EXECUTOR_POOL.execute(() -> {
             try {
@@ -117,7 +117,9 @@ public class TaskScheduleService {
                 logger.info("worker任务分配完成！");
             } catch (Exception ex) {
                 logger.error(ex.getMessage(),ex);
+                return Boolean.FALSE;
             }
+            return Boolean.TRUE;
 //        });
     }
 

@@ -7,6 +7,8 @@ import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.common.message.Message;
 import yaycrawler.worker.model.YayCrawlerRequest;
 
+import java.util.UUID;
+
 /**
  * @author bill
  * @create 2017-09-27 18:46
@@ -41,8 +43,9 @@ public class Producer {
                 yayCrawlerRequest.setAccount("15626241465");
                 yayCrawlerRequest.setAccountType("");
                 yayCrawlerRequest.setCategory(2);
-                yayCrawlerRequest.setCityCode("gz");
+                yayCrawlerRequest.setCityCode("440100");
                 yayCrawlerRequest.setPassword("jaB4Gz143AtQ");
+                yayCrawlerRequest.setOrderId(UUID.randomUUID().toString());
                 Message msg = new Message("TP_CRAWLER_REQUEST",// topic
                         "portal",// tag
                         "OrderID002",// key

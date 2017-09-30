@@ -6,6 +6,15 @@ import yaycrawler.common.utils.IdentificationGenerator;
  * 爬虫请求对象
  */
 public class YayCrawlerRequest {
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
     public enum RequestCategory {
         GONGJIJIN("公积金", 0), SHEBAO("社保", 1), GESHUI("个税", 2);
 
@@ -16,8 +25,9 @@ public class YayCrawlerRequest {
             this.name = name;
             this.value = value;
         }
-        public enum AccountType{
-            ID_CARD("身份证",0),PERSON_NAME("姓名",1),MOBILE("手机号",2);
+
+        public enum AccountType {
+            ID_CARD("身份证", 0), PERSON_NAME("姓名", 1), MOBILE("手机号", 2);
             private String name;
             private int value;
 
@@ -44,6 +54,7 @@ public class YayCrawlerRequest {
         }
     }
 
+    private String orderId;
     private int category;
     private String cityCode;
     private String accountType;
@@ -124,5 +135,4 @@ public class YayCrawlerRequest {
     public String getIdentification() {
         return IdentificationGenerator.fromHash(String.valueOf(category), cityCode, accountType, account);
     }
-
 }

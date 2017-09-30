@@ -10,6 +10,8 @@ import yaycrawler.common.model.CommunicationAPIs;
 import yaycrawler.common.model.RestFulResult;
 import yaycrawler.common.utils.HttpUtils;
 import yaycrawler.common.utils.UrlUtils;
+import yaycrawler.dao.domain.CrawlerTask;
+import yaycrawler.dao.repositories.CrawlerTaskRepository;
 import yaycrawler.rocketmq.processor.IMessageProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import yaycrawler.dao.domain.PageInfo;
 import yaycrawler.dao.service.PageParserRuleService;
 import yaycrawler.spider.listener.IPageParseListener;
 import yaycrawler.worker.exception.WorkerResultNotifyFailureException;
+import yaycrawler.worker.mapper.CrawlerTaskMapper;
 import yaycrawler.worker.model.WorkerContext;
 import yaycrawler.worker.model.YayCrawlerRequest;
 
@@ -39,6 +42,9 @@ public class DefaultMessageProcessor implements IMessageProcessor {
     @Autowired
     private PageParserRuleService pageParseRuleService;
 
+    @Autowired
+    private CrawlerTaskRepository crawlerTaskRepository;
+
     @Override
     public boolean handleMessage(MessageExt messageExt) {
         logger.info("receive : " + messageExt.toString());
@@ -49,21 +55,22 @@ public class DefaultMessageProcessor implements IMessageProcessor {
                     // 执行TagA的消费
                     String message = new String(messageExt.getBody(), "utf-8");
                     YayCrawlerRequest yayCrawlerRequest = JSON.parseObject(message, YayCrawlerRequest.class);
-                    List<CrawlerRequest> crawlerRequestList = Lists.newArrayList();
-                    List<PageInfo> pageInfos = pageParseRuleService.getPageInfoByCityCode(yayCrawlerRequest.getCityCode());
+//                    List<CrawlerRequest> crawlerRequestList = Lists.newArrayList();
+                    List<PageInfo> pageInfos = pageParseRuleService.getPageInfoByCityCodeAndCategory(yayCrawlerRequest.getCityCode(),yayCrawlerRequest.getCategory());
                     if (pageInfos != null) {
                         pageInfos.forEach(pageInfo -> {
-                            CrawlerRequest crawlerRequest = new CrawlerRequest();
-                            crawlerRequest.setUrl(pageInfo.getPageUrl());
-                            crawlerRequest.setMethod("GET");
-                            crawlerRequest.setDomain(UrlUtils.getDomain(pageInfo.getPageUrl()));
-                            crawlerRequest.setData(ImmutableMap.of("loginName", yayCrawlerRequest.getAccount(), "loginPassword", yayCrawlerRequest.getPassword()));
-                            crawlerRequestList.add(crawlerRequest);
+                            CrawlerTask crawlerTask = new CrawlerTask();
+                            crawlerTask.setUrl(pageInfo.getPageUrl());
+                            crawlerTask.setMethod("GET");
+                            crawlerTask.setData(ImmutableMap.of("orderId", yayCrawlerRequest.getOrderId(),"loginName", yayCrawlerRequest.getAccount(), "loginPassword", yayCrawlerRequest.getPassword()));
+                            crawlerTaskRepository.save(crawlerTask);
                         });
-                        String targetUrl = CommunicationAPIs.getFullRemoteUrl(WorkerContext.getMasterServerAddress(), CommunicationAPIs.ADMIN_POST_MASTER_TASK_REGEDIT);
-                        RestFulResult result = HttpUtils.doSignedHttpExecute(WorkerContext.getSignatureSecret(), targetUrl, HttpMethod.POST, crawlerRequestList);
-                        if(result!=null && result.hasError()) logger.error(result.getMessage());
-                        return result != null && !result.hasError();
+//                        String targetUrl = CommunicationAPIs.getFullRemoteUrl(WorkerContext.getMasterServerAddress(), CommunicationAPIs.ADMIN_POST_MASTER_TASK_REGEDIT);
+//                        RestFulResult result = HttpUtils.doSignedHttpExecute(WorkerContext.getSignatureSecret(), targetUrl, HttpMethod.POST, crawlerRequestList);
+//                        if(result!=null && result.hasError()) logger.error(result.getMessage());
+//                        return result != null && !result.hasError();
+
+                        return Boolean.TRUE;
                     }
                     System.out.println(message);
                 }

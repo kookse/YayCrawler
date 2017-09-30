@@ -36,15 +36,17 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
     private CrawlerTaskRepository crawlerTaskRepository;
 
 //    待运行
-    private static int STATUS_WAITING = -2;
+    private static int STATUS_WAITING = 0;
+    //    运行中
+    private static int STATUS_READY = 1;
 //    运行中
-    private static int STATUS_RUNNING = -1;
+    private static int STATUS_RUNNING = 2;
 //    失败
-    private static int STATUS_FAILURE = 0;
+    private static int STATUS_FAILURE = 3;
 //    成功
-    private static int STATUS_SUCCESS = 1;
+    private static int STATUS_SUCCESS = 4;
 //    超时
-    private static int STATUS_TIMEOUT = 2;
+    private static int STATUS_TIMEOUT = 5;
 
     /**
      * 添加任务到待执行队列

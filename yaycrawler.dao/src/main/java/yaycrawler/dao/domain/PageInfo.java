@@ -57,6 +57,17 @@ public class PageInfo {
     @Column(name = "cityCode",columnDefinition = "varchar(50)")
     private String cityCode;
 
+    @Column(name = "category",columnDefinition = "int")
+    private Integer category;
+
+    public Integer getCategory() {
+        return category;
+    }
+
+    public void setCategory(Integer category) {
+        this.category = category;
+    }
+
     public String getCityCode() {
         return cityCode;
     }

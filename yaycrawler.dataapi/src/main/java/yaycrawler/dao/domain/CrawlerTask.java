@@ -1,6 +1,7 @@
 package yaycrawler.dao.domain;
 
 import com.alibaba.fastjson.JSON;
+import org.hibernate.annotations.GenericGenerator;
 import yaycrawler.common.model.CrawlerRequest;
 
 import javax.persistence.*;
@@ -14,10 +15,16 @@ import java.util.Map;
 @Entity
 @Table(name = "crawler_task")
 public class CrawlerTask {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator="s_gen")
+    @SequenceGenerator(name="s_gen",sequenceName="crawler_task_id_seq")
+    private Integer id;
+
     /**
      * 任务的标识
      */
-    @Id
+    @Column(name = "code" , columnDefinition = "varchar(300)")
     private String code;
 
     /**
@@ -87,6 +94,14 @@ public class CrawlerTask {
             this.data = JSON.toJSONString(data);
         if (extendData != null)
             this.extendData = JSON.toJSONString(extendData);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getCode() {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import yaycrawler.spider.persistent.IResultPersistentService;
 import yaycrawler.spider.persistent.PersistentDataType;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -28,7 +29,15 @@ public class RocketMQPersistentService implements IResultPersistentService {
 
     @Override
     public boolean saveCrawlerResult(String pageUrl, Map<String, Object> regionDataMap) {
-        String paramJson = JSON.toJSONString(regionDataMap);
+        Map<String,Object> data = new HashMap<>();
+        regionDataMap.remove("_id");
+        regionDataMap.remove("pageUrl");
+        regionDataMap.remove("timestamp");
+        Map loginParams = (Map) regionDataMap.get("loginParams");
+        regionDataMap.remove("loginParams");
+        data.put("result",regionDataMap);
+        data.put("orderId",loginParams.get("orderId"));
+        String paramJson = JSON.toJSONString(data);
         boolean flag = produceService.sendMsg(TOPIC, TAG, null, paramJson);
         return flag;
     }

@@ -14,10 +14,15 @@ import java.util.Map;
 @Entity
 @Table(name = "crawler_task")
 public class CrawlerTask {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     /**
      * 任务的标识
      */
-    @Id
+    @Column(name = "code" , columnDefinition = "varchar(300)")
     private String code;
 
     /**
@@ -87,6 +92,22 @@ public class CrawlerTask {
             this.data = JSON.toJSONString(data);
         if (extendData != null)
             this.extendData = JSON.toJSONString(extendData);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getExtendData() {
+        return extendData;
+    }
+
+    public void setExtendData(String extendData) {
+        this.extendData = extendData;
     }
 
     public String getCode() {
