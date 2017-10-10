@@ -3,6 +3,7 @@ package yaycrawler.spider.processor;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -15,23 +16,16 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Json;
 import us.codecraft.webmagic.selector.Selectable;
-import yaycrawler.api.engine.Engine;
-import yaycrawler.api.process.SpringContextUtil;
 import yaycrawler.api.resolver.CrawlerExpressionResolver;
 import yaycrawler.common.model.CrawlerRequest;
-import yaycrawler.common.model.EngineResult;
-import yaycrawler.common.model.LoginParam;
-import yaycrawler.common.model.PhantomCookie;
-import us.codecraft.webmagic.utils.UrlUtils;
+import yaycrawler.common.status.CrawlerStatus;
 import yaycrawler.common.utils.PinYinUtil;
 import yaycrawler.dao.domain.*;
-import yaycrawler.dao.service.PageCookieService;
+import yaycrawler.dao.mapper.CrawlerTaskMapper;
+
 import yaycrawler.dao.service.PageParserRuleService;
-import yaycrawler.monitor.captcha.CaptchaIdentificationProxy;
-import yaycrawler.monitor.login.AutoLoginProxy;
 import yaycrawler.spider.listener.IPageParseListener;
-import yaycrawler.spider.service.PageSiteService;
-import yaycrawler.spider.utils.RequestHelper;
+
 
 import java.util.*;
 
@@ -47,6 +41,9 @@ public class GenericPageProcessor implements PageProcessor {
     private IPageParseListener pageParseListener;
     @Autowired
     private PageParserRuleService pageParserRuleService;
+
+    @Autowired
+    private CrawlerTaskMapper crawlerTaskMapper;
 
     @Override
     public void process(Page page) {
@@ -69,12 +66,16 @@ public class GenericPageProcessor implements PageProcessor {
                         page.putField(PinYinUtil.converterToFirstSpell(pageParseRegion.getName()), result);
                     }
                 }
-                if (pageParseListener != null)
+                if (pageParseListener != null) {
                     pageParseListener.onSuccess(pageRequest, childRequestList);
+                }
+                crawlerTaskMapper.updateCrawlerTaskStatus(DigestUtils.sha1Hex(getUniqueUrl(pageRequest)),"", CrawlerStatus.SUCCESS.getStatus(), CrawlerStatus.SUCCESS.getMsg());
             } catch (Exception ex) {
                 logger.error(ex.getMessage());
-                if (pageParseListener != null)
+                if (pageParseListener != null) {
                     pageParseListener.onError(pageRequest, "页面解析失败");
+                }
+                crawlerTaskMapper.updateCrawlerTaskStatus(DigestUtils.sha1Hex(getUniqueUrl(pageRequest)),"", CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg());
             }
 //        }
 //        else {
@@ -84,6 +85,14 @@ public class GenericPageProcessor implements PageProcessor {
 //        }
     }
 
+    private String getUniqueUrl(Request request) {
+        if (request.getExtras() == null)
+            return request.getUrl();
+        StringBuilder urlBuilder = new StringBuilder(request.getUrl().trim());
+        String random = DigestUtils.sha1Hex(JSON.toJSONString(request.getExtras()));
+        urlBuilder.append(String.format("%s%s=%s", urlBuilder.indexOf("?") > 0 ? "&" : "?", "random", random));
+        return urlBuilder.toString();
+    }
 
     @SuppressWarnings("all")
     public Object parseOneRegion(Page page, PageParseRegion pageParseRegion, List<CrawlerRequest> childRequestList) {

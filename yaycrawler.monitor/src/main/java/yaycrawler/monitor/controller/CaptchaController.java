@@ -91,12 +91,12 @@ public class CaptchaController {
 //                deleteImage(fullbgImagePath);
 //                deleteImage(bgImagePath);
 
-                GeetestTrail geetestTrail=geetestTrailRepository.findOneByDeltaX(deltaX);
-                if(geetestTrail==null) return RestFulResult.failure("没有匹配到位移为"+deltaX+"的轨迹");
+//                GeetestTrail geetestTrail=geetestTrailRepository.findOneByDeltaX(deltaX);
+//                if(geetestTrail==null) return RestFulResult.failure("没有匹配到位移为"+deltaX+"的轨迹");
                 Map<String, Object> resultMap = new HashedMap();
-                resultMap.put("trailId", geetestTrail.getId());
+//                resultMap.put("trailId", geetestTrail.getId());
                 resultMap.put("deltaX", deltaX);
-                resultMap.put("trailArray", geetestTrail.getTrailArray());
+//                resultMap.put("trailArray", geetestTrail.getTrailArray());
                 return RestFulResult.success(resultMap);
             } else {
                 return RestFulResult.failure("求解轨迹失败！");

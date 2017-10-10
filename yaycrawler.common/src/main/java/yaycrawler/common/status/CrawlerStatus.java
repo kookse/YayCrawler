@@ -1,4 +1,4 @@
-package yaycrawler.dao.status;
+package yaycrawler.common.status;
 
 /**
  * @author bill

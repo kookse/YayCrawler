@@ -6,9 +6,9 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import yaycrawler.common.model.CrawlerRequest;
+import yaycrawler.common.status.CrawlerStatus;
 import yaycrawler.dao.domain.CrawlerTask;
 import yaycrawler.dao.repositories.CrawlerTaskRepository;
-import yaycrawler.dao.status.CrawlerStatus;
 import yaycrawler.rocketmq.processor.IMessageProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +81,7 @@ public class DefaultMessageProcessor implements IMessageProcessor {
         if (StringUtils.isEmpty(crawlerTask.getData()))
             return crawlerTask.getUrl();
         StringBuilder urlBuilder = new StringBuilder(crawlerTask.getUrl().trim());
-        String random = DigestUtils.sha1Hex(JSON.toJSONString(crawlerTask.getData()));
+        String random = DigestUtils.sha1Hex(crawlerTask.getData());
         urlBuilder.append(String.format("%s%s=%s", urlBuilder.indexOf("?") > 0 ? "&" : "?", "random", random));
         return urlBuilder.toString();
     }

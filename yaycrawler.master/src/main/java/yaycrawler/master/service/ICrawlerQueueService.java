@@ -93,7 +93,9 @@ public interface ICrawlerQueueService {
      */
     String getSupportedDataType();
 
-    Integer moveWaitingTaskToReadyQueue(List<Integer> ids);
+    Integer moveWaitingTaskToReadyQueue(List<?> ids);
 
-    Integer moveReadyaskToRunningQueue(List<Integer> ids);
+    Integer moveReadyTaskToRunningQueue(List<?> ids);
+
+    Integer moveRunningTaskToFailureQueue(List<?> ids);
 }

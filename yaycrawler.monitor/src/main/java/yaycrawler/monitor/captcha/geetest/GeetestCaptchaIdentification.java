@@ -40,10 +40,11 @@ public class GeetestCaptchaIdentification {
 
     private static boolean startIdentification(String pageUrl,String domain,String cookies,String jsFileName, String deltaResolveAddress) {
         List<String> paramList = new ArrayList<>();
-        paramList.add(pageUrl);
-        paramList.add(deltaResolveAddress);
-        paramList.add(domain);
-        paramList.add(cookies);
+        paramList.add(String.format("--pageUrl=%s",pageUrl));
+        paramList.add(String.format("--deltaResolveAddress=%s",deltaResolveAddress));
+        paramList.add(String.format("--domain=%s",domain));
+        paramList.add(String.format("--cookies=%s",cookies));
+        paramList.add(String.format("--searchword=%s","小米"));
         String result = CasperjsProgramManager.launch(jsFileName, paramList);
         logger.info("验证码识别结果：\r\n" + result);
         return result != null && (result.contains("验证通过") || result.contains("不存在极验验证码"));
@@ -54,19 +55,19 @@ public class GeetestCaptchaIdentification {
         int successCount = 0;
         int retryCount = 0;
 //        String pageUrl = "http://www.qichacha.com/search_index?index=0&p=1&key=%E5%BD%A6%E4%B8%9C%E5%A1%91%E8%83%B6%E5%85%AC%E5%8F%B8";
-        String pageUrl = "http://user.geetest.com/login?url=http:%2F%2Faccount.geetest.com%2Freport";
+        String pageUrl = "http://www.gsxt.gov.cn/corp-query-homepage.html";
         String deltaResolveAddress = "http://localhost:8086/worker/resolveGeetestSlicePosition";
         StopWatch stopWatch = new StopWatch();
         for (int i = 0; i < totalCount; i++) {
             stopWatch.reset();
             stopWatch.start();
-            if (startIdentification(pageUrl,null,null,"geetest_refresh.js", deltaResolveAddress))
+            if (startIdentification(pageUrl,null,null,"d:/tmp/js/geetest_refresh.js", deltaResolveAddress))
                 successCount++;
             else {
                 int t = retryCount;
                 while (t > 0) {
                     System.out.println("重试一次");
-                    if (startIdentification(pageUrl, null,null,"geetest_refresh.js",deltaResolveAddress)) {
+                    if (startIdentification(pageUrl, null,null,"d:/tmp/js/geetest_refresh.js",deltaResolveAddress)) {
                         successCount++;
                         break;
                     }

@@ -45,10 +45,10 @@ public class EncryptEngine implements Engine<Map<String, Object>> {
     @Value("${yaycrawler.api.src.path:d:/tmp/ocr/}")
     private String srcPath;
 
-    @Value("${yaycrawler.api.src.path:d:/tmp/ocr/dest}")
+    @Value("${yaycrawler.api.dest.path:d:/tmp/ocr/dest}")
     private String destPath;
 
-    @Value("${yaycrawler.api.src.path:d:/tmp/js}")
+    @Value("${yaycrawler.api.js.path:d:/tmp/js}")
     private String jsPath;
 
     private static Pattern INVOKE_PATTERN = Pattern.compile("(\\w+)\\((.*)\\)");

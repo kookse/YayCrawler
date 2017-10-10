@@ -11,7 +11,7 @@ public class CrawlerQueueDataType {
 
     public static final String REDIS = "redis";
 
-    public static final String MYSQL = "mysql";
+    public static final String DB = "db";
 
     public static final String POSTGRESQL = "postgresql";
 }

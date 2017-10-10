@@ -14,11 +14,10 @@ public class CrawlerRequest implements Serializable{
 
     private String url;
     private String method;
-    private Map data;
+    private Map<String,Object> data;
     private String hashCode;
     private String domain;
-    private Map extendMap;
-
+    private Map<String,Object> extendMap;
     /**
      *
      * startTime:开始时间

@@ -20,7 +20,7 @@ import java.util.Map;
 @Component
 public class RocketMQPersistentService implements IResultPersistentService {
 
-    private static final String TOPIC = "TP_CRAWLER_RESPONSE";
+    private static final String TOPIC = "TP_CRAWLER_RESPONSE_DEV";
     private static final String TAG = "portal";
     private static final Logger logger = LoggerFactory.getLogger(RocketMQPersistentService.class);
 

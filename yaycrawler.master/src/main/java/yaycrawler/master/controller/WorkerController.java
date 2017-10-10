@@ -87,7 +87,7 @@ public class WorkerController {
 
     @RequestMapping("/crawlerReadyNotify")
     @ResponseBody
-    public RestFulResult crawlerReadyNotify(@RequestBody List<Integer> ids) {
+    public RestFulResult crawlerReadyNotify(@RequestBody List<?> ids) {
         logger.debug("接收到任务开始通知:{}", JSON.toJSONString(ids));
         Assert.notNull(ids);
         taskDispatcher.dealResultNotifyReady(ids);
@@ -96,10 +96,19 @@ public class WorkerController {
 
     @RequestMapping("/crawlerDealingNotify")
     @ResponseBody
-    public RestFulResult crawlerDealingNotify(@RequestBody List<Integer> ids) {
+    public RestFulResult crawlerDealingNotify(@RequestBody List<?> ids) {
         logger.debug("接收到任务执行通知:{}", JSON.toJSONString(ids));
         Assert.notNull(ids);
         taskDispatcher.dealResultNotifyDealing(ids);
+        return RestFulResult.success(true);
+    }
+
+    @RequestMapping("/crawlerFailurIngNotify")
+    @ResponseBody
+    public RestFulResult crawlerFailurIngNotify(@RequestBody List<?> ids) {
+        logger.debug("接收到任务执行通知:{}", JSON.toJSONString(ids));
+        Assert.notNull(ids);
+        taskDispatcher.dealResultNotifyFailure(ids);
         return RestFulResult.success(true);
     }
 

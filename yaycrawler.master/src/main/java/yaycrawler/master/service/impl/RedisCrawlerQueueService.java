@@ -17,6 +17,7 @@ import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.model.CrawlerResult;
 import yaycrawler.common.model.QueueQueryParam;
 import yaycrawler.common.model.QueueQueryResult;
+import yaycrawler.master.service.AbstractICrawlerQueueService;
 import yaycrawler.master.service.CrawlerQueueDataType;
 import yaycrawler.master.service.ICrawlerQueueService;
 
@@ -29,7 +30,7 @@ import java.util.*;
  * Created by yuananyun on 2016/8/7.
  */
 @Service
-public class RedisCrawlerQueueService implements ICrawlerQueueService {
+public class RedisCrawlerQueueService extends AbstractICrawlerQueueService {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisCrawlerQueueService.class);
 
@@ -40,6 +41,8 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
     private static final String DUPLICATE_REMOVAL_PREFIX = "history:set_";
     private static final String TASK_DETAIL_HASH_PREFIX = "detail:hash_";
     private static final String WAITING_QUEUE_PREFIX = "waiting:queue_";
+    private static final String READY_QUEUE_PREFIX = "ready:queue_";
+    private static final String READY_EXTRA_PREFIX = "ready_extra:hash_";
     private static final String RUNNING_QUEUE_PREFIX = "running:queue_";
     private static final String RUNNING_EXTRA_PREFIX = "running_extra:hash_";
     private static final String FAIL_QUEUE_PREFIX = "fail:queue_";
@@ -77,6 +80,13 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
         return RUNNING_EXTRA_PREFIX + "data";
     }
 
+    private String getReadyQueueIdentification() {
+        return READY_QUEUE_PREFIX + "data";
+    }
+
+    private String getReadyQueueExtraInfoIdentification() {
+        return READY_EXTRA_PREFIX + "data";
+    }
     private String getFailQueueIdentification() {
         return FAIL_QUEUE_PREFIX + "data";
     }
@@ -103,28 +113,7 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
     @Override
     public boolean pushTasksToWaitingQueue(List<CrawlerRequest> crawlerRequests, boolean removeDuplicated) {
         Map<String, String> taskDetailsMap = Maps.newHashMap();
-        List<CrawlerRequest> requestTmps = Lists.newArrayList();
-        for (CrawlerRequest crawlerRequest : crawlerRequests) {
-            if(crawlerRequest.getUrl() == null)
-                continue;
-            Map<String, Object> parameter = crawlerRequest.getData();
-            List<Object> arrayTmps = null;
-            Map pagination = null;
-            List datas = Lists.newArrayList();
-            if (parameter == null || parameter.size() == 0) {
-                requestTmps.add(crawlerRequest);
-            } else {
-
-                for (Map.Entry<String, Object> entry : parameter.entrySet()) {
-                    transformParameters(entry, datas);
-                }
-                if (datas != null && datas.size() > 0) {
-                    transformRequest(requestTmps, crawlerRequest, datas);
-                }
-            }
-
-
-        }
+        List<CrawlerRequest> requestTmps = transCrawlerQueue(crawlerRequests);
         logger.info("开始注册{}个任务", requestTmps.size());
         for (CrawlerRequest request : requestTmps) {
             if (!removeDuplicated && isDuplicate(request)) continue;
@@ -143,78 +132,6 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
     }
 
     /**
-     * 通过迪卡尔积生成多个参数批量任务
-     * @param requestTmps
-     * @param crawlerRequest
-     * @param datas
-     */
-    private void transformRequest(List<CrawlerRequest> requestTmps, CrawlerRequest crawlerRequest, List datas) {
-        Set<List<ImmutableMap<String, String>>> parameterSets = Sets.cartesianProduct(datas);
-        Map dataTmp = ImmutableMap.of();
-        for (List<ImmutableMap<String, String>> parameters : parameterSets) {
-            CrawlerRequest request = new CrawlerRequest();
-            BeanUtils.copyProperties(crawlerRequest, request);
-            Map<Object, Object> tmp = Maps.newHashMap();
-            for (Map data : parameters) {
-                if (data != null)
-                    tmp.put(data.keySet().iterator().next(), data.values().iterator().next());
-            }
-//            if (StringUtils.equalsIgnoreCase(crawlerRequest.getMethod(), "GET")) {
-//                StringBuilder urlBuilder = new StringBuilder(request.getUrl());
-//                for (Map.Entry<Object, Object> entry : tmp.entrySet()) {
-//                    try {
-//                        if (entry.getKey() == null || StringUtils.isEmpty(entry.getKey().toString())) {
-//                            urlBuilder.append(String.format("%s/%s", "/", URLEncoder.encode(String.valueOf(entry.getValue()), "utf-8")));
-//                        } else
-//                            urlBuilder.append(String.format("%s%s=%s", urlBuilder.indexOf("?") > 0 ? "&" : "?", entry.getKey(), URLEncoder.encode(String.valueOf(entry.getValue()), "utf-8")));
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//                request.setUrl(urlBuilder.toString());
-//                request.setData(dataTmp);
-//            } else {
-//                request.setData(tmp);
-//            }
-            request.setData(tmp);
-            requestTmps.add(request);
-        }
-    }
-
-    /**
-     * 通过批量参数转换成批量任务
-     * @param entry
-     * @param datas
-     */
-    private void transformParameters(Map.Entry<String, Object> entry, List datas) {
-        List<Object> arrayTmps;
-        Map pagination;
-        if (StringUtils.startsWith(entry.getKey(), "$array_")) {
-            arrayTmps = JSON.parseObject(String.valueOf(entry.getValue()), List.class);
-            List<Map<String, Object>> tmpData = Lists.newArrayList();
-            String tmpParam = StringUtils.substringAfter(entry.getKey(), "$array_");
-            for (Object tmp : arrayTmps) {
-                tmpData.add(ImmutableMap.of(tmpParam, tmp));
-            }
-
-            datas.add(ImmutableSet.copyOf(tmpData));
-        } else if (StringUtils.startsWith(entry.getKey(), "$pagination_")) {
-            pagination = JSON.parseObject(String.valueOf(entry.getValue()), Map.class);
-            List<Map> tmpData = Lists.newArrayList();
-            int start = Integer.parseInt(pagination.get("START").toString());
-            int end = Integer.parseInt(pagination.get("END").toString());
-            int step = Integer.parseInt(pagination.get("STEP").toString());
-            String tmpParam = StringUtils.substringAfter(entry.getKey(), "$pagination_");
-            for (int i = start; i <= end; i = i + step) {
-                tmpData.add(ImmutableMap.of(tmpParam, i));
-            }
-            datas.add(ImmutableSet.copyOf(tmpData));
-        } else {
-            datas.add(ImmutableSet.of(ImmutableMap.of(entry.getKey(), entry.getValue())));
-        }
-    }
-
-    /**
      * 从待执行队列中拿取指定数目的任务
      *
      * @param taskCount 任务数目
@@ -222,7 +139,22 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
      */
     @Override
     public List<CrawlerRequest> fetchTasksFromWaitingQueue(long taskCount,List<Integer> taskItemIds) {
-        HashSet<String> taskCodeList = (HashSet<String>) redisTemplate.opsForZSet().range(getWaitingQueueIdentification(), 0, taskCount - 1);
+        Set<DefaultTypedTuple> tupleList = redisTemplate.opsForZSet().rangeWithScores(getWaitingQueueIdentification(),0,(taskCount - 1) * taskItemIds.size());
+        HashSet<DefaultTypedTuple> taskCodeList = Sets.newHashSet();//(HashSet<String>) redisTemplate.opsForZSet().range(getWaitingQueueIdentification(), 0, taskCount - 1);
+        HashMap<Integer,Object> datas = Maps.newHashMap();
+        for (Integer taskItemId:taskItemIds) {
+            datas.put(taskItemId,taskItemId);
+        }
+        int i = 0;
+        for(DefaultTypedTuple defaultTypedTuple:tupleList) {
+            int id = (int)defaultTypedTuple.getScore().longValue() % 10;
+            if(datas.get(id) != null) {
+                taskCodeList.add(defaultTypedTuple);
+                i++;
+            }
+            if(i >= taskCount)
+                break;
+        }
         return getCrawlerRequestsByCodes(taskCodeList);
     }
 
@@ -408,11 +340,13 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
      * @param taskCodeList
      * @return
      */
-    private List<CrawlerRequest> getCrawlerRequestsByCodes(Set<String> taskCodeList) {
+    private List<CrawlerRequest> getCrawlerRequestsByCodes(Set<DefaultTypedTuple> taskCodeList) {
         List<String> taskDetailList = redisTemplate.opsForHash().multiGet(getTaskInfoHashIdentification(), taskCodeList);
         List<CrawlerRequest> taskList = new ArrayList<>(taskDetailList.size());
-        for (String detail : taskDetailList) {
-            CrawlerRequest crawlerRequest = JSON.parseObject(detail, CrawlerRequest.class);
+        for (DefaultTypedTuple detail : taskCodeList) {
+            String data = redisTemplate.opsForHash().get(getTaskInfoHashIdentification(),detail.getValue()).toString();
+            CrawlerRequest crawlerRequest = JSON.parseObject(data, CrawlerRequest.class);
+            crawlerRequest.setExtendMap(ImmutableMap.of("$tuple",detail));
             taskList.add(crawlerRequest);
         }
         return taskList;
@@ -474,12 +408,17 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
     }
 
     @Override
-    public Integer moveWaitingTaskToReadyQueue(List<Integer> ids) {
+    public Integer moveWaitingTaskToReadyQueue(List<?> ids) {
         return null;
     }
 
     @Override
-    public Integer moveReadyaskToRunningQueue(List<Integer> ids) {
+    public Integer moveReadyTaskToRunningQueue(List<?> ids) {
+        return null;
+    }
+
+    @Override
+    public Integer moveRunningTaskToFailureQueue(List<?> ids) {
         return null;
     }
 }

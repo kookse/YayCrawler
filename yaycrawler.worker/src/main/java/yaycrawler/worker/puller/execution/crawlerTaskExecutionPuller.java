@@ -3,15 +3,14 @@ package yaycrawler.worker.puller.execution;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.taobao.pamirs.schedule.TaskItemDefine;
-import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import yaycrawler.common.status.CrawlerStatus;
 import yaycrawler.dao.domain.CrawlerTask;
-import yaycrawler.dao.status.CrawlerStatus;
+import yaycrawler.dao.mapper.CrawlerTaskMapper;
 import yaycrawler.worker.communication.MasterActor;
-import yaycrawler.worker.mapper.CrawlerTaskMapper;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,8 +27,8 @@ import java.util.Map;
 @Service("crawlerTaskExecutionPuller")
 public class crawlerTaskExecutionPuller extends AbstractExecutionDataPuller<CrawlerTask> {
 
-//    @Autowired
-//    private CrawlerTaskMapper crawlerTaskMapper;
+    @Autowired
+    private CrawlerTaskMapper crawlerTaskMapper;
 
     @Autowired
     private MasterActor masterActor;
@@ -44,21 +43,22 @@ public class crawlerTaskExecutionPuller extends AbstractExecutionDataPuller<Craw
         taskItemList.forEach(taskItemDefine -> {
             taskItemIds.add(Integer.parseInt(taskItemDefine.getTaskItemId()));
         });
-        List<CrawlerTask> orders = null;//crawlerTaskMapper.selectListForParse(offset, limit, 10,taskItemIds, CrawlerStatus.INIT.getStatus());
+        List<CrawlerTask> orders = crawlerTaskMapper.selectListForParse(offset, limit, 10,taskItemIds, CrawlerStatus.INIT.getStatus());
         Object data = masterActor.sendHeartbeart(taskItemIds);
         if(data instanceof Collection)
             orders = (List)data;
         if(orders == null || orders.isEmpty()){
             return null;
         } else {
-            Map<Integer,CrawlerTask> queryBatchInfoMap = new HashMap<>();
+            Map<Long,CrawlerTask> queryBatchInfoMap = new HashMap<>();
             orders.forEach(order ->  {
-                queryBatchInfoMap.put(order.getId(),order);
+                queryBatchInfoMap.put(order.getId().longValue(),order);
             });
-            List<Integer> ids = Lists.newArrayList(queryBatchInfoMap.keySet());
+            List<Long> ids = Lists.newArrayList(queryBatchInfoMap.keySet());
             logger.debug(JSON.toJSONString(ids));
             if(ids != null && !ids.isEmpty() ) {
-                masterActor.notifyTaskReady(ids)   ;//crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.READY.getStatus(),CrawlerStatus.READY.getMsg(), CrawlerStatus.INIT.getStatus(), ids);
+                masterActor.notifyTaskReady(ids);
+                crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.READY.getStatus(),CrawlerStatus.READY.getMsg(), CrawlerStatus.INIT.getStatus(), ids);
             }
         }
         return orders;

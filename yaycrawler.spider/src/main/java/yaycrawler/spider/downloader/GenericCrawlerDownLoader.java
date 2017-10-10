@@ -89,6 +89,7 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
         Page page = Page.fail();
         PageInfo pageInfo = pageParserRuleService.findOnePageInfoByRgx(request.getUrl());
         boolean doRecovery = false;
+        EngineResult engineResult = null;
         try {
             Site site = task.getSite();
             while (i < 5 && !pageValidated(page, pageInfo.getPageValidationRule())) {
@@ -101,35 +102,33 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                 String loginName = request.getExtra("loginName") != null ? request.getExtra("loginName").toString() : RequestHelper.getParam(request.getUrl(), "loginName");
 
                 SiteCookie siteCookie = pageCookieService.getCookieByUrl(pageUrl, loginName);
-                if ((i >= 1 && StringUtils.isNotEmpty(page.getRawText())) || (i > 2 && page.getRawText() == null)) {
+                if ((i >= 2 && StringUtils.isNotEmpty(page.getRawText())) || (i > 3 && page.getRawText() == null)) {
                     siteCookie = null;
                 }
                 String cookie = "";
-                int j = 0;
-                while (StringUtils.isNotEmpty(loginName) && siteCookie == null && j <= 5) {
-                    EngineResult engineResult = doAutomaticRecovery(Page.fail(), request, request.getUrl());
-                    if (engineResult != null && engineResult.getStatus()) {
-                        page = new Page();
-                        byte[] bytes = engineResult.getResult().getBytes(site.getCharset());
-                        page.setBytes(bytes);
-                        if (!request.isBinaryContent()) {
-                            page.setCharset(site.getCharset());
-                            String content = new String(bytes, site.getCharset());
-                            //unicode编码处理
-                            if (UNICODE_PATTERN.matcher(content).find())
-                                content = StringEscapeUtils.unescapeJava(content.replace("\"", "\\\""));
-                            page.setRawText(content);
-                        }
-                        page.setUrl(new PlainText(request.getUrl()));
-                        page.setRequest(request);
-                        doRecovery = engineResult.getStatus();
-                        break;
+                if(siteCookie == null)
+                    engineResult = doAutomaticRecovery(Page.fail(), request, request.getUrl());
+                if (engineResult != null && engineResult.getStatus()) {
+                    page = new Page();
+                    byte[] bytes = engineResult.getResult().getBytes(site.getCharset());
+                    page.setBytes(bytes);
+                    if (!request.isBinaryContent()) {
+                        page.setCharset(site.getCharset());
+                        String content = new String(bytes, site.getCharset());
+                        //unicode编码处理
+                        if (UNICODE_PATTERN.matcher(content).find())
+                            content = StringEscapeUtils.unescapeJava(content.replace("\"", "\\\""));
+                        page.setRawText(content);
                     }
-                    j++;
+                    page.setUrl(new PlainText(request.getUrl()));
+                    page.setRequest(request);
+                    doRecovery = engineResult.getStatus();
                 }
                 if(doRecovery) {
                     continue;
                 }
+                if(engineResult !=null && !engineResult.getStatus())
+                    break;
                 if (siteCookie != null) {
                     cookie = siteCookie.getCookie();
 //                String cookieId = siteCookie.getId();

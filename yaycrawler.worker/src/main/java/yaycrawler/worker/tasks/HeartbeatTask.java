@@ -12,7 +12,7 @@ public class HeartbeatTask {
     private MasterActor masterActor;
 
     public void sendHeartbeart() {
-        masterActor.sendHeartbeart();
+        masterActor.sendHeartbeart(null);
     }
 
     public void setMasterActor(MasterActor masterActor) {

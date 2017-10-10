@@ -201,7 +201,7 @@ public interface CrawlerTaskMapper {
             "  #{id}" +
             " </foreach>   " +
             " and status = #{batchStatus}</script>")
-    Integer updateCrawlerTaskByStatus(@Param("status") Integer status, @Param("msg") String msg, @Param("batchStatus") Integer batchStatus, @Param("ids") List<Integer> ids);
+    Integer updateCrawlerTaskByStatus(@Param("status") Integer status, @Param("msg") String msg, @Param("batchStatus") Integer batchStatus, @Param("ids") List<?> ids);
 
     @Update("update crawler_task set status=#{status},worker_id=#{workId},message=#{msg} where code=#{code}")
     int updateCrawlerTaskStatus(@Param("code") String code, @Param("workId") String workId, @Param("status") int status, @Param("msg") String msg);

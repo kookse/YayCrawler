@@ -8,9 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import yaycrawler.common.model.CrawlerRequest;
+import yaycrawler.common.status.CrawlerStatus;
 import yaycrawler.dao.domain.CrawlerTask;
-import yaycrawler.dao.status.CrawlerStatus;
-import yaycrawler.worker.mapper.CrawlerTaskMapper;
+import yaycrawler.dao.mapper.CrawlerTaskMapper;
+import yaycrawler.worker.communication.MasterActor;
 import yaycrawler.worker.model.ScheduleResult;
 import yaycrawler.worker.model.WorkerContext;
 import yaycrawler.worker.service.TaskScheduleService;
@@ -46,6 +47,9 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
     @Autowired
     private TaskScheduleService taskScheduleService;
 
+    @Autowired
+    private MasterActor masterActor;
+
     @Override
     public ScheduleResult execute(CrawlerTask crawlerTask) {
         ScheduleResult result = new ScheduleResult();
@@ -72,25 +76,27 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
                 result.setStatus(Boolean.FALSE);
                 return result;
             }
-            Map<Integer, CrawlerTask> batchOrderInfoMap = new HashMap<>();
+            Map<Long, CrawlerTask> batchOrderInfoMap = new HashMap<>();
             crawlerTask.forEach(task -> {
-                batchOrderInfoMap.put(task.getId(), task);
+                batchOrderInfoMap.put(task.getId().longValue(), task);
             });
 
-            List<Integer> ids = Lists.newArrayList(batchOrderInfoMap.keySet());
+            List<Long> ids = Lists.newArrayList(batchOrderInfoMap.keySet());
             logger.info("采集调度任务主线程结束,后台线程执行中...执行数量{}", ids.size());
             if (ids != null && !ids.isEmpty()) {
+                masterActor.notifyTaskDealing(ids);
                 crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.DEALING.getStatus(), CrawlerStatus.DEALING.getMsg(), CrawlerStatus.READY.getStatus(), ids);
                 call(ids, batchOrderInfoMap);
             }
             result.setStatus(Boolean.TRUE);
         } catch (Exception e) {
-            Map<Integer, CrawlerTask> batchOrderInfoMap = new HashMap<>();
+            Map<Long, CrawlerTask> batchOrderInfoMap = new HashMap<>();
             crawlerTask.forEach(order -> {
-                batchOrderInfoMap.put(order.getId(), order);
+                batchOrderInfoMap.put(order.getId().longValue(), order);
             });
-            List<Integer> ids = new ArrayList<>();
+            List<Long> ids = new ArrayList<>();
             ids.addAll(batchOrderInfoMap.keySet());
+            masterActor.notifyTaskFailure(ids);
             crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg(), CrawlerStatus.READY.getStatus(), ids);
             logger.error("出现了异常,执行终止操作,数据：{}", JSON.toJSON(crawlerTask));
             result.setStatus(Boolean.FALSE);
@@ -131,7 +137,7 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
      * @param ids
      * @Param queryOrderInfoMap
      */
-    private void call(List<Integer> ids, Map<Integer, CrawlerTask> batchOrderInfoMap) {
+    private void call(List<Long> ids, Map<Long, CrawlerTask> batchOrderInfoMap) {
         logger.info("工单解析任务开始,后台线程开始轮询解析任务...");
         ids.forEach(id -> {
             try {
@@ -149,6 +155,7 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
         crawlerTask.setStatus(CrawlerStatus.FAILURE.getStatus());
         //更新状态
         logger.info("工单{}解析任务，重试次数超过{}次", crawlerTask.getCode(), MAXFAILURETIMES);
+        masterActor.notifyTaskFailure(Lists.newArrayList(crawlerTask.getId()));
         crawlerTaskMapper.updateCrawlerTaskStatus(crawlerTask.getCode(),WorkerContext.getWorkerId(), CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg());
     }
 

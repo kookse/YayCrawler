@@ -13,44 +13,33 @@ import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.model.CrawlerResult;
 import yaycrawler.common.model.QueueQueryParam;
 import yaycrawler.common.model.QueueQueryResult;
+import yaycrawler.common.status.CrawlerStatus;
 import yaycrawler.dao.domain.CrawlerTask;
 import yaycrawler.dao.mapper.CrawlerTaskMapper;
 import yaycrawler.dao.repositories.CrawlerTaskRepository;
-import yaycrawler.dao.status.CrawlerStatus;
+import yaycrawler.master.service.AbstractICrawlerQueueService;
 import yaycrawler.master.service.CrawlerQueueDataType;
-import yaycrawler.master.service.ICrawlerQueueService;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 基于mysql的队列服务
  * Created by  yuananyun on 2017/3/24.
  */
-@Service(value = "mysqlQueueService")
+@Service(value = "dbQueueService")
 @Transactional
-public class MySqlCrawlerQueueService implements ICrawlerQueueService {
+public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
 
-    private static final Logger logger  = LoggerFactory.getLogger(MySqlCrawlerQueueService.class);
+    private static final Logger logger  = LoggerFactory.getLogger(DBCrawlerQueueService.class);
 
     @Autowired
     private CrawlerTaskRepository crawlerTaskRepository;
 
     @Autowired
     private CrawlerTaskMapper crawlerTaskMapper;
-//    待运行
-    private static int STATUS_WAITING = 0;
-    //    运行中
-    private static int STATUS_READY = 1;
-//    运行中
-    private static int STATUS_RUNNING = 2;
-//    失败
-    private static int STATUS_FAILURE = 3;
-//    成功
-    private static int STATUS_SUCCESS = 4;
-//    超时
-    private static int STATUS_TIMEOUT = 5;
 
     /**
      * 添加任务到待执行队列
@@ -62,13 +51,14 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
     @Override
     public boolean pushTasksToWaitingQueue(List<CrawlerRequest> crawlerRequests, boolean removeDuplicated) {
         boolean exists;
-        for (CrawlerRequest crawlerRequest : crawlerRequests) {
+        List<CrawlerRequest> requestTmps = transCrawlerQueue(crawlerRequests);
+        for (CrawlerRequest crawlerRequest : requestTmps) {
             exists = crawlerTaskRepository.exists(crawlerRequest.getHashCode());
             if (exists && !removeDuplicated) break;
             if (exists)
                 crawlerTaskRepository.delete(crawlerRequest.getHashCode());
             CrawlerTask task = CrawlerTask.convertFromCrawlerRequest(crawlerRequest);
-            task.setStatus(STATUS_WAITING);
+            task.setStatus(CrawlerStatus.INIT.getStatus());
             task.setCreatedTime(new Date());
             crawlerTaskRepository.save(task);
         }
@@ -155,7 +145,7 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
     @Override
     public QueueQueryResult queryWaitingQueues(QueueQueryParam queryParam) {
         Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.ASC, "createdTime")));
-        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(STATUS_WAITING, pageable);
+        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(CrawlerStatus.INIT.getStatus(), pageable);
         return new QueueQueryResult(getCrawlerRequests(pageData.getContent()), pageData.getTotalPages(), pageData.getTotalElements());
     }
 
@@ -168,7 +158,7 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
     @Override
     public QueueQueryResult queryRunningQueues(QueueQueryParam queryParam) {
         Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.DESC, "startedTime")));
-        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(STATUS_RUNNING, pageable);
+        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(CrawlerStatus.DEALING.getStatus(), pageable);
         return new QueueQueryResult(getCrawlerRequests(pageData.getContent()), pageData.getTotalPages(), pageData.getTotalElements());
     }
 
@@ -181,7 +171,7 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
     @Override
     public QueueQueryResult queryFailQueues(QueueQueryParam queryParam) {
         Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.DESC, "completedTime")));
-        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(STATUS_FAILURE, pageable);
+        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(CrawlerStatus.FAILURE.getStatus(), pageable);
         return new QueueQueryResult(getCrawlerRequests(pageData.getContent()), pageData.getTotalPages(), pageData.getTotalElements());
     }
 
@@ -194,7 +184,7 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
     @Override
     public QueueQueryResult querySuccessQueues(QueueQueryParam queryParam) {
         Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.DESC, "completedTime")));
-        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(STATUS_SUCCESS, pageable);
+        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(CrawlerStatus.SUCCESS.getStatus(), pageable);
         return new QueueQueryResult(getCrawlerRequests(pageData.getContent()), pageData.getTotalPages(), pageData.getTotalElements());
     }
 
@@ -203,8 +193,9 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
         List<CrawlerRequest> requestList = new ArrayList<>(taskList.size());
         for (CrawlerTask task : taskList) {
             CrawlerRequest crawlerRequest = task.convertToCrawlerRequest();
-            crawlerRequest.getExtendMap().put("startTime", task.getStartedTime());
-            crawlerRequest.getExtendMap().put("extraInfo", task.getMessage());
+            Map<String,Object> extendMap = crawlerRequest.getExtendMap();
+            extendMap.put("startTime", task.getStartedTime());
+            extendMap.put("extraInfo", task.getMessage());
             requestList.add(crawlerRequest);
         }
         return requestList;
@@ -212,17 +203,21 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
 
     @Override
     public String getSupportedDataType() {
-        return CrawlerQueueDataType.MYSQL;
+        return CrawlerQueueDataType.DB;
     }
 
     @Override
-    public Integer moveWaitingTaskToReadyQueue(List<Integer> ids) {
+    public Integer moveWaitingTaskToReadyQueue(List<?> ids) {
         return crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.READY.getStatus(),CrawlerStatus.READY.getMsg(), CrawlerStatus.INIT.getStatus(), ids);
     }
 
     @Override
-    public Integer moveReadyaskToRunningQueue(List<Integer> ids) {
+    public Integer moveReadyTaskToRunningQueue(List<?> ids) {
         return crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.DEALING.getStatus(),CrawlerStatus.DEALING.getMsg(), CrawlerStatus.READY.getStatus(), ids);
     }
 
+    @Override
+    public Integer moveRunningTaskToFailureQueue(List<?> ids) {
+        return null;
+    }
 }

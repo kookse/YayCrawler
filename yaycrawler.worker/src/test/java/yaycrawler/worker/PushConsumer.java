@@ -31,12 +31,12 @@ public class PushConsumer {
          * 注意：ConsumerGroupName需要由应用来保证唯一
          */
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("testmerchantLeagueConsumerGroup");
-        consumer.setNamesrvAddr("127.0.0.1:9876");
+        consumer.setNamesrvAddr("172.16.1.89:9876;172.16.1.221:9876");
 
         /**
          * 订阅指定topic下tags分别等于TagA或TagB
          */
-        consumer.subscribe("TP_CRAWLER_RESPONSE", "portal");
+        consumer.subscribe("TP_CRAWLER_RESPONSE_DEV", "portal");
 
 
         /**
@@ -55,7 +55,7 @@ public class PushConsumer {
                                                             ConsumeConcurrentlyContext context) {
                 System.out.println(Thread.currentThread().getName() + " Receive New Messages: " + msgs);
                 MessageExt msg = msgs.get(0);
-                if (msg.getTopic().equals("TP_CRAWLER_RESPONSE")) {
+                if (msg.getTopic().equals("TP_CRAWLER_RESPONSE_DEV")) {
                     // 执行TopicTest1的消费逻辑
                     if (msg.getTags() != null && msg.getTags().equals("portal")) {
                         // 执行TagA的消费

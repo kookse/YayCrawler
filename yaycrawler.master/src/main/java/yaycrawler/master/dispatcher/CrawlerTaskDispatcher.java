@@ -76,13 +76,18 @@ public class CrawlerTaskDispatcher {
     }
 
 
-    public void dealResultNotifyReady(List<Integer> ids) {
+    public void dealResultNotifyReady(List<?> ids) {
         ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         crawlerQueueService.moveWaitingTaskToReadyQueue(ids);
     }
 
-    public void dealResultNotifyDealing(List<Integer> ids) {
+    public void dealResultNotifyDealing(List<?> ids) {
         ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
-        crawlerQueueService.moveReadyaskToRunningQueue(ids);
+        crawlerQueueService.moveReadyTaskToRunningQueue(ids);
+    }
+
+    public void dealResultNotifyFailure(List<?> ids) {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
+        crawlerQueueService.moveRunningTaskToFailureQueue(ids);
     }
 }

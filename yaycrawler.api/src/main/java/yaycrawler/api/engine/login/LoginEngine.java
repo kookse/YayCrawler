@@ -59,7 +59,7 @@ public class LoginEngine implements Engine<LoginParam> {
         Matcher matcher;
         Engine encryptEngine = (Engine) SpringContextUtil.getBean("encryptEngine");
         int i = 0;
-        while (i < 20) {
+        while (i < 10) {
             try {
                 HttpResponse response = httpUtil.doPost(loginUrl, null, params, headerList);
                 String content = EntityUtils.toString(response.getEntity());

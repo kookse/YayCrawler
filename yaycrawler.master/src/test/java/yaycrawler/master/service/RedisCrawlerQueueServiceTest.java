@@ -50,14 +50,14 @@ public class RedisCrawlerQueueServiceTest {
     public void fetchTasksFromWaitingQueueTest()
     {
         ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
-        Assert.assertEquals(crawlerQueueService.fetchTasksFromWaitingQueue(100).size(), 100);
+        Assert.assertEquals(crawlerQueueService.fetchTasksFromWaitingQueue(100,null).size(), 100);
     }
 
     @Test
     public void moveWaitingTaskToRunningQueueTest()
     {
         ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
-        Assert.assertTrue(crawlerQueueService.moveWaitingTaskToRunningQueue("", crawlerQueueService.fetchTasksFromWaitingQueue(100)));
+        Assert.assertTrue(crawlerQueueService.moveWaitingTaskToRunningQueue("", crawlerQueueService.fetchTasksFromWaitingQueue(100,null)));
     }
 
     @Test

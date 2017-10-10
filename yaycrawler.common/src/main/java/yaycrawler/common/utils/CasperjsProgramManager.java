@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import yaycrawler.common.interceptor.SignatureSecurityInterceptor;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -28,35 +29,37 @@ public class CasperjsProgramManager {
         BufferedReader br = null;
         try {
             if(pageCharset==null) pageCharset = "utf-8";
-            String path = CasperjsProgramManager.class.getResource("/").getPath();
-            path = path.substring(1, path.lastIndexOf("/") + 1);
-            String os = System.getProperties().getProperty("os.name");
-            String casperJsPath = "";
-            String phantomJsPath = "";
-            if (StringUtils.startsWithIgnoreCase(os, "win")) {
-                casperJsPath = path + "casperjs/bin/casperjs.exe";
-                phantomJsPath = path + "phantomjs/window/phantomjs.exe";
-            } else {
-                path = "/" + path;
-                casperJsPath = path + "casperjs/bin/casperjs";
-                phantomJsPath = path + "phantomjs/linux/phantomjs";
-            }
-            logger.info("CasperJs程序地址:{}", casperJsPath);
-            ProcessBuilder processBuilder = new ProcessBuilder(casperJsPath, jsFileName);
-            if (params != null) {
-                for (String param : params) {
-                    processBuilder.command().add(param);
-                }
-            }
-            processBuilder.command().add("--output-encoding="+pageCharset);
-            processBuilder.command().add("--web-security=no");
-            processBuilder.command().add("--ignore-ssl-errors=true");
+            File pathFile = new File(jsFileName);
+//            String path = CasperjsProgramManager.class.getResource("/").getPath();
+//            path = path.substring(1, path.lastIndexOf("/") + 1);
+//            String os = System.getProperties().getProperty("os.name");
+//            String casperJsPath = "casperjs";
+//            String phantomJsPath = "";
+//            if (StringUtils.startsWithIgnoreCase(os, "win")) {
+//                casperJsPath = path + "casperjs/bin/casperjs.exe";
+//                phantomJsPath = path + "phantomjs/window/phantomjs.exe";
+//            } else {
+//                path = "/" + path;
+//                casperJsPath = path + "casperjs/bin/casperjs";
+//                phantomJsPath = path + "phantomjs/linux/phantomjs";
+//            }
+//            logger.info("CasperJs程序地址:{}", casperJsPath);
 
-            processBuilder.directory(new File(path + "casperjs/js"));
-            processBuilder.environment().put("PHANTOMJS_EXECUTABLE", phantomJsPath);
-
-            Process p = processBuilder.start();
-            InputStream is = p.getInputStream();
+            List<String> cmd = new ArrayList<String>();
+            cmd.add("casperjs");
+            cmd.add("");
+            cmd.add(new File(jsFileName).getName());
+            cmd.addAll(params);
+            cmd.add("--output-encoding="+pageCharset);
+            cmd.add("--web-security=no");
+            cmd.add("--ignore-ssl-errors=true");
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.directory(new File(jsFileName).getParentFile());
+            processBuilder.command(cmd);
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            int w = process.waitFor();
+            InputStream is = process.getInputStream();
             br = new BufferedReader(new InputStreamReader(is, pageCharset));
             StringBuffer sbf = new StringBuffer();
             String tmp = "";
@@ -64,10 +67,10 @@ public class CasperjsProgramManager {
                 sbf.append(tmp).append("\r\n");
             }
             br.close();
-            p.destroy();
+            process.destroy();
             return sbf.toString();
-        } catch (IOException ex) {
-            logger.error(ex.getMessage());
+        } catch (Exception ex) {
+            logger.error("{}",ex);
             return null;
         } finally {
             if(br != null)

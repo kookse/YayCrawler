@@ -1,10 +1,9 @@
 package yaycrawler.dao.domain;
 
 import com.alibaba.fastjson.JSON;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import yaycrawler.common.model.CrawlerRequest;
-import yaycrawler.dao.status.CrawlerStatus;
+import yaycrawler.common.status.CrawlerStatus;
 
 import javax.persistence.*;
 import java.util.Date;
