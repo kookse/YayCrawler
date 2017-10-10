@@ -2,7 +2,9 @@ package yaycrawler.dao.domain;
 
 import com.alibaba.fastjson.JSON;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import yaycrawler.common.model.CrawlerRequest;
+import yaycrawler.dao.status.CrawlerStatus;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -42,7 +44,8 @@ public class CrawlerTask {
     /**
      * 请求的数据（JSON字符串）
      */
-    @Column(columnDefinition = "text")
+    @Column(name = "data",columnDefinition="text")
+    @Type(type = "JsonDataUserType")
     private String data;
 
     /**
@@ -53,7 +56,7 @@ public class CrawlerTask {
 
     @Column(name = "created_time",columnDefinition = "timestamp default (now())")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdTime = new Date();;
+    private Date createdTime = new Date();
 
     @Column(name = "started_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -64,10 +67,10 @@ public class CrawlerTask {
     private Date completedTime;
 
     /**
-     * 状态，未开始：-2；运行中：-1；失败：0；成功：1；超时：2
+     * 状态，未开始：0；等待执行：1；运行中：2；执行中：3；失败：4；成功；5：超时；
      */
-    @Column(name = "status", columnDefinition = "int default -2")
-    private Integer status;
+    @Column(name = "status", columnDefinition = "int default 0")
+    private Integer status = CrawlerStatus.INIT.getStatus();
 
     /**
      * 表示任务在哪个worker上执行

@@ -1,4 +1,4 @@
-package yaycrawler.worker.mapper;
+package yaycrawler.dao.mapper;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -176,7 +176,7 @@ public interface CrawlerTaskMapper {
             "  " +
             " </script>")
     List<CrawlerTask> selectListForParse(@Param("offset") Long offset, @Param("limit") Long limit, @Param("taskItemNum") Integer taskItemNum, @Param("taskItemIds") List taskItemIds,
-                                   @Param("status") Integer status);
+                                         @Param("status") Integer status);
 
     @Update("update s_p_base_order set batch_sts= #{status},status= #{msg} where batch_sts = #{updateStatus} and id >= #{start} and id <= #{end}")
     Integer updateOrderListByID(@Param("updateStatus") Integer updatedStatus,
@@ -204,5 +204,5 @@ public interface CrawlerTaskMapper {
     Integer updateCrawlerTaskByStatus(@Param("status") Integer status, @Param("msg") String msg, @Param("batchStatus") Integer batchStatus, @Param("ids") List<Integer> ids);
 
     @Update("update crawler_task set status=#{status},worker_id=#{workId},message=#{msg} where code=#{code}")
-    int updateCrawlerTaskStatus(@Param("code") String code,@Param("workId") String workId, @Param("status") int status, @Param("msg") String msg);
+    int updateCrawlerTaskStatus(@Param("code") String code, @Param("workId") String workId, @Param("status") int status, @Param("msg") String msg);
 }

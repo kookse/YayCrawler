@@ -33,6 +33,8 @@ public class GenericPipeline implements Pipeline {
     @Value("${rocketmq.status:false}")
     private Boolean rockeMQStatus;
 
+    @Value("${crawler.result.persistent:mongdb}")
+    private String resultPersistent;
     @Override
     public void process(ResultItems resultItems, Task task) {
         if (persistentServiceFactory == null) {
@@ -62,7 +64,10 @@ public class GenericPipeline implements Pipeline {
              */
             for (Map.Entry<String, Map<String, Object>> groupedDataEntry : groupedRegionDataMap.entrySet()) {
                 try {
-                    IResultPersistentService persistentService = persistentServiceFactory.getPersistentServiceByDataType(groupedDataEntry.getKey());
+                    IResultPersistentService persistentService = null;
+                    if(StringUtils.equalsIgnoreCase(groupedDataEntry.getKey(),PersistentDataType.MAP)) {
+                        persistentService = persistentServiceFactory.getPersistentServiceByDataType(resultPersistent.toLowerCase());
+                    }
                     if (persistentService != null) {
                         logger.debug("开始持久化{}到{}", groupedDataEntry.getKey(), persistentService.toString());
                         Map dataMap = groupedDataEntry.getValue();

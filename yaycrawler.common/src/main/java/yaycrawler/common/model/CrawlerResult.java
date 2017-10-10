@@ -11,6 +11,7 @@ public class CrawlerResult {
     private boolean isSuccess;
     private List<CrawlerRequest> crawlerRequestList;
     private String message;
+    private Integer status;
 
     public CrawlerResult() {
     }
@@ -20,6 +21,14 @@ public class CrawlerResult {
         this.key = key;
         this.crawlerRequestList = crawlerRequestList;
         this.message = message;
+    }
+
+    public CrawlerResult(String key, boolean isSuccess, List<CrawlerRequest> crawlerRequestList, String message, Integer status) {
+        this.key = key;
+        this.isSuccess = isSuccess;
+        this.crawlerRequestList = crawlerRequestList;
+        this.message = message;
+        this.status = status;
     }
 
     public String getKey() {
@@ -54,6 +63,14 @@ public class CrawlerResult {
         this.message = message;
     }
 
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "CrawlerResult{" +
@@ -61,6 +78,7 @@ public class CrawlerResult {
                 ", isSuccess=" + isSuccess +
                 ", crawlerRequestList=" + crawlerRequestList +
                 ", message='" + message + '\'' +
+                ", status=" + status +
                 '}';
     }
 }

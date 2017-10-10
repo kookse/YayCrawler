@@ -1,11 +1,11 @@
-package yaycrawler.worker.model.status;
+package yaycrawler.dao.status;
 
 /**
  * @author bill
  * @create 2017-09-30 11:23
  * @desc 采集链接状态
  **/
-public enum  CrawlerStatus {
+public enum CrawlerStatus {
 
     //状态，未开始：0；等待执行：1；运行中：2；执行中：3；失败：4；成功；5：超时；
 
@@ -25,7 +25,7 @@ public enum  CrawlerStatus {
     private Integer status;
     private String msg;
 
-    CrawlerStatus(Integer status,String msg){
+    CrawlerStatus(Integer status, String msg){
         this.status = status;
         this.msg = msg;
     }

@@ -14,7 +14,9 @@ import yaycrawler.common.model.CrawlerResult;
 import yaycrawler.common.model.QueueQueryParam;
 import yaycrawler.common.model.QueueQueryResult;
 import yaycrawler.dao.domain.CrawlerTask;
+import yaycrawler.dao.mapper.CrawlerTaskMapper;
 import yaycrawler.dao.repositories.CrawlerTaskRepository;
+import yaycrawler.dao.status.CrawlerStatus;
 import yaycrawler.master.service.CrawlerQueueDataType;
 import yaycrawler.master.service.ICrawlerQueueService;
 
@@ -35,6 +37,8 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
     @Autowired
     private CrawlerTaskRepository crawlerTaskRepository;
 
+    @Autowired
+    private CrawlerTaskMapper crawlerTaskMapper;
 //    待运行
     private static int STATUS_WAITING = 0;
     //    运行中
@@ -78,10 +82,12 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
      * @return
      */
     @Override
-    public List<CrawlerRequest> fetchTasksFromWaitingQueue(long taskCount) {
-        Pageable pageable = new PageRequest(0, (int) taskCount, new Sort(new Sort.Order(Sort.Direction.ASC, "createdTime")));
-        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(STATUS_WAITING, pageable);
-        return getCrawlerRequests(pageData.getContent());
+    public List<CrawlerRequest> fetchTasksFromWaitingQueue(long taskCount,List<Integer> taskItemIds) {
+//        Pageable pageable = new PageRequest(0, (int) taskCount, new Sort(new Sort.Order(Sort.Direction.ASC, "createdTime")));
+//        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(STATUS_WAITING, pageable);
+//        return getCrawlerRequests(pageData.getContent());
+        List<CrawlerTask> crawlerTasks = crawlerTaskMapper.selectListForParse(null, taskCount, 10,taskItemIds, CrawlerStatus.INIT.getStatus());
+        return getCrawlerRequests(crawlerTasks);
     }
 
 
@@ -207,6 +213,16 @@ public class MySqlCrawlerQueueService implements ICrawlerQueueService {
     @Override
     public String getSupportedDataType() {
         return CrawlerQueueDataType.MYSQL;
+    }
+
+    @Override
+    public Integer moveWaitingTaskToReadyQueue(List<Integer> ids) {
+        return crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.READY.getStatus(),CrawlerStatus.READY.getMsg(), CrawlerStatus.INIT.getStatus(), ids);
+    }
+
+    @Override
+    public Integer moveReadyaskToRunningQueue(List<Integer> ids) {
+        return crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.DEALING.getStatus(),CrawlerStatus.DEALING.getMsg(), CrawlerStatus.READY.getStatus(), ids);
     }
 
 }

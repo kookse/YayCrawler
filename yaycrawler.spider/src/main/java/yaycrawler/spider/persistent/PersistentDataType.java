@@ -34,4 +34,7 @@ public class PersistentDataType {
 
     public final static String MQ = "mq";
     public final static String ROCKETMQ = "rocketmq";
+
+    public final static String POSTGRESQL = "postgresql";
+    public final static String  MONGDB = "mongdb";
 }

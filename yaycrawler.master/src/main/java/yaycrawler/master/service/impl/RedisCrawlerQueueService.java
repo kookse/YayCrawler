@@ -221,7 +221,7 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
      * @return
      */
     @Override
-    public List<CrawlerRequest> fetchTasksFromWaitingQueue(long taskCount) {
+    public List<CrawlerRequest> fetchTasksFromWaitingQueue(long taskCount,List<Integer> taskItemIds) {
         HashSet<String> taskCodeList = (HashSet<String>) redisTemplate.opsForZSet().range(getWaitingQueueIdentification(), 0, taskCount - 1);
         return getCrawlerRequestsByCodes(taskCodeList);
     }
@@ -471,5 +471,15 @@ public class RedisCrawlerQueueService implements ICrawlerQueueService {
     @Override
     public String getSupportedDataType() {
         return CrawlerQueueDataType.REDIS;
+    }
+
+    @Override
+    public Integer moveWaitingTaskToReadyQueue(List<Integer> ids) {
+        return null;
+    }
+
+    @Override
+    public Integer moveReadyaskToRunningQueue(List<Integer> ids) {
+        return null;
     }
 }

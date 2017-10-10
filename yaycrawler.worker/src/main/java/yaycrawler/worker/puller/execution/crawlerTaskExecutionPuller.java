@@ -9,9 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import yaycrawler.dao.domain.CrawlerTask;
+import yaycrawler.dao.status.CrawlerStatus;
+import yaycrawler.worker.communication.MasterActor;
 import yaycrawler.worker.mapper.CrawlerTaskMapper;
-import yaycrawler.worker.model.status.CrawlerStatus;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +28,12 @@ import java.util.Map;
 @Service("crawlerTaskExecutionPuller")
 public class crawlerTaskExecutionPuller extends AbstractExecutionDataPuller<CrawlerTask> {
 
+//    @Autowired
+//    private CrawlerTaskMapper crawlerTaskMapper;
+
     @Autowired
-    private CrawlerTaskMapper crawlerTaskMapper;
+    private MasterActor masterActor;
+
     private static final Logger logger = LoggerFactory.getLogger(crawlerTaskExecutionPuller.class);
 
     @Override
@@ -38,7 +44,10 @@ public class crawlerTaskExecutionPuller extends AbstractExecutionDataPuller<Craw
         taskItemList.forEach(taskItemDefine -> {
             taskItemIds.add(Integer.parseInt(taskItemDefine.getTaskItemId()));
         });
-        List<CrawlerTask> orders = crawlerTaskMapper.selectListForParse(offset, limit, MapUtils.getInteger(conditions,"taskItemNum"),taskItemIds, CrawlerStatus.INIT.getStatus());
+        List<CrawlerTask> orders = null;//crawlerTaskMapper.selectListForParse(offset, limit, 10,taskItemIds, CrawlerStatus.INIT.getStatus());
+        Object data = masterActor.sendHeartbeart(taskItemIds);
+        if(data instanceof Collection)
+            orders = (List)data;
         if(orders == null || orders.isEmpty()){
             return null;
         } else {
@@ -49,7 +58,7 @@ public class crawlerTaskExecutionPuller extends AbstractExecutionDataPuller<Craw
             List<Integer> ids = Lists.newArrayList(queryBatchInfoMap.keySet());
             logger.debug(JSON.toJSONString(ids));
             if(ids != null && !ids.isEmpty() ) {
-                crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.READY.getStatus(),CrawlerStatus.READY.getMsg(), CrawlerStatus.INIT.getStatus(), ids);
+                masterActor.notifyTaskReady(ids)   ;//crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.READY.getStatus(),CrawlerStatus.READY.getMsg(), CrawlerStatus.INIT.getStatus(), ids);
             }
         }
         return orders;

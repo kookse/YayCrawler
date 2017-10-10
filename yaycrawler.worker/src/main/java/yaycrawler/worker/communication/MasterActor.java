@@ -51,7 +51,7 @@ public class MasterActor {
      * Worker向Master发送心跳
      * @return
      */
-    public boolean sendHeartbeart() {
+    public Object sendHeartbeart(List<Integer> taskItemIds) {
         logger.debug("worker-{}开始向Master发送心跳", WorkerContext.getWorkerId());
         WorkerHeartbeat heartbeat = new WorkerHeartbeat(WorkerContext.getWorkerId());
         heartbeat.setWorkerContextPath(WorkerContext.getContextPath());
@@ -65,8 +65,8 @@ public class MasterActor {
 
         String targetUrl = CommunicationAPIs.getFullRemoteUrl(WorkerContext.getMasterServerAddress(), CommunicationAPIs.WORKER_POST_MASTER_HEARTBEAT);
         heartbeat.setWaitTaskCount(taskScheduleService.getRunningTaskCount());
+        heartbeat.setTaskItemIds(taskItemIds);
         RestFulResult result = HttpUtils.doSignedHttpExecute(WorkerContext.getSignatureSecret(), targetUrl, HttpMethod.POST, heartbeat);
-
         if (result.hasError()) {
             //心跳失败的处理
 //            WorkerContext.heartbeatFailCount++;
@@ -85,7 +85,7 @@ public class MasterActor {
                 WorkerContext.completedResultMap.remove(resultEntry.getKey());
             }
         }
-        return true;
+        return result.getData();
     }
 
 
@@ -106,6 +106,14 @@ public class MasterActor {
         return true;
     }
 
+    public boolean notifyTaskReady(List<Integer> ids) {
+        String targetUrl = CommunicationAPIs.getFullRemoteUrl(WorkerContext.getMasterServerAddress(), CommunicationAPIs.WORKER_POST_MASTER_READY_NOTIFY);
+        RestFulResult result = HttpUtils.doSignedHttpExecute(WorkerContext.getSignatureSecret(), targetUrl, HttpMethod.POST, ids);
+        if (result.hasError()) {
+            throw new WorkerResultNotifyFailureException(result.getMessage());
+        }
+        return true;
+    }
 
     /**
      * Worker通知Master任务执行失败

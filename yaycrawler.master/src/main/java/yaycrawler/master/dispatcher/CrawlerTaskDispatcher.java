@@ -57,22 +57,32 @@ public class CrawlerTaskDispatcher {
     /**
      * 分派任务
      */
-    public void assignTasks(WorkerHeartbeat workerHeartbeat) {
+    public List<CrawlerRequest> assignTasks(WorkerHeartbeat workerHeartbeat) {
         ConcurrentHashMap<String, WorkerRegistration> workerListMap = MasterContext.workerRegistrationMap;
         WorkerRegistration workerRegistration = workerListMap.get(workerHeartbeat.getWorkerContextPath());
-        if (workerRegistration == null) return;
+        if (workerRegistration == null) return null;
         ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
         logger.info("worker:{}剩余任务数:{}", workerHeartbeat.getWorkerId(), workerHeartbeat.getWaitTaskCount());
-        int canAssignCount = batchSize - workerHeartbeat.getWaitTaskCount();
-        if (canAssignCount <= 0) return;
-        List<CrawlerRequest> crawlerRequests = crawlerQueueService.fetchTasksFromWaitingQueue(canAssignCount);
-        if (crawlerRequests.size() == 0) return;
-        boolean flag = workerActor.assignTasks(workerRegistration, crawlerRequests);
-        if (flag) {
-            logger.info("给worker:{}分派了{}个任务", workerHeartbeat.getWorkerId(), crawlerRequests.size());
-            crawlerQueueService.moveWaitingTaskToRunningQueue(workerHeartbeat.getWorkerId(), crawlerRequests);
-        }
+//        int canAssignCount = batchSize - workerHeartbeat.getWaitTaskCount();
+//        if (canAssignCount <= 0) return;
+        List<CrawlerRequest> crawlerRequests = crawlerQueueService.fetchTasksFromWaitingQueue(batchSize,workerHeartbeat.getTaskItemIds());
+//        if (crawlerRequests.size() == 0) return;
+//        boolean flag = workerActor.assignTasks(workerRegistration, crawlerRequests);
+//        if (flag) {
+//            logger.info("给worker:{}分派了{}个任务", workerHeartbeat.getWorkerId(), crawlerRequests.size());
+//            crawlerQueueService.moveWaitingTaskToRunningQueue(workerHeartbeat.getWorkerId(), crawlerRequests);
+//        }
+        return crawlerRequests;
     }
 
 
+    public void dealResultNotifyReady(List<Integer> ids) {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
+        crawlerQueueService.moveWaitingTaskToReadyQueue(ids);
+    }
+
+    public void dealResultNotifyDealing(List<Integer> ids) {
+        ICrawlerQueueService crawlerQueueService = crawlerQueueServiceFactory.getCrawlerQueueServiceByDataType(dataType);
+        crawlerQueueService.moveReadyaskToRunningQueue(ids);
+    }
 }

@@ -17,6 +17,7 @@ import yaycrawler.master.dispatcher.CrawlerTaskDispatcher;
 import yaycrawler.master.model.MasterContext;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Created by ucs_yuananyun on 2016/5/12.
@@ -71,8 +72,7 @@ public class WorkerController {
             for (CrawlerResult result : heartbeat.getCompletedCrawlerResultList())
                 taskDispatcher.dealResultNotify(result);
         //重新分派任务
-        taskDispatcher.assignTasks(heartbeat);
-        return RestFulResult.success(true);
+        return RestFulResult.success(taskDispatcher.assignTasks(heartbeat));
     }
 
 
@@ -82,6 +82,24 @@ public class WorkerController {
         logger.debug("接收到任务执行成功通知:{}", crawlerResult.toString());
         Assert.notNull(crawlerResult);
         taskDispatcher.dealResultNotify(crawlerResult);
+        return RestFulResult.success(true);
+    }
+
+    @RequestMapping("/crawlerReadyNotify")
+    @ResponseBody
+    public RestFulResult crawlerReadyNotify(@RequestBody List<Integer> ids) {
+        logger.debug("接收到任务开始通知:{}", JSON.toJSONString(ids));
+        Assert.notNull(ids);
+        taskDispatcher.dealResultNotifyReady(ids);
+        return RestFulResult.success(true);
+    }
+
+    @RequestMapping("/crawlerDealingNotify")
+    @ResponseBody
+    public RestFulResult crawlerDealingNotify(@RequestBody List<Integer> ids) {
+        logger.debug("接收到任务执行通知:{}", JSON.toJSONString(ids));
+        Assert.notNull(ids);
+        taskDispatcher.dealResultNotifyDealing(ids);
         return RestFulResult.success(true);
     }
 

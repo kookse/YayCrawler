@@ -26,7 +26,7 @@ public interface ICrawlerQueueService {
      * @param taskCount 任务数目
      * @return
      */
-    List<CrawlerRequest> fetchTasksFromWaitingQueue(long taskCount);
+    List<CrawlerRequest> fetchTasksFromWaitingQueue(long taskCount,List<Integer> taskItemIds);
 
     /**
      * 将任务从待执行移到执行中队列
@@ -92,4 +92,8 @@ public interface ICrawlerQueueService {
      * @return
      */
     String getSupportedDataType();
+
+    Integer moveWaitingTaskToReadyQueue(List<Integer> ids);
+
+    Integer moveReadyaskToRunningQueue(List<Integer> ids);
 }

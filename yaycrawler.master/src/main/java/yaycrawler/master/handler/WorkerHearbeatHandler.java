@@ -12,7 +12,7 @@ import yaycrawler.master.dispatcher.CrawlerTaskDispatcher;
 @Component
 public class WorkerHearbeatHandler {
     @Autowired
-    private CrawlerTaskDispatcher taskDispatcher;
+    private  CrawlerTaskDispatcher taskDispatcher;
 
     public void handler(WorkerHeartbeat heartbeat) {
         /**

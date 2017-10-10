@@ -1,6 +1,5 @@
 package yaycrawler.worker.service;
 
-import com.google.common.collect.Maps;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,6 @@ import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.spider.persistent.IResultPersistentService;
 import yaycrawler.spider.persistent.PersistentDataType;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +41,6 @@ public class MongDBPersistentService implements IResultPersistentService {
 
     @Override
     public String getSupportedDataType() {
-        return PersistentDataType.MAP;
+        return PersistentDataType.MONGDB;
     }
 }

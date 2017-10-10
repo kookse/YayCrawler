@@ -10,6 +10,8 @@ public class WorkerHeartbeat {
     private String workerContextPath;
     private Long heartbeatInteval;
     private int waitTaskCount;
+    private List<Integer> taskItemIds;
+
     /**
      * 已经完成的任务的列表
      */
@@ -65,6 +67,14 @@ public class WorkerHeartbeat {
         this.completedCrawlerResultList = completedCrawlerResultList;
     }
 
+    public List<Integer> getTaskItemIds() {
+        return taskItemIds;
+    }
+
+    public void setTaskItemIds(List<Integer> taskItemIds) {
+        this.taskItemIds = taskItemIds;
+    }
+
     @Override
     public String toString() {
         return "WorkerHeartbeat{" +
@@ -72,6 +82,7 @@ public class WorkerHeartbeat {
                 ", workerContextPath='" + workerContextPath + '\'' +
                 ", heartbeatInteval=" + heartbeatInteval +
                 ", waitTaskCount=" + waitTaskCount +
+                ", taskItemIds=" + taskItemIds +
                 ", completedCrawlerResultList=" + completedCrawlerResultList +
                 '}';
     }

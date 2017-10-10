@@ -9,9 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.dao.domain.CrawlerTask;
+import yaycrawler.dao.status.CrawlerStatus;
 import yaycrawler.worker.mapper.CrawlerTaskMapper;
 import yaycrawler.worker.model.ScheduleResult;
-import yaycrawler.worker.model.status.CrawlerStatus;
+import yaycrawler.worker.model.WorkerContext;
 import yaycrawler.worker.service.TaskScheduleService;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
     @Autowired
     private CrawlerTaskMapper crawlerTaskMapper;
 
-    private final static int MAXFAILURETIMES = 1;
+    private final static int MAXFAILURETIMES = 3;
 
     @Value("${schedule.task.pull.thread.number:500}")
     private Integer defaultMultiThreadNum;
@@ -148,7 +149,7 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
         crawlerTask.setStatus(CrawlerStatus.FAILURE.getStatus());
         //更新状态
         logger.info("工单{}解析任务，重试次数超过{}次", crawlerTask.getCode(), MAXFAILURETIMES);
-        crawlerTaskMapper.updateCrawlerTaskStatus(crawlerTask.getCode(), CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg());
+        crawlerTaskMapper.updateCrawlerTaskStatus(crawlerTask.getCode(),WorkerContext.getWorkerId(), CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg());
     }
 
 }
