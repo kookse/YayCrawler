@@ -35,6 +35,9 @@ public class LoginEngine implements Engine<LoginParam> {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginEngine.class);
 
+    @Value("${login.engine.validate:self.location =  \"(.*)\"}")
+    private String regexParam;
+
     @Override
     public EngineResult execute(LoginParam info) {
         EngineResult engineResult = executeEngineWithFailover(info);
@@ -53,7 +56,7 @@ public class LoginEngine implements Engine<LoginParam> {
         String loginUrl = info.getLoginUrl();
         Map params = info.getNewParams();
         List<Header> headerList = new ArrayList<>();
-        headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"));
+        headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"));
         headerList.add(new BasicHeader("Cookie", info.getCookie()));
         Pattern pattern = Pattern.compile(info.getValideLogin());
         Matcher matcher;
@@ -91,7 +94,23 @@ public class LoginEngine implements Engine<LoginParam> {
                     engineResult.setHeaders(headerList1);
                     engineResult.setStatus(Boolean.TRUE);
                     response = httpUtil.doGet(info.getUrl(),null,headerList);
-                    engineResult.setResult(EntityUtils.toString(response.getEntity()));
+                    content = EntityUtils.toString(response.getEntity());
+                    pattern = Pattern.compile(regexParam);
+                    matcher = pattern.matcher(content);
+                    String url = "";
+                    while (matcher.find()) {
+                        for (int j = 1; j <= matcher.groupCount(); j++) {
+                            url = matcher.group(j);
+                            if(StringUtils.isNotEmpty(url)) {
+                                if(!StringUtils.startsWithAny(url,"http","https"))
+                                    url = StringUtils.substringBeforeLast(info.getUrl(),"/") + "/" +  url;
+                                response = httpUtil.doGet(url,null,headerList);
+                                content = EntityUtils.toString(response.getEntity());
+                                break;
+                            }
+                        }
+                    }
+                    engineResult.setResult(content);
                     break;
                 } else {
                     engineResult.setStatus(Boolean.FALSE);
@@ -105,7 +124,7 @@ public class LoginEngine implements Engine<LoginParam> {
             params = info.getNewParams();
             i++;
         }
-        if ( i == 20){
+        if ( i == 10){
             logger.info("登陆失败！");
         }
         return engineResult;

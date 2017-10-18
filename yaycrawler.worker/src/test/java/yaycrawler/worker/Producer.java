@@ -5,7 +5,7 @@ import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.client.producer.DefaultMQProducer;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.common.message.Message;
-import yaycrawler.worker.model.YayCrawlerRequest;
+import yaycrawler.common.model.YayCrawlerRequest;
 
 import java.util.UUID;
 
@@ -24,7 +24,7 @@ public class Producer {
          */
         DefaultMQProducer producer = new DefaultMQProducer("ProducerGroupTest");
 
-        producer.setNamesrvAddr("127.0.0.1:9876");
+        producer.setNamesrvAddr("172.16.1.89:9876;172.16.1.221:9876");
         /**
          * Producer对象在使用之前必须要调用start初始化，初始化一次即可<br>
          * 注意：切记不可以在每次发送消息时，都调用start方法
@@ -40,15 +40,16 @@ public class Producer {
         try {
             {
                 YayCrawlerRequest yayCrawlerRequest = new YayCrawlerRequest();
-                yayCrawlerRequest.setAccount("15626241465");
+                yayCrawlerRequest.setAccount("445281198903100953");
                 yayCrawlerRequest.setAccountType("");
-                yayCrawlerRequest.setCategory(2);
+                yayCrawlerRequest.setCategory(0);
                 yayCrawlerRequest.setCityCode("440100");
-                yayCrawlerRequest.setPassword("jaB4Gz143AtQ");
-                yayCrawlerRequest.setOrderId(UUID.randomUUID().toString());
+                yayCrawlerRequest.setPassword("890310");
+                String orderId = UUID.randomUUID().toString();
+                yayCrawlerRequest.setOrderId(orderId);
                 Message msg = new Message("TP_CRAWLER_REQUEST",// topic
                         "portal",// tag
-                        "OrderID002",// key
+                        orderId,// key
                         (JSON.toJSONString(yayCrawlerRequest)).getBytes());// body
                 SendResult sendResult = producer.send(msg);
                 System.out.println(sendResult);

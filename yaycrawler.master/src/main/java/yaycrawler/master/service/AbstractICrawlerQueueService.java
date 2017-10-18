@@ -2,6 +2,7 @@ package yaycrawler.master.service;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.*;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import yaycrawler.common.model.CrawlerRequest;
@@ -164,4 +165,20 @@ public class AbstractICrawlerQueueService implements ICrawlerQueueService{
         }
         return crawlerRequestList;
     }
+
+    /**
+     * 为爬虫任务生成一个唯一的url
+     *
+     * @param crawlerRequest 请求
+     * @return
+     */
+    protected String getUniqueUrl(CrawlerRequest crawlerRequest) {
+        if (crawlerRequest.getData() == null || crawlerRequest.getData().size() == 0)
+            return crawlerRequest.getUrl();
+        StringBuilder urlBuilder = new StringBuilder(crawlerRequest.getUrl().trim());
+        String random = DigestUtils.sha1Hex(JSON.toJSONString(crawlerRequest.getData()));
+        urlBuilder.append(String.format("%s%s=%s", urlBuilder.indexOf("?") > 0 ? "&" : "?", "random", random));
+        return urlBuilder.toString();
+    }
+
 }

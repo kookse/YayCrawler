@@ -2,8 +2,13 @@ package yaycrawler.admin;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.junit.Test;
+import org.springframework.util.Base64Utils;
+import yaycrawler.common.utils.HttpUtil;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -120,6 +125,75 @@ public class Solution {
     }
 
     @Test
+    public void toBjgjj() {
+        Map param = Maps.newHashMap();
+        param.put("$loginUrl","http://www.bjgjj.gov.cn/wsyw/wscx/gjjcx-choice.jsp");
+        param.put("#lk","downloadEngine(http://www.bjgjj.gov.cn/wsyw/wscx/asdwqnasmdnams.jsp$$content).trim($1).substring(\"$1\"$$\"4\")");
+        param.put("lb",1);
+        param.put("$valideLogin","<span class=\"tittle1\">");
+        param.put("$bh1","get(loginName)");
+        param.put("$mm1","get(loginPassword)");
+        param.put("$bh","get(loginName).encrypt3Hex($1$$pdcss123$$css11q1a$$co1qacq11)");
+        param.put("$mm","get(loginPassword).encrypt3Hex($1$$pdcss123$$css11q1a$$co1qacq11)");
+        param.put("$gjjcxjjmyhpppp","downloadEngine(http://www.bjgjj.gov.cn/wsyw/servlet/PicCheckCode1?v=1).binaryEngine($1$$178$$13$$160).ocrEngine($1$$[0-9a-zA-z]{4})");
+        param.put("#gjjcxjjmyhpppp1","get(gjjcxjjmyhpppp)");
+        System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
+    public void toBjgjjSite() {
+        Map param = Maps.newHashMap();
+        param.put("loginName","120107198207113912");
+        param.put("loginPassword","031107");
+        System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
+    public void toShgjj() {
+        Map param = Maps.newHashMap();
+        param.put("$loginUrl","https://persons.shgjj.com/MainServlet");
+        param.put("$valideLogin","<div align=\"center\">您的个人账户情况</div>");
+        param.put("$username","get(loginName)");
+        param.put("$password","get(loginPassword)");
+        param.put("SUBMIT.x","25");
+        param.put("SUBMIT.y","15");
+        param.put("ID","0");
+        param.put("$password_md5","get(loginPassword).md5($1)");
+        param.put("$imagecode","downloadEngine(https://persons.shgjj.com/VerifyImageServlet).ocrEngine($1$$[0-9]{4})");
+        System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
+    public void toShgjjSite() {
+        Map param = Maps.newHashMap();
+        param.put("loginName","28324978");
+        param.put("loginPassword","19097041");
+        System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
+    public void toSzsi() {
+        Map param = Maps.newHashMap();
+        param.put("$loginUrl","https://e.szsi.gov.cn/siservice/LoginAction.do");
+        param.put("$valideLogin","<img border=\"0\" name='image1' src=\"ShowImage\" width=\"94\" height=\"122\" alt=\"\">");
+        param.put("$AAC002","get(loginName)");
+        param.put("$CAC222","get(loginPassword).base64($1)");
+        param.put("$pid","regex(<input type=\"hidden\" name=\"pid\" value=\"(.*)\">)");
+        param.put("Method","P");
+        param.put("$PSINPUT","regex(<img border=0 src=\"(.*)\" alt=\"\").format(\"https://e.szsi.gov.cn/siservice/%s\"$$\"$1\").downloadEngine($1).ocrEngine($1$$[0-9]{4})");
+        System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
+    public void toSzsiSite() {
+        Map param = Maps.newHashMap();
+        param.put("loginName","fei891223");
+        param.put("loginPassword","Fei12345");
+        System.out.println(Base64Utils.encodeToString("Fei12345".getBytes()));
+        System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
     public void testParam() {
         String param = "grsds";
         String url = "http://mtax.gdltax.gov.cn/appserver/zrr/grsds/queryGrsdsNsmx.do?startdate=20170601&enddate=20170930&callback=jsonp_callback4&time=1505464152982&timeOut=60000&loginName=15626241465&loginPassword=123432435";
@@ -135,5 +209,13 @@ public class Solution {
             }
         }
         System.out.println(value);
+    }
+
+    @Test
+    public void testData() throws Exception{
+        String url = "http://www.bjgjj.gov.cn/wsyw/wscx/gjjcx-login.jsp";
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        HttpResponse response = httpUtil.doGet(url,null,null);
+        System.out.println(EntityUtils.toString(response.getEntity()));
     }
 }

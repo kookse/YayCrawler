@@ -19,8 +19,9 @@ public enum CrawlerStatus {
     FAILURE(3,"采集失败"),
     // 完成
     SUCCESS(5,"采集成功"),
-    // 工单异常
-    EXCEPTION(6,"采集超时");
+    // 采集超时
+    EXPORT(6,"导出完成"),
+    EXCEPTION(7,"采集超时");
 
     private Integer status;
     private String msg;

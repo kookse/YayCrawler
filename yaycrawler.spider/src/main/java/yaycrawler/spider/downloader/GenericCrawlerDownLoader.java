@@ -8,9 +8,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
@@ -45,6 +47,7 @@ import yaycrawler.spider.utils.RequestHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -53,7 +56,7 @@ import java.util.regex.Pattern;
 @Component
 public class GenericCrawlerDownLoader extends AbstractDownloader {
 
-    private static final Logger logger  = LoggerFactory.getLogger(GenericCrawlerDownLoader.class);
+    private static final Logger logger = LoggerFactory.getLogger(GenericCrawlerDownLoader.class);
     private static String DEFAULT_PAGE_SELECTOR = "page";
     @Autowired
     private PageParserRuleService pageParserRuleService;
@@ -69,7 +72,7 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
     @Autowired
     private CaptchaIdentificationProxy captchaIdentificationProxy;
 
-//    @Autowired
+    //    @Autowired
 //    private GenericPageProcessor genericPageProcessor;
     private CrawlerHttpClientDownloader httpClientDownloader;
     private PhantomJsMockDonwnloader mockDonwnloader;
@@ -81,7 +84,8 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
         mockDonwnloader = new PhantomJsMockDonwnloader();
     }
 
-    private static Pattern redirectPattern = Pattern.compile("<script.*(?s)setInterval.*location.href\\s*=.*(?s).*</script>");
+    @Value("login.engine.validate:self.location =  \"(.*)\";")
+    private String regexParam;
 
     @Override
     public Page download(Request request, Task task) {
@@ -90,13 +94,12 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
         PageInfo pageInfo = pageParserRuleService.findOnePageInfoByRgx(request.getUrl());
         boolean doRecovery = false;
         EngineResult engineResult = null;
-        try {
-            Site site = task.getSite();
-            while (i < 5 && !pageValidated(page, pageInfo.getPageValidationRule())) {
-
-                if (pageInfo == null && request.getExtra("$pageInfo") != null) {
-                    pageInfo = (PageInfo) request.getExtra("$pageInfo");
-                }
+        if (pageInfo == null && request.getExtra("$pageInfo") != null) {
+            pageInfo = (PageInfo) request.getExtra("$pageInfo");
+        }
+        Site site = task.getSite();
+        while (i < 5 && !pageValidated(page, pageInfo.getPageValidationRule())) {
+            try {
                 boolean isJsRendering = pageInfo != null && "1".equals(pageInfo.getIsJsRendering());
                 String pageUrl = request.getUrl();
                 String loginName = request.getExtra("loginName") != null ? request.getExtra("loginName").toString() : RequestHelper.getParam(request.getUrl(), "loginName");
@@ -106,7 +109,7 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                     siteCookie = null;
                 }
                 String cookie = "";
-                if(siteCookie == null)
+                if (siteCookie == null && StringUtils.isNotEmpty(loginName))
                     engineResult = doAutomaticRecovery(Page.fail(), request, request.getUrl());
                 if (engineResult != null && engineResult.getStatus()) {
                     page = new Page();
@@ -124,10 +127,10 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                     page.setRequest(request);
                     doRecovery = engineResult.getStatus();
                 }
-                if(doRecovery) {
+                if (doRecovery) {
                     continue;
                 }
-                if(engineResult !=null && !engineResult.getStatus())
+                if (engineResult != null && !engineResult.getStatus())
                     break;
                 if (siteCookie != null) {
                     cookie = siteCookie.getCookie();
@@ -144,15 +147,35 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                 }
 //            request = RequestHelper.createRequest(request.getUrl(),request.getMethod(),request.getExtras());
                 page = !isJsRendering ? httpClientDownloader.download(request, task, cookie) : mockDonwnloader.download(request, task, cookie);
-                if (!isJsRendering && (!"post".equalsIgnoreCase(request.getMethod()) && page != null) && page.getRawText() != null && redirectPattern.matcher(page.getRawText()).find())
+                String content = page.getRawText();
+                if(StringUtils.isEmpty(content))
+                    continue;
+                Pattern pattern = Pattern.compile(regexParam);
+                Matcher matcher = pattern.matcher(content);
+
+                if (!isJsRendering && (!"post".equalsIgnoreCase(request.getMethod()) && page != null) && page.getRawText() != null && matcher.find())
                     page = mockDonwnloader.download(request, task, cookie);
+                if(page == null || page.getRawText() == null) {
+                    String url;
+                    for (int j = 1; j <= matcher.groupCount(); j++) {
+                        url = matcher.group(i);
+                        if(StringUtils.isNotEmpty(url)) {
+                            if(!StringUtils.startsWithAny(url,"http","https"))
+                                url = StringUtils.substringBeforeLast(request.getUrl(),"/") + "/" +  url;
+                            request.setUrl(url);
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("pageUrl {},Exception", request.getUrl(), e);
+                page = Page.fail();
+            } finally {
                 i++;
             }
-        } catch (Exception e) {
-            logger.error("pageUrl {},Exception",request.getUrl(),e);
-            page = Page.fail();
         }
-        if(page != null && page.getRawText() == null)
+
+        if (page != null && page.getRawText() == null)
             return null;
 
         return page;
@@ -173,7 +196,7 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
      */
     public boolean pageValidated(Page page, String pageValidationExpression) {
         if (StringUtils.isEmpty(pageValidationExpression)) return true;
-        if(page.getRawText() == null) return false;
+        if (page.getRawText() == null) return false;
         Request request = page.getRequest();
         Selectable context = getPageRegionContext(page, request, pageValidationExpression);
         if (context == null) return false;
@@ -221,11 +244,11 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                     paramData.putAll(pageRequest.getExtras());
                     paramData.remove("$pageInfo");
                 } else {
-                    paramData.put("loginName", RequestHelper.getParam(pageRequest.getUrl(),"loginName"));
-                    paramData.put("loginPassword", RequestHelper.getParam(pageRequest.getUrl(),"loginPassword"));
+                    paramData.put("loginName", RequestHelper.getParam(pageRequest.getUrl(), "loginName"));
+                    paramData.put("loginPassword", RequestHelper.getParam(pageRequest.getUrl(), "loginPassword"));
                 }
                 engineResult = encryptEngine.execute(paramData);
-                if(engineResult.getStatus() == null || !engineResult.getStatus())
+                if (engineResult.getStatus() == null || !engineResult.getStatus())
                     return engineResult;
                 LoginParam loginParam = engineResult.getLoginParam();
                 loginParam.setUrl(pageRequest.getUrl());
@@ -237,21 +260,21 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                         PhantomCookie phantomCookie = new PhantomCookie(header.getName(), header.getValue());
                         phantomCookies.add(phantomCookie);
                     });
-                    String loginName = pageRequest.getExtra("loginName") != null? pageRequest.getExtra("loginName").toString():RequestHelper.getParam(pageRequest.getUrl(),"loginName");
-                    pageCookieService.deleteCookieBySiteId(pageSite.getId(),loginName);
-                    if (pageCookieService.saveCookies(UrlUtils.getDomain(pageUrl), pageSite.getId(), phantomCookies,loginName)) {
+                    String loginName = pageRequest.getExtra("loginName") != null ? pageRequest.getExtra("loginName").toString() : RequestHelper.getParam(pageRequest.getUrl(), "loginName");
+                    pageCookieService.deleteCookieBySiteId(pageSite.getId(), loginName);
+                    if (pageCookieService.saveCookies(UrlUtils.getDomain(pageUrl), pageSite.getId(), phantomCookies, loginName)) {
                         logger.info("保存新的cookie成功！");
                     } else
                         logger.info("保存新的cookie失败！");
                     //重新加入队列
 //                    page.addTargetRequest(pageRequest);
                 } else {
-                    logger.info("登陆失败{}",JSON.toJSONString(pageRequest));
+                    logger.info("登陆失败{}", JSON.toJSONString(pageRequest));
                 }
             } else {
                 Selectable judgeContext = StringUtils.isNotBlank(loginJsFileName) ? getPageRegionContext(page, pageRequest, loginJudgeExpression) : null;
                 if (judgeContext != null && judgeContext.match()) {
-                   engineResult.setStatus(Boolean.TRUE);
+                    engineResult.setStatus(Boolean.TRUE);
                     //需要登录了
                     autoLoginProxy.login(pageUrl, loginJsFileName, page.getRawText(), oldCookieId);
                     //重新加入队列

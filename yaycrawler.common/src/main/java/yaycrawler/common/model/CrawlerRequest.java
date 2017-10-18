@@ -18,6 +18,7 @@ public class CrawlerRequest implements Serializable{
     private String hashCode;
     private String domain;
     private Map<String,Object> extendMap;
+
     /**
      *
      * startTime:开始时间
@@ -120,4 +121,5 @@ public class CrawlerRequest implements Serializable{
                 ", extendMap=" + extendMap +
                 '}';
     }
+
 }

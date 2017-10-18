@@ -1,5 +1,7 @@
 package yaycrawler.master.service.impl;
 
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,14 +52,15 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
      */
     @Override
     public boolean pushTasksToWaitingQueue(List<CrawlerRequest> crawlerRequests, boolean removeDuplicated) {
-        boolean exists;
+        CrawlerTask crawlerTask;
         List<CrawlerRequest> requestTmps = transCrawlerQueue(crawlerRequests);
         for (CrawlerRequest crawlerRequest : requestTmps) {
-            exists = crawlerTaskRepository.exists(crawlerRequest.getHashCode());
-            if (exists && !removeDuplicated) break;
-            if (exists)
-                crawlerTaskRepository.delete(crawlerRequest.getHashCode());
+            crawlerTask = crawlerTaskMapper.findFirstByCode(crawlerRequest.getHashCode());
+            if (crawlerTask != null && !removeDuplicated) break;
+            if (crawlerTask != null)
+                crawlerTaskMapper.deleteByCode(crawlerRequest.getHashCode());
             CrawlerTask task = CrawlerTask.convertFromCrawlerRequest(crawlerRequest);
+            task.setOrderId(crawlerRequest.getData().get("orderId") != null ?crawlerRequest.getData().get("orderId").toString():"");
             task.setStatus(CrawlerStatus.INIT.getStatus());
             task.setCreatedTime(new Date());
             crawlerTaskRepository.save(task);
@@ -90,7 +93,8 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
     @Override
     public boolean moveWaitingTaskToRunningQueue(String workerId, List<CrawlerRequest> crawlerRequests) {
         for (CrawlerRequest request : crawlerRequests) {
-            crawlerTaskRepository.updateTaskToRunningStatus(request.getHashCode(), workerId);
+            crawlerTaskMapper.updateCrawlerTaskStatus(request.getHashCode(),"", CrawlerStatus.DEALING.getStatus(), CrawlerStatus.DEALING.getMsg());
+//            crawlerTaskRepository.updateTaskToRunningStatus(request.getHashCode(), workerId,CrawlerStatus.DEALING.getStatus());
         }
         return true;
     }
@@ -104,7 +108,7 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
      */
     @Override
     public boolean moveRunningTaskToFailQueue(String taskCode, String message) {
-        crawlerTaskRepository.updateTaskToFailureStatus(taskCode, message);
+        crawlerTaskRepository.updateTaskToFailureStatus(taskCode, message,CrawlerStatus.FAILURE.getStatus());
         return true;
     }
 
@@ -116,7 +120,8 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
      */
     @Override
     public boolean moveRunningTaskToSuccessQueue(CrawlerResult crawlerResult) {
-        crawlerTaskRepository.updateTaskToSuccessStatus(crawlerResult.getKey());
+        crawlerTaskMapper.updateCrawlerTaskStatus(crawlerResult.getKey(),"", CrawlerStatus.SUCCESS.getStatus(), CrawlerStatus.SUCCESS.getMsg());
+//        crawlerTaskRepository.updateTaskToSuccessStatus(crawlerResult.getKey(),CrawlerStatus.SUCCESS.getStatus());
         //把附带的子任务加入队列
         List<CrawlerRequest> childRequestList = crawlerResult.getCrawlerRequestList();
         if (childRequestList != null && childRequestList.size() > 0) {
@@ -132,7 +137,7 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
      */
     @Override
     public void refreshBreakedQueue(Long timeout) {
-        crawlerTaskRepository.refreshBreakedQueue(timeout);
+        crawlerTaskRepository.refreshBreakedQueue(CrawlerStatus.INIT.getStatus(),CrawlerStatus.DEALING.getStatus(),timeout/1000);
     }
 
 
@@ -196,6 +201,11 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
             Map<String,Object> extendMap = crawlerRequest.getExtendMap();
             extendMap.put("startTime", task.getStartedTime());
             extendMap.put("extraInfo", task.getMessage());
+            crawlerRequest.setExtendMap(ImmutableMap.of("$keyword",task.getId()));
+            String url = getUniqueUrl(crawlerRequest);
+            crawlerRequest.setUrl(url);
+            String hashCode = DigestUtils.sha1Hex(url);
+            crawlerRequest.setHashCode(hashCode);
             requestList.add(crawlerRequest);
         }
         return requestList;
@@ -218,6 +228,6 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
 
     @Override
     public Integer moveRunningTaskToFailureQueue(List<?> ids) {
-        return null;
+        return crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.FAILURE.getStatus(),CrawlerStatus.FAILURE.getMsg(), CrawlerStatus.DEALING.getStatus(), ids);
     }
 }

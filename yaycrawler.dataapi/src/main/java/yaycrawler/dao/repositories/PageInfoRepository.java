@@ -17,7 +17,7 @@ import java.util.List;
 @Repository
 public  interface PageInfoRepository extends CrudRepository<PageInfo, String> {
 
-    @Query(value="select *  from conf_page_info pi where ?  ~  pi.url_rgx",nativeQuery = true)
+    @Query(value="select *  from conf_page_info pi where ?  ~  pi.url_rgx ORDER BY url_rgx desc limit 1",nativeQuery = true)
     PageInfo findOneByUrlRgx(String url);
 
     @OrderBy("createdDate desc ")

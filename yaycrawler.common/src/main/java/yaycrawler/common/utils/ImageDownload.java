@@ -25,7 +25,7 @@ public class ImageDownload {
     public static void main(String[] args) throws IOException, URISyntaxException {
         HttpUtil httpUtil = HttpUtil.getInstance();
         ArrayList<Header> headerList = new ArrayList<>();
-        headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"));
+        headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"));
         for (int i = 0; i < 200; i++) {
             HttpResponse response = httpUtil.doGet("http://gzlss.hrssgz.gov.cn/cas/captcha.jpg?Rnd=" + Math.random(), null, headerList);
             if (response.getStatusLine().getStatusCode() != 200) {

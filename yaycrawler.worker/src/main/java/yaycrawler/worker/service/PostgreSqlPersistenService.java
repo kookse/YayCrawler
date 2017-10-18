@@ -19,12 +19,16 @@ public class PostgreSqlPersistenService implements IResultPersistentService {
 
     @Override
     public boolean saveCrawlerResult(String pageUrl, Map<String, Object> regionDataMap) {
-        CrawlerData crawlerData = new CrawlerData();
         String _id = DigestUtils.sha1Hex(pageUrl);
+        CrawlerData crawlerData = crawlerDataRepository.findByCode(_id);
+        if(crawlerData == null)
+            crawlerData = new CrawlerData();
         crawlerData.setCode(_id);
         String paramJson = JSON.toJSONString(regionDataMap);
         crawlerData.setData(paramJson);
         crawlerData.setPageUrl(pageUrl);
+        Object orderId = ((Map)regionDataMap.get("loginParams")).get("orderId");
+        crawlerData.setOrderId(orderId!=null?orderId.toString():null);
         crawlerDataRepository.save(crawlerData);
         return true;
     }

@@ -74,10 +74,10 @@ public class GenericPipeline implements Pipeline {
                         dataMap.put("loginParams",request.getExtras());
                         if (!persistentService.saveCrawlerResult(pageUrl, dataMap))
                             logger.error("可能持久化{}到{}失败！", groupedDataEntry.getKey(), persistentService.toString());
-                        else if(rockeMQStatus) {
-                            IResultPersistentService rocketMQPersistentService = persistentServiceFactory.getPersistentServiceByDataType(PersistentDataType.ROCKETMQ);
-                            rocketMQPersistentService.saveCrawlerResult(pageUrl,dataMap);
-                        }
+//                        else if(rockeMQStatus) {
+//                            IResultPersistentService rocketMQPersistentService = persistentServiceFactory.getPersistentServiceByDataType(PersistentDataType.ROCKETMQ);
+//                            rocketMQPersistentService.saveCrawlerResult(pageUrl,dataMap);
+//                        }
                     }
                 } catch (Exception ex) {
                     logger.error(ex.getMessage());
@@ -91,7 +91,7 @@ public class GenericPipeline implements Pipeline {
     private void addToDataTypeGroup(Map<String, Map<String, Object>> groupedDataMapList, String dataType,Map.Entry<String, Object> regionDataMap) {
         if (StringUtils.isBlank(dataType)) return;
         if (StringUtils.equalsIgnoreCase(dataType, "autoField") || StringUtils.equalsIgnoreCase(dataType, "autoRowField"))
-            dataType = PersistentDataType.ROCKETMQ;
+            dataType = PersistentDataType.MAP;
         Map<String, Object> groupedMap = groupedDataMapList.get(dataType);
         if (groupedMap == null) {
             groupedMap = new HashMap<>();

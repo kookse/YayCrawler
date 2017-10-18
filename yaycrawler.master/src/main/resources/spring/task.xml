@@ -11,7 +11,7 @@
         <property name="queueTimeOut" value="${task.queue.timeout:3600000}"></property>
     </bean>
 
-
+    <bean id="rocketMQTask" class="yaycrawler.master.quartz.RocketMQTask"/>
     <!-- For times when you just need to invoke a method on a specific object -->
     <bean id="refreshWorkerJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <property name="targetObject" ref="workerRefreshTask"/>
@@ -23,6 +23,16 @@
         <property name="targetMethod" value="refreshBreakedQueue"/>
     </bean>
 
+    <bean id="rocketMQTaskJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="rocketMQTask"/>
+        <property name="targetMethod" value="saveRocketMQ"/>
+    </bean>
+
+    <bean id="rocketMQTaskTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="rocketMQTaskJobDetail"/>
+        <property name="startDelay" value="${worker.refreshInteval}"/>
+        <property name="repeatInterval" value="${worker.refreshInteval}"/>
+    </bean>
 
     <bean id="workerRefreshTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="refreshWorkerJobDetail"/>
@@ -41,12 +51,14 @@
             <list>
                 <ref bean="refreshWorkerJobDetail"/>
                 <ref bean="refreshBreakedQueueJobDetail"/>
+                <ref bean="rocketMQTaskJobDetail"/>
             </list>
         </property>
         <property name="triggers">
             <list>
                 <ref bean="workerRefreshTrigger"/>
                 <ref bean="breakedQueueRefreshTrigger"/>
+                <ref bean="rocketMQTaskTrigger"/>
             </list>
         </property>
     </bean>

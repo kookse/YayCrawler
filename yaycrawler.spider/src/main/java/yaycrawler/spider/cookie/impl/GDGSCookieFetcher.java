@@ -77,7 +77,7 @@ public class GDGSCookieFetcher implements ICookieProvider {
                 validation = GeetestValidationProvider.getValidation("http://gd.gsxt.gov.cn", account.getUserName());
             } while (validation == null && tryCount-- > 0);
             if (validation != null && validation.getGeetest_validate() != null) {
-                Map<String, String> paramMap = new HashMap<>();
+                Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put("textfield", "当乐");
                 paramMap.put("geetest_challenge", validation.getGeetest_challenge());
                 paramMap.put("geetest_validate", validation.getGeetest_validate());

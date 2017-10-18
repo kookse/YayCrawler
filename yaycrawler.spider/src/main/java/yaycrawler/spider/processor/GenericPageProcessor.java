@@ -69,13 +69,13 @@ public class GenericPageProcessor implements PageProcessor {
                 if (pageParseListener != null) {
                     pageParseListener.onSuccess(pageRequest, childRequestList);
                 }
-                crawlerTaskMapper.updateCrawlerTaskStatus(DigestUtils.sha1Hex(getUniqueUrl(pageRequest)),"", CrawlerStatus.SUCCESS.getStatus(), CrawlerStatus.SUCCESS.getMsg());
+                //crawlerTaskMapper.updateCrawlerTaskStatus(DigestUtils.sha1Hex(pageRequest.getUrl()),"", CrawlerStatus.SUCCESS.getStatus(), CrawlerStatus.SUCCESS.getMsg());
             } catch (Exception ex) {
                 logger.error(ex.getMessage());
                 if (pageParseListener != null) {
                     pageParseListener.onError(pageRequest, "页面解析失败");
                 }
-                crawlerTaskMapper.updateCrawlerTaskStatus(DigestUtils.sha1Hex(getUniqueUrl(pageRequest)),"", CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg());
+                //crawlerTaskMapper.updateCrawlerTaskStatus(DigestUtils.sha1Hex(getUniqueUrl(pageRequest)),"", CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg());
             }
 //        }
 //        else {
@@ -184,7 +184,7 @@ public class GenericPageProcessor implements PageProcessor {
                         childMap.put("value", StringUtils.trimToEmpty(value.toString()));
                         resultData.add(childMap);
                     } else if (label != null && value != null) {
-                        label = PinYinUtil.converterToFirstSpell(label.toString());
+                        label = PinYinUtil.converterToFirstSpell(StringUtils.trimToEmpty(String.valueOf(label)));
                         if(StringUtils.isNotEmpty(label.toString()))
                             resultMap.put(label,StringUtils.trimToEmpty(value.toString()));
                     }

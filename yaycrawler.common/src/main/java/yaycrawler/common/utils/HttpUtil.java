@@ -120,7 +120,7 @@ public class HttpUtil {
         }
     }
 
-    public List<Cookie> doPostCookies(String cookieUrl, Map<String, String> formParams, List<Header> headerList) {
+    public List<Cookie> doPostCookies(String cookieUrl, Map<String, Object> formParams, List<Header> headerList) {
         try {
             return getCookiesFromResponse(cookieUrl, doPost(cookieUrl, null, formParams, headerList));
         } catch (Exception ex) {
@@ -139,7 +139,7 @@ public class HttpUtil {
      * @throws IOException
      * @throws ClientProtocolException
      */
-    public HttpResponse doGet(String url, Map<String, String> queryParams, List<Header> headerList) throws URISyntaxException, IOException {
+    public HttpResponse doGet(String url, Map<String, Object> queryParams, List<Header> headerList) throws URISyntaxException, IOException {
         HttpGet gm = new HttpGet();
         RequestConfig requestConfig = getRequestConfig();
         gm.setConfig(requestConfig);
@@ -156,50 +156,50 @@ public class HttpUtil {
         return response;
     }
 
-    public HttpResponse doGet(String url, Map<String, String> queryParams) throws IOException, URISyntaxException {
+    public HttpResponse doGet(String url, Map<String, Object> queryParams) throws IOException, URISyntaxException {
         return doGet(url, queryParams, null);
     }
 
-    public InputStream doGetForStream(String url, Map<String, String> queryParams) throws URISyntaxException, IOException {
+    public InputStream doGetForStream(String url, Map<String, Object> queryParams) throws URISyntaxException, IOException {
         HttpResponse response = this.doGet(url, queryParams);
         return response != null ? response.getEntity().getContent() : null;
     }
 
 
-    public Map<String, Object> doGetForMap(String url, Map<String, String> queryParams, List<Header> headerList) throws IOException, URISyntaxException {
+    public Map<String, Object> doGetForMap(String url, Map<String, Object> queryParams, List<Header> headerList) throws IOException, URISyntaxException {
         HttpResponse response = doGet(url, queryParams, headerList);
         return readResponseToMap(response);
     }
 
-    public Map<String, Object> doPostForMap(String url, Map<String, String> queryParams, Map<String, String> formParams, List<Header> headerList) throws IOException, URISyntaxException {
+    public Map<String, Object> doPostForMap(String url, Map<String, Object> queryParams, Map<String, Object> formParams, List<Header> headerList) throws IOException, URISyntaxException {
         HttpResponse response = doPost(url, queryParams, formParams, headerList);
         return readResponseToMap(response);
     }
 
-    public InputStream doPostForStream(String url, Map<String, String> queryParams) throws URISyntaxException, ClientProtocolException, IOException {
+    public InputStream doPostForStream(String url, Map<String, Object> queryParams) throws URISyntaxException, ClientProtocolException, IOException {
         HttpResponse response = this.doPost(url, queryParams, null, null);
         return response != null ? response.getEntity().getContent() : null;
     }
 
-    public InputStream doPostForStream(String url, Map<String, String> queryParams, List<Header> headers) throws URISyntaxException, ClientProtocolException, IOException {
+    public InputStream doPostForStream(String url, Map<String, Object> queryParams, List<Header> headers) throws URISyntaxException, ClientProtocolException, IOException {
         HttpResponse response = this.doPost(url, queryParams, null, headers);
         return response != null ? response.getEntity().getContent() : null;
     }
 
-    public String doPostForString(String url, Map<String, String> queryParams) throws URISyntaxException, ClientProtocolException, IOException {
+    public String doPostForString(String url, Map<String, Object> queryParams) throws URISyntaxException, ClientProtocolException, IOException {
         return HttpUtil.readStream(this.doPostForStream(url, queryParams), null);
     }
 
-    public String doPostForString(String url, Map<String, String> queryParams, List<Header> headers) throws URISyntaxException, ClientProtocolException, IOException {
+    public String doPostForString(String url, Map<String, Object> queryParams, List<Header> headers) throws URISyntaxException, ClientProtocolException, IOException {
         return HttpUtil.readStream(this.doPostForStream(url, queryParams, headers), null);
     }
 
-    public InputStream doPostForStream(String url, Map<String, String> queryParams, Map<String, String> formParams) throws URISyntaxException, ClientProtocolException, IOException {
+    public InputStream doPostForStream(String url, Map<String, Object> queryParams, Map<String, Object> formParams) throws URISyntaxException, ClientProtocolException, IOException {
         HttpResponse response = this.doPost(url, queryParams, formParams, null);
         return response != null ? response.getEntity().getContent() : null;
     }
 
-    public String doPostRetString(String url, Map<String, String> queryParams, Map<String, String> formParams) throws URISyntaxException, ClientProtocolException, IOException {
+    public String doPostRetString(String url, Map<String, Object> queryParams, Map<String, Object> formParams) throws URISyntaxException, ClientProtocolException, IOException {
         return HttpUtil.readStream(this.doPostForStream(url, queryParams, formParams), null);
     }
 
@@ -214,7 +214,7 @@ public class HttpUtil {
      * @throws IOException
      * @throws ClientProtocolException
      */
-    public HttpResponse doPost(String url, Map<String, String> queryParams, Map<String, String> formParams, List<Header> headerList) throws URISyntaxException, IOException {
+    public HttpResponse doPost(String url, Map<String, Object> queryParams, Map<String, Object> formParams, List<Header> headerList) throws URISyntaxException, IOException {
         HttpPost pm = new HttpPost();
         URIBuilder builder = new URIBuilder(url);
         setHeaders(headerList, pm);
@@ -277,7 +277,7 @@ public class HttpUtil {
     private RequestConfig getRequestConfig() {
 //        HttpHost proxy = new HttpHost("127.0.0.1", 8888);
         RequestConfig.Builder build = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES)
-                //.setProxy(proxy)
+//                .setProxy(proxy)
                 .setConnectTimeout(30000).setConnectionRequestTimeout(30000)
                 .setSocketTimeout(30000);
         return build.build();
@@ -308,11 +308,11 @@ public class HttpUtil {
         }
     }
 
-    private static List<NameValuePair> paramsConverter(Map<String, String> params) {
+    private static List<NameValuePair> paramsConverter(Map<String, Object> params) {
         List<NameValuePair> nvps = new LinkedList<NameValuePair>();
-        Set<Entry<String, String>> paramsSet = params.entrySet();
-        for (Entry<String, String> paramEntry : paramsSet) {
-            nvps.add(new BasicNameValuePair(paramEntry.getKey(), paramEntry.getValue()));
+        Set<Entry<String, Object>> paramsSet = params.entrySet();
+        for (Entry<String, Object> paramEntry : paramsSet) {
+            nvps.add(new BasicNameValuePair(paramEntry.getKey(), String.valueOf(paramEntry.getValue())));
         }
         return nvps;
     }
@@ -431,7 +431,7 @@ public class HttpUtil {
 //     * @return 是否成功设置cookie
 //     */
 //    private boolean setCookie(String key, String value, String domain, String path, Boolean useSecure) {
-//        Map<String, String> cookies = new HashMap<String, String>();
+//        Map<String, Object> cookies = new HashMap<String, Object>();
 //        cookies.put(key, value);
 //        return setCookie(cookies, domain, path, useSecure);
 //    }

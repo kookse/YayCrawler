@@ -21,8 +21,11 @@ public class CrawlerData {
     /**
      * 任务的标识
      */
-    @Column(name = "code" , columnDefinition = "varchar(300)")
+    @Column(name = "code" , columnDefinition = "varchar(300)",unique = true)
     private String code;
+
+    @Column(name = "orderId" , columnDefinition = "varchar(300)")
+    private String orderId;
 
     /**
      * 请求的数据（JSON字符串）
@@ -92,5 +95,13 @@ public class CrawlerData {
     public void setData(Map data) {
         if (data != null)
             setData(JSON.toJSONString(data));
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }

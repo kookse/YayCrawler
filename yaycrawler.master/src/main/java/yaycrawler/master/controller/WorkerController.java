@@ -72,7 +72,7 @@ public class WorkerController {
             for (CrawlerResult result : heartbeat.getCompletedCrawlerResultList())
                 taskDispatcher.dealResultNotify(result);
         //重新分派任务
-        return RestFulResult.success(taskDispatcher.assignTasks(heartbeat));
+        return RestFulResult.success(JSON.toJSONString(taskDispatcher.assignTasks(heartbeat)));
     }
 
 
@@ -87,7 +87,7 @@ public class WorkerController {
 
     @RequestMapping("/crawlerReadyNotify")
     @ResponseBody
-    public RestFulResult crawlerReadyNotify(@RequestBody List<?> ids) {
+    public RestFulResult crawlerReadyNotify(@RequestBody List<Object> ids) {
         logger.debug("接收到任务开始通知:{}", JSON.toJSONString(ids));
         Assert.notNull(ids);
         taskDispatcher.dealResultNotifyReady(ids);
@@ -96,7 +96,7 @@ public class WorkerController {
 
     @RequestMapping("/crawlerDealingNotify")
     @ResponseBody
-    public RestFulResult crawlerDealingNotify(@RequestBody List<?> ids) {
+    public RestFulResult crawlerDealingNotify(@RequestBody List<Object> ids) {
         logger.debug("接收到任务执行通知:{}", JSON.toJSONString(ids));
         Assert.notNull(ids);
         taskDispatcher.dealResultNotifyDealing(ids);
@@ -105,7 +105,7 @@ public class WorkerController {
 
     @RequestMapping("/crawlerFailurIngNotify")
     @ResponseBody
-    public RestFulResult crawlerFailurIngNotify(@RequestBody List<?> ids) {
+    public RestFulResult crawlerFailurIngNotify(@RequestBody List<Object> ids) {
         logger.debug("接收到任务执行通知:{}", JSON.toJSONString(ids));
         Assert.notNull(ids);
         taskDispatcher.dealResultNotifyFailure(ids);

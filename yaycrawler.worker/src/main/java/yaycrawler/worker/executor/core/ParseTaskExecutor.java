@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @Date 2017/6/16 14:56
  */
 @Service("parseTaskExecutor")
-public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
+public class ParseTaskExecutor implements ITaskExecutor<CrawlerRequest> {
 
     private static final Logger logger = LoggerFactory.getLogger(ParseTaskExecutor.class);
 
@@ -51,9 +51,9 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
     private MasterActor masterActor;
 
     @Override
-    public ScheduleResult execute(CrawlerTask crawlerTask) {
+    public ScheduleResult execute(CrawlerRequest crawlerTask) {
         ScheduleResult result = new ScheduleResult();
-        result.setStatus(taskScheduleService.doSchedule(getCrawlerRequests(Lists.newArrayList(crawlerTask))));
+        result.setStatus(taskScheduleService.doSchedule(Lists.newArrayList(crawlerTask)));
         return result;
     }
 
@@ -69,35 +69,37 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
     }
 
     @Override
-    public ScheduleResult execute(List<CrawlerTask> crawlerTask) {
+    public ScheduleResult execute(List<CrawlerRequest> crawlerTask) {
         ScheduleResult result = new ScheduleResult();
         try {
             if (crawlerTask == null || crawlerTask.isEmpty()) {
                 result.setStatus(Boolean.FALSE);
                 return result;
             }
-            Map<Long, CrawlerTask> batchOrderInfoMap = new HashMap<>();
+            Map<Object, CrawlerRequest> batchOrderInfoMap = new HashMap<>();
             crawlerTask.forEach(task -> {
-                batchOrderInfoMap.put(task.getId().longValue(), task);
+                Object keyword = task.getExtendMap().get("$keyword");
+                batchOrderInfoMap.put(keyword, task);
             });
 
-            List<Long> ids = Lists.newArrayList(batchOrderInfoMap.keySet());
+            List<Object> ids = Lists.newArrayList(batchOrderInfoMap.keySet());
             logger.info("采集调度任务主线程结束,后台线程执行中...执行数量{}", ids.size());
             if (ids != null && !ids.isEmpty()) {
                 masterActor.notifyTaskDealing(ids);
-                crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.DEALING.getStatus(), CrawlerStatus.DEALING.getMsg(), CrawlerStatus.READY.getStatus(), ids);
+                //crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.DEALING.getStatus(), CrawlerStatus.DEALING.getMsg(), CrawlerStatus.READY.getStatus(), ids);
                 call(ids, batchOrderInfoMap);
             }
             result.setStatus(Boolean.TRUE);
         } catch (Exception e) {
-            Map<Long, CrawlerTask> batchOrderInfoMap = new HashMap<>();
+            Map<Object, CrawlerRequest> batchOrderInfoMap = new HashMap<>();
             crawlerTask.forEach(order -> {
-                batchOrderInfoMap.put(order.getId().longValue(), order);
+                Object keyword = order.getExtendMap().get("$keyword");
+                batchOrderInfoMap.put(keyword, order);
             });
-            List<Long> ids = new ArrayList<>();
+            List<Object> ids = new ArrayList<>();
             ids.addAll(batchOrderInfoMap.keySet());
             masterActor.notifyTaskFailure(ids);
-            crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg(), CrawlerStatus.READY.getStatus(), ids);
+            //crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg(), CrawlerStatus.READY.getStatus(), ids);
             logger.error("出现了异常,执行终止操作,数据：{}", JSON.toJSON(crawlerTask));
             result.setStatus(Boolean.FALSE);
             e.printStackTrace();
@@ -111,18 +113,18 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
      *
      * @param crawlerTask
      */
-    public void executeSQLWithFailover(CrawlerTask crawlerTask) {
+    public void executeSQLWithFailover(CrawlerRequest crawlerTask) {
         int count = 1;
         while (MAXFAILURETIMES >= count) {
             ScheduleResult scheduleResult = new ScheduleResult();
-            scheduleResult.setStatus(taskScheduleService.doSchedule(getCrawlerRequests(Lists.newArrayList(crawlerTask))));
+            scheduleResult.setStatus(taskScheduleService.doSchedule(Lists.newArrayList(crawlerTask)));
             Boolean result = scheduleResult != null && scheduleResult.getStatus();
             logger.info("第:[{}]次执行工单解析任务:[{}] {}",
-                    count, crawlerTask.getId(), result ? "成功." : "失败.");
+                    count, crawlerTask.getHashCode(), result ? "成功." : "失败.");
             count++;
             if (count >= MAXFAILURETIMES && !result) {
                 logger.info("执行工单解析任务:[{}]失败次数过多,开始执行失败回调方法.",
-                        crawlerTask.getId());
+                        crawlerTask.getHashCode());
                 failureCallback(crawlerTask);
             }
             if (result) {
@@ -132,12 +134,12 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
     }
 
     /**
-     * 处理小智查询调度任务
+     * 处理采集调度任务
      *
      * @param ids
      * @Param queryOrderInfoMap
      */
-    private void call(List<Long> ids, Map<Long, CrawlerTask> batchOrderInfoMap) {
+    private void call(List<Object> ids, Map<Object, CrawlerRequest> batchOrderInfoMap) {
         logger.info("工单解析任务开始,后台线程开始轮询解析任务...");
         ids.forEach(id -> {
             try {
@@ -151,12 +153,13 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerTask> {
     }
 
     @Override
-    public void failureCallback(CrawlerTask crawlerTask) {
-        crawlerTask.setStatus(CrawlerStatus.FAILURE.getStatus());
+    public void failureCallback(CrawlerRequest crawlerTask) {
+        //crawlerTask.setStatus(CrawlerStatus.FAILURE.getStatus());
         //更新状态
-        logger.info("工单{}解析任务，重试次数超过{}次", crawlerTask.getCode(), MAXFAILURETIMES);
-        masterActor.notifyTaskFailure(Lists.newArrayList(crawlerTask.getId()));
-        crawlerTaskMapper.updateCrawlerTaskStatus(crawlerTask.getCode(),WorkerContext.getWorkerId(), CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg());
+        logger.info("工单{}解析任务，重试次数超过{}次", crawlerTask.getHashCode(), MAXFAILURETIMES);
+        Object keyword = crawlerTask.getExtendMap().get("$keyword");
+        masterActor.notifyTaskFailure(Lists.newArrayList(keyword));
+        //crawlerTaskMapper.updateCrawlerTaskStatus(crawlerTask.getCode(),WorkerContext.getWorkerId(), CrawlerStatus.FAILURE.getStatus(), CrawlerStatus.FAILURE.getMsg());
     }
 
 }

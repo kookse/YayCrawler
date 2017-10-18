@@ -16,4 +16,5 @@ import yaycrawler.dao.domain.CrawlerTask;
 @Repository
 public interface CrawlerDataRepository extends PagingAndSortingRepository<CrawlerData, String> {
 
+    public CrawlerData findByCode(String code);
 }

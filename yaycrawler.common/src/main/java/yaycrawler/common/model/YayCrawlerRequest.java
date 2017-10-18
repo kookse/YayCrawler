@@ -1,4 +1,4 @@
-package yaycrawler.worker.model;
+package yaycrawler.common.model;
 
 import yaycrawler.common.utils.IdentificationGenerator;
 

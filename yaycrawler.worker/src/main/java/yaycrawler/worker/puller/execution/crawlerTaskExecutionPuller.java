@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.status.CrawlerStatus;
 import yaycrawler.dao.domain.CrawlerTask;
 import yaycrawler.dao.mapper.CrawlerTaskMapper;
@@ -25,7 +26,7 @@ import java.util.Map;
  * @Date 2017/6/15 15:26
  */
 @Service("crawlerTaskExecutionPuller")
-public class crawlerTaskExecutionPuller extends AbstractExecutionDataPuller<CrawlerTask> {
+public class crawlerTaskExecutionPuller extends AbstractExecutionDataPuller<CrawlerRequest> {
 
     @Autowired
     private CrawlerTaskMapper crawlerTaskMapper;
@@ -36,32 +37,35 @@ public class crawlerTaskExecutionPuller extends AbstractExecutionDataPuller<Craw
     private static final Logger logger = LoggerFactory.getLogger(crawlerTaskExecutionPuller.class);
 
     @Override
-    public List<CrawlerTask> select(Map<String, Object> conditions, Long offset, Long limit){
+    public List<CrawlerRequest> select(Map<String, Object> conditions, Long offset, Long limit){
 
         List<TaskItemDefine> taskItemList = (List<TaskItemDefine>) conditions.get("taskItemList");
         List<Integer> taskItemIds = Lists.newArrayList();
         taskItemList.forEach(taskItemDefine -> {
             taskItemIds.add(Integer.parseInt(taskItemDefine.getTaskItemId()));
         });
-        List<CrawlerTask> orders = crawlerTaskMapper.selectListForParse(offset, limit, 10,taskItemIds, CrawlerStatus.INIT.getStatus());
+        //List<CrawlerTask> orders = crawlerTaskMapper.selectListForParse(offset, limit, 10,taskItemIds, CrawlerStatus.INIT.getStatus());
         Object data = masterActor.sendHeartbeart(taskItemIds);
-        if(data instanceof Collection)
-            orders = (List)data;
-        if(orders == null || orders.isEmpty()){
+        if(data == null)
+            return null;
+        List<CrawlerRequest> crawlerRequestList = JSON.parseArray(data.toString(),CrawlerRequest.class);
+
+        if(crawlerRequestList == null || crawlerRequestList.isEmpty()){
             return null;
         } else {
-            Map<Long,CrawlerTask> queryBatchInfoMap = new HashMap<>();
-            orders.forEach(order ->  {
-                queryBatchInfoMap.put(order.getId().longValue(),order);
+            Map<Object,CrawlerRequest> queryBatchInfoMap = new HashMap<>();
+            crawlerRequestList.forEach(crawlerRequest ->  {
+                Object keyword = crawlerRequest.getExtendMap().get("$keyword");
+                queryBatchInfoMap.put(keyword,crawlerRequest);
             });
-            List<Long> ids = Lists.newArrayList(queryBatchInfoMap.keySet());
+            List<Object> ids = Lists.newArrayList(queryBatchInfoMap.keySet());
             logger.debug(JSON.toJSONString(ids));
             if(ids != null && !ids.isEmpty() ) {
                 masterActor.notifyTaskReady(ids);
-                crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.READY.getStatus(),CrawlerStatus.READY.getMsg(), CrawlerStatus.INIT.getStatus(), ids);
+                //crawlerTaskMapper.updateCrawlerTaskByStatus(CrawlerStatus.READY.getStatus(),CrawlerStatus.READY.getMsg(), CrawlerStatus.INIT.getStatus(), ids);
             }
         }
-        return orders;
+        return crawlerRequestList;
     }
 
 }

@@ -106,7 +106,7 @@ public class MasterActor {
         return true;
     }
 
-    public boolean notifyTaskReady(List<?> ids) {
+    public boolean notifyTaskReady(List<Object> ids) {
         String targetUrl = CommunicationAPIs.getFullRemoteUrl(WorkerContext.getMasterServerAddress(), CommunicationAPIs.WORKER_POST_MASTER_READY_NOTIFY);
         RestFulResult result = HttpUtils.doSignedHttpExecute(WorkerContext.getSignatureSecret(), targetUrl, HttpMethod.POST, ids);
         if (result.hasError()) {
@@ -115,7 +115,7 @@ public class MasterActor {
         return true;
     }
 
-    public boolean notifyTaskDealing(List<?> ids) {
+    public boolean notifyTaskDealing(List<Object> ids) {
         String targetUrl = CommunicationAPIs.getFullRemoteUrl(WorkerContext.getMasterServerAddress(), CommunicationAPIs.WORKER_POST_MASTER_DEALING_NOTIFY);
         RestFulResult result = HttpUtils.doSignedHttpExecute(WorkerContext.getSignatureSecret(), targetUrl, HttpMethod.POST, ids);
         if (result.hasError()) {
@@ -124,7 +124,7 @@ public class MasterActor {
         return true;
     }
 
-    public boolean notifyTaskFailure(List<?> ids) {
+    public boolean notifyTaskFailure(List<Object> ids) {
         String targetUrl = CommunicationAPIs.getFullRemoteUrl(WorkerContext.getMasterServerAddress(), CommunicationAPIs.WORKER_POST_MASTER_FAILUREING_NOTIFY);
         RestFulResult result = HttpUtils.doSignedHttpExecute(WorkerContext.getSignatureSecret(), targetUrl, HttpMethod.POST, ids);
         if (result.hasError()) {

@@ -1,8 +1,5 @@
 package yaycrawler.dao.mapper;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 import yaycrawler.dao.datasource.DatabaseType;
 import yaycrawler.dao.datasource.MultiDataSource;
@@ -205,4 +202,15 @@ public interface CrawlerTaskMapper {
 
     @Update("update crawler_task set status=#{status},worker_id=#{workId},message=#{msg} where code=#{code}")
     int updateCrawlerTaskStatus(@Param("code") String code, @Param("workId") String workId, @Param("status") int status, @Param("msg") String msg);
+
+    @Update("update crawler_task set status=#{status} where order_id = #{orderId}")
+    Integer updateCrawlerTaskByOrderId(@Param("status") Integer status,@Param("orderId") String orderId);
+
+    @Select("select id as id, code as code,completed_time as completedTime,data as data,extend_data as extendData," +
+            "message as message, method as method,started_time as startedTime,status as status," +
+            "url as url,worker_id as worker_id from crawler_task where code = #{code} limit 1")
+    CrawlerTask findFirstByCode(@Param("code") String code);
+
+    @Delete("delete from crawler_task where code = #{code}")
+    Integer deleteByCode(@Param("code") String Code);
 }

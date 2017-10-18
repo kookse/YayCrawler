@@ -25,7 +25,7 @@ public class CrawlerTask {
     /**
      * 任务的标识
      */
-    @Column(name = "code" , columnDefinition = "varchar(300)")
+    @Column(name = "code" , columnDefinition = "varchar(300)",unique = true)
     private String code;
 
     /**
@@ -83,6 +83,9 @@ public class CrawlerTask {
     @Column(columnDefinition = "varchar(200)")
     private String message;
 
+
+    @Column(name = "orderId" , columnDefinition = "varchar(300)")
+    private String orderId;
 
     public CrawlerTask() {
 
@@ -229,5 +232,13 @@ public class CrawlerTask {
 
     public void setCompletedTime(Date completedTime) {
         this.completedTime = completedTime;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }

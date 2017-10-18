@@ -108,6 +108,10 @@
             <artifactId>HikariCP</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.yaycrawler</groupId>
+            <artifactId>yaycrawler-rocketmq</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

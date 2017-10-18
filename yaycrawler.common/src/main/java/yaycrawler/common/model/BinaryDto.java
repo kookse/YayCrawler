@@ -15,6 +15,7 @@ public class BinaryDto {
     private String dest;
     private String language = "eng";
     private String cookie;
+    private String suffix;
 
     public BinaryDto() {
 
@@ -100,6 +101,14 @@ public class BinaryDto {
         this.cookie = cookie;
     }
 
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+
     @Override
     public String toString() {
         return "BinaryDto{" +
@@ -111,6 +120,7 @@ public class BinaryDto {
                 ", dest='" + dest + '\'' +
                 ", language='" + language + '\'' +
                 ", cookie='" + cookie + '\'' +
+                ", suffix='" + suffix + '\'' +
                 '}';
     }
 }

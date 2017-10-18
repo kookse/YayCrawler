@@ -285,20 +285,6 @@ public class RedisCrawlerQueueService extends AbstractICrawlerQueueService {
     }
 
 /******************************************************************私有方法*********************************************************/
-    /**
-     * 为爬虫任务生成一个唯一的url
-     *
-     * @param crawlerRequest 请求
-     * @return
-     */
-    private String getUniqueUrl(CrawlerRequest crawlerRequest) {
-        if (crawlerRequest.getData() == null || crawlerRequest.getData().size() == 0)
-            return crawlerRequest.getUrl();
-        StringBuilder urlBuilder = new StringBuilder(crawlerRequest.getUrl().trim());
-        String random = DigestUtils.sha1Hex(JSON.toJSONString(crawlerRequest.getData()));
-        urlBuilder.append(String.format("%s%s=%s", urlBuilder.indexOf("?") > 0 ? "&" : "?", "random", random));
-        return urlBuilder.toString();
-    }
 
     /**
      * 批量加入任务到等待队列
@@ -346,7 +332,7 @@ public class RedisCrawlerQueueService extends AbstractICrawlerQueueService {
         for (DefaultTypedTuple detail : taskCodeList) {
             String data = redisTemplate.opsForHash().get(getTaskInfoHashIdentification(),detail.getValue()).toString();
             CrawlerRequest crawlerRequest = JSON.parseObject(data, CrawlerRequest.class);
-            crawlerRequest.setExtendMap(ImmutableMap.of("$tuple",detail));
+            crawlerRequest.setExtendMap(ImmutableMap.of("$keyword",detail));
             taskList.add(crawlerRequest);
         }
         return taskList;
@@ -409,16 +395,37 @@ public class RedisCrawlerQueueService extends AbstractICrawlerQueueService {
 
     @Override
     public Integer moveWaitingTaskToReadyQueue(List<?> ids) {
-        return null;
+        ZSetOperations zSetOperations = redisTemplate.opsForZSet();
+        for (Object id : ids) {
+            DefaultTypedTuple tuple = (DefaultTypedTuple)id;
+            zSetOperations.add(getReadyQueueIdentification(), tuple.getValue(), tuple.getScore());
+            zSetOperations.remove(getWaitingQueueIdentification(), tuple.getValue());
+        }
+        //保存任务所在的workerId？
+        return 1;
     }
 
     @Override
     public Integer moveReadyTaskToRunningQueue(List<?> ids) {
-        return null;
+        ZSetOperations zSetOperations = redisTemplate.opsForZSet();
+        for (Object id : ids) {
+            DefaultTypedTuple tuple = (DefaultTypedTuple)id;
+            zSetOperations.add(getRunningQueueIdentification(), tuple.getValue(), tuple.getScore());
+            zSetOperations.remove(getReadyQueueIdentification(), tuple.getValue());
+        }
+        //保存任务所在的workerId？
+        return 1;
     }
 
     @Override
     public Integer moveRunningTaskToFailureQueue(List<?> ids) {
-        return null;
+        ZSetOperations zSetOperations = redisTemplate.opsForZSet();
+        for (Object id : ids) {
+            DefaultTypedTuple tuple = (DefaultTypedTuple)id;
+            zSetOperations.add(getFailQueueIdentification(), tuple.getValue(), tuple.getScore());
+            zSetOperations.remove(getRunningQueueIdentification(), tuple.getValue());
+        }
+        //保存任务所在的workerId？
+        return 1;
     }
 }
