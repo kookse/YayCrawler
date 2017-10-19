@@ -195,7 +195,8 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
      * @return
      */
     public boolean pageValidated(Page page, String pageValidationExpression) {
-        if (StringUtils.isEmpty(pageValidationExpression)) return true;
+        if (StringUtils.isEmpty(pageValidationExpression))
+            return false;
         if (page.getRawText() == null) return false;
         Request request = page.getRequest();
         Selectable context = getPageRegionContext(page, request, pageValidationExpression);
