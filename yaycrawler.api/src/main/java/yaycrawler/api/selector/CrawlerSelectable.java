@@ -98,12 +98,18 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
     public CrawlerSelectable array(int start, int end, int step, int jump) {
         List<String> datas = Lists.newArrayList();
         List<String> tmps = all();
-        if (end < 0) {
+        if (end <= 0) {
             end += tmps.size();
+        }
+        if(step == 0 && jump> 0) {
+            step = end/jump;
+        }
+        if(jump == 0 && step > 0) {
+            jump = end/step;
         }
         for (int i = start; i < end / step; i++) {
             if (step == 1) {
-                datas.add(tmps.get(i));
+                datas.add(StringUtils.trimToEmpty(tmps.get(i)));
             } else {
                 List tmp = Lists.newArrayList();
                 int index = 1;
@@ -113,7 +119,7 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
                     } else {
                         index = j * jump + i;
                     }
-                    tmp.add(tmps.get(index));
+                    tmp.add(StringUtils.trimToEmpty(tmps.get(index)));
                 }
                 datas.add(JSON.toJSONString(tmp));
             }
@@ -129,7 +135,9 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
         List<String> indexData = Lists.newArrayList();
         if(StringUtils.contains(indexs,"-")) {
             String [] tmps = StringUtils.split(indexs,"-");
-            for (int i = Integer.parseInt(tmps[0]); i < Integer.parseInt(tmps[1]); i++) {
+            int start = Integer.parseInt(tmps[0]);
+            int end = tmps.length > 1 ? Integer.parseInt(tmps[1]):datas.size();
+            for (int i = start; i < end; i++) {
                 indexData.add(String.valueOf(i));
             }
         } else if(StringUtils.contains(indexs,",")){

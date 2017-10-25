@@ -273,21 +273,18 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                     logger.info("登陆失败{}", JSON.toJSONString(pageRequest));
                 }
             } else {
-                Selectable judgeContext = StringUtils.isNotBlank(loginJsFileName) ? getPageRegionContext(page, pageRequest, loginJudgeExpression) : null;
-                if (judgeContext != null && judgeContext.match()) {
                     engineResult.setStatus(Boolean.TRUE);
                     //需要登录了
                     autoLoginProxy.login(pageUrl, loginJsFileName, page.getRawText(), oldCookieId);
                     //重新加入队列
                     page.addTargetRequest(pageRequest);
-                } else {
-                    judgeContext = StringUtils.isNotBlank(captchaJsFileName) ? getPageRegionContext(page, pageRequest, captchaJudgeExpression) : null;
-                    if (judgeContext != null && judgeContext.match()) {
-                        engineResult.setStatus(Boolean.FALSE);
-                        //需要刷新验证码了
-                        captchaIdentificationProxy.recognition(pageUrl, captchaJsFileName, page.getRawText(), oldCookieId);
-                    }
-                }
+//                    judgeContext = StringUtils.isNotBlank(captchaJsFileName) ? getPageRegionContext(page, pageRequest, captchaJudgeExpression) : null;
+//                    if (judgeContext != null && judgeContext.match()) {
+//                        engineResult.setStatus(Boolean.FALSE);
+//                        //需要刷新验证码了
+//                        captchaIdentificationProxy.recognition(pageUrl, captchaJsFileName, page.getRawText(), oldCookieId);
+//                    }
+//                }
             }
 
         }

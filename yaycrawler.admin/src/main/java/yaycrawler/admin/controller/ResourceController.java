@@ -25,12 +25,14 @@ public class ResourceController {
     private SiteCookieRepository cookieRepository;
 
     @RequestMapping(value = "/addCookie", method = RequestMethod.POST)
-    public Object addCookie(String siteId, String domain, String cookie) {
+    public Object addCookie(String siteId, String domain, String cookie,String loginName,String loginPassword) {
         Assert.notNull(siteId);
         Assert.notNull(domain);
         Assert.notNull(cookie);
         SiteCookie siteCookie = new SiteCookie(siteId,domain, cookie);
         siteCookie.setLastUpdatedDate(new java.sql.Date(System.currentTimeMillis()));
+        siteCookie.setLoginName(loginName);
+        siteCookie.setPassword(loginPassword);
         return cookieRepository.save(siteCookie);
     }
 

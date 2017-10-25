@@ -1,7 +1,12 @@
 package yaycrawler.admin;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +15,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
+import yaycrawler.common.utils.CasperjsProgramManager;
+import yaycrawler.common.utils.HttpUtil;
 import yaycrawler.spider.processor.GenericPageProcessor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -123,5 +132,35 @@ public class PageProcessorTest {
         request.putExtra("loginPassword", "123456789");
         page.setRequest(request);
         pageProcessor.process(page);
+    }
+
+    @Test
+    public void testDownload() throws Exception {
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        List<Header> headerList = Lists.newArrayList();
+        headerList.add(new BasicHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"));
+        HttpResponse response = httpUtil.doGet("http://www.qichacha.com/",null, headerList);
+        Header[] headers = response.getHeaders("Set-Cookie");
+        for (Header header : headers) {
+            headerList.add(new BasicHeader("Cookie",header.getValue()));
+        }
+        System.out.println(EntityUtils.toString(response.getEntity()));
+        response = httpUtil.doGet("http://www.qichacha.com/firm_9cce0780ab7644008b73bc2120479d31.html",null,headerList);
+        System.out.println(EntityUtils.toString(response.getEntity()));
+    }
+
+    @Test
+    public void testLoginQichacha() {
+        int totalCount = 20;
+        int successCount = 0;
+        int retryCount = 0;
+        String pageUrl = "http://www.qichacha.com/company_getinfos?unique=9cce0780ab7644008b73bc2120479d31&companyname=%E5%B0%8F%E7%B1%B3%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E8%B4%A3%E4%BB%BB%E5%85%AC%E5%8F%B8&tab=susong";
+//        String pageUrl = "http://www.gsxt.gov.cn/corp-query-homepage.html";
+        String deltaResolveAddress = "http://localhost:8086/worker/resolveGeetestSlicePosition";
+        List<String> paramList = new ArrayList<>();
+        paramList.add(String.format("--pageUrl=%s",pageUrl));
+        paramList.add(String.format("--deltaResolveAddress=%s",deltaResolveAddress));
+        String result = CasperjsProgramManager.launch("d:/tmp/js/login_qcc.js", paramList);
+        System.out.println(result);
     }
 }

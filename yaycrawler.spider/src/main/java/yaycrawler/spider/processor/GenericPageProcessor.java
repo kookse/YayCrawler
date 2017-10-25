@@ -163,6 +163,7 @@ public class GenericPageProcessor implements PageProcessor {
                 try {
                     if (label == null && value != null && value instanceof Collection) {
                         for (Object val : (Collection) value) {
+                            childMap = new HashMap();
                             childMap.put("value", StringUtils.trimToEmpty(val.toString()));
                             resultData.add(childMap);
                         }

@@ -194,6 +194,14 @@ public class Solution {
     }
 
     @Test
+    public void toQichachaSite() {
+        Map param = Maps.newHashMap();
+        param.put("loginName","13175315644");
+        param.put("loginPassword","123456789");
+        System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
     public void testParam() {
         String param = "grsds";
         String url = "http://mtax.gdltax.gov.cn/appserver/zrr/grsds/queryGrsdsNsmx.do?startdate=20170601&enddate=20170930&callback=jsonp_callback4&time=1505464152982&timeOut=60000&loginName=15626241465&loginPassword=123432435";

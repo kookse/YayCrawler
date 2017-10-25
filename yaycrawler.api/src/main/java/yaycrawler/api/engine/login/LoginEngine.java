@@ -64,10 +64,13 @@ public class LoginEngine implements Engine<LoginParam> {
         int i = 0;
         while (i < 10) {
             try {
-                HttpResponse response = httpUtil.doPost(loginUrl, null, params, headerList);
+                HttpResponse response = httpUtil.doPost(loginUrl, null,params, headerList);
                 String content = EntityUtils.toString(response.getEntity());
+                if(StringUtils.isEmpty(content) && response.getStatusLine().getStatusCode() == 302) {
+                    response = httpUtil.doGet(loginUrl,params,headerList);
+                    content = EntityUtils.toString(response.getEntity());
+                }
                 matcher = pattern.matcher(content);
-
                 if (matcher.find()) {
                     Header[] headers ;
                     while (response.getStatusLine().getStatusCode() == 302) {

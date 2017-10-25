@@ -51,7 +51,15 @@
                             <input type="hidden" id="siteId" name="siteId"/>
                             <input type="hidden" id="domain" name="domain"/>
                             <div class="form-group">
-                                <label>cookie信息</label>
+                                <label for="loginName">用户名：</label>
+                            <input type="text" id="loginName" name="loginName"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword">&nbsp;&nbsp;&nbsp;&nbsp;密码：</label>
+                                <input type="password" id="loginPassword" name="loginPassword"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="cookie">cookie信息</label>
                                 <textarea id="cookie" name="cookie" rows="10" Style="width:100%;"
                                           required="required"></textarea>
                             </div>
@@ -145,10 +153,12 @@
                             <div class="form-group">
                                 <label class="control-label">请求头参数(JSON)</label>
                                 <textarea name="headers" rows="3" class="form-control">
-{
- "Content-Type":"application/x-www-form-urlencoded"
- }
+                                    {"Content-Type":"application/x-www-form-urlencoded"}
                                 </textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">登陆参数(JSON)</label>
+                                <textarea name="loginParam" rows="3" class="form-control"></textarea>
                             </div>
                             <div class="form-group">
                                 <label class="control-label">是否需要登录判断</label>
