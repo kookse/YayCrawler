@@ -194,6 +194,14 @@ public class Solution {
     }
 
     @Test
+    public void toQichacha() {
+        Map param = Maps.newHashMap();
+        param.put("$loginUrl","http://www.qichacha.com/user_login");
+        param.put("$loginJsFileName","login_qcc.js");
+        System.out.println(JSON.toJSONString(param));
+    }
+
+    @Test
     public void toQichachaSite() {
         Map param = Maps.newHashMap();
         param.put("loginName","13175315644");

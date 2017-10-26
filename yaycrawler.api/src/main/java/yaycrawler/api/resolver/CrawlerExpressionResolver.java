@@ -47,74 +47,96 @@ public class CrawlerExpressionResolver {
                 String[] paramArray = new String[]{};
                 Object[] params = new Object[1];
                 Class<?>[] ptypes = new Class[]{};
-                if(StringUtils.equalsIgnoreCase(param,"")) {
+                int k = 0;
+                if (StringUtils.equalsIgnoreCase(param, "")) {
                     params[0] = selector;
+                } else if (method.equalsIgnoreCase("request")) {
+                    paramArray = param.split("\\$\\$");
+                    params = new Object[paramArray.length + 2];
+                    params[0] = selector;
+                    params[1] = request.getUrl();
+                    ptypes = new Class[paramArray.length + 1];
+                    ptypes[0] = String.class;
+                    k = 1;
                 } else {
                     paramArray = param.split("\\$\\$");
-                    params = new Object[paramArray.length+1];
+                    params = new Object[paramArray.length + 1];
                     params[0] = selector;
                     ptypes = new Class[paramArray.length];
                 }
 
                 for (int j = 0; j < paramArray.length; j++) {
                     String p = String.valueOf(paramArray[j]);
+
                     if (p.startsWith("\""))
                         p = p.substring(1, p.length());
                     if (p.endsWith("\""))
                         p = p.substring(0, p.length() - 1);
-                    if (p.equals("$1"))
-                        p = selector.toString();
-                    try{
-                        Object object = Integer.parseInt(p);
-                        ptypes[j] = int.class;
-                        params[j + 1] = Integer.parseInt(p);
+                    if (p.equals("$1")) {
+                        List obj = ((Selectable)selector).all();
+                        if(obj.size() == 1) {
+                            ptypes[j+k] = String.class;
+                            params[j+k+1] = String.valueOf(obj.get(0));
+                        } else {
+                            ptypes[j+k] = List.class;
+                            params[j+k+1] = obj;
+                        }
+                        continue;
+                    }
+                    try {
+                        Integer.parseInt(p);
+                        ptypes[j + k] = int.class;
+                        params[j + k + 1] = Integer.parseInt(p);
                     } catch (Exception e) {
-                        ptypes[j] = String.class;
-                        params[j + 1] = p;
+                        ptypes[j + k] = String.class;
+                        params[j + 1 + k] = p;
                     }
                 }
 
-                if(selector instanceof Collection) {
-                    selector = new PlainText((List)selector);
-                } else if(selector instanceof String) {
+                if (selector instanceof Collection) {
+                    selector = new PlainText((List) selector);
+                } else if (selector instanceof String) {
                     selector = new PlainText(String.valueOf(selector));
                 }
-                if(method.equalsIgnoreCase("getCrawler")) {
-                    selector = new CrawlerSelectable(((Selectable)selector).all());
+                if (method.equalsIgnoreCase("getCrawler")) {
+                    selector = new CrawlerSelectable(((Selectable) selector).all());
                     cls = null;
-                } else if(method.equalsIgnoreCase("getJson")) {
-                    selector = new Json(((Selectable)selector).all());
+                } else if (method.equalsIgnoreCase("requestUrl")) {
+                    selector = new CrawlerSelectable(request.getUrl());
                     cls = null;
-                } else if(method.equalsIgnoreCase("getHtml")) {
+                } else if (method.equalsIgnoreCase("getJson")) {
+                    selector = new Json(((Selectable) selector).all());
+                    cls = null;
+                } else if (method.equalsIgnoreCase("getHtml")) {
                     StringBuffer buffer = new StringBuffer();
-                    ((Selectable)selector).all().forEach(sel -> {
+                    ((Selectable) selector).all().forEach(sel -> {
                         buffer.append(sel);
                     });
                     selector = new Html(buffer.toString());
                     cls = null;
-                } else if(method.equalsIgnoreCase("all")){
-                    selector = ((Selectable)selector).all();
+                } else if (method.equalsIgnoreCase("all")) {
+                    selector = ((Selectable) selector).all();
                     cls = null;
-                } else if(method.equalsIgnoreCase("nodes")){
-                    selector = ((Selectable)selector).nodes();
+                } else if (method.equalsIgnoreCase("nodes")) {
+                    selector = ((Selectable) selector).nodes();
                     cls = null;
-                } else if(method.equalsIgnoreCase("get")){
-                    selector = ((Selectable)selector).get();
+                } else if (method.equalsIgnoreCase("get")) {
+                    selector = ((Selectable) selector).get();
                     cls = null;
-                } else if(selector instanceof CrawlerSelectable) {
+                } else if (selector instanceof CrawlerSelectable) {
                     cls = CrawlerSelectable.class;
-                } else if(selector instanceof Selectable) {
-                   cls = Selectable.class;
-                } else if(selector instanceof Collection) {
+                } else if (selector instanceof Selectable) {
+                    cls = Selectable.class;
+                } else if (selector instanceof Collection) {
                     cls = List.class;
                 }
-                if(cls!=null && StringUtils.containsAny(cls.getName(),"Selectable","CrawlerSelectable")) {
-                    if(ptypes.length == 0)
+                if (cls != null && StringUtils.containsAny(cls.getName(), "Selectable", "CrawlerSelectable")) {
+                    if (ptypes.length == 0)
                         methodType = MethodType.methodType(cls);
                     else
-                        methodType = MethodType.methodType(cls,ptypes);
+                        methodType = MethodType.methodType(cls, ptypes);
                     try {
-                        methodHandle = lookup.findVirtual(cls,method,methodType);
+                        methodHandle = lookup.findVirtual(cls, method, methodType);
                         selector = methodHandle.invokeWithArguments(params);
                     } catch (NoSuchMethodException e) {
                         e.printStackTrace();

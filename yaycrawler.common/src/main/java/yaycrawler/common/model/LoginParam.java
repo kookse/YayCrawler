@@ -22,6 +22,26 @@ public class LoginParam {
     private String content;
     private String url;
 
+    private Boolean jsStatus = false;
+
+    private String loginJsFileName;
+
+    public String getLoginJsFileName() {
+        return loginJsFileName;
+    }
+
+    public void setLoginJsFileName(String loginJsFileName) {
+        this.loginJsFileName = loginJsFileName;
+    }
+
+    public Boolean getJsStatus() {
+        return jsStatus;
+    }
+
+    public void setJsStatus(Boolean jsStatus) {
+        this.jsStatus = jsStatus;
+    }
+
     /**
      *
      * @param username

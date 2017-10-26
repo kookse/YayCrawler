@@ -160,7 +160,9 @@ public class PageProcessorTest {
         List<String> paramList = new ArrayList<>();
         paramList.add(String.format("--pageUrl=%s",pageUrl));
         paramList.add(String.format("--deltaResolveAddress=%s",deltaResolveAddress));
-        String result = CasperjsProgramManager.launch("d:/tmp/js/login_qcc.js", paramList);
-        System.out.println(result);
+        for (int i = 0; i < 20; i++) {
+            String result = CasperjsProgramManager.launch("d:/tmp/js/login_qcc.js", paramList);
+            System.out.println(result);
+        }
     }
 }

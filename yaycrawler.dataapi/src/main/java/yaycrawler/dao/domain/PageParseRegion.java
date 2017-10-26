@@ -35,7 +35,7 @@ public class PageParseRegion implements Serializable {
     /**
      * 区域选择表达式
      */
-    @Column(name = "selectExpression",columnDefinition = "varchar(100)")
+    @Column(name = "selectExpression",columnDefinition = "varchar(5000)")
     private String selectExpression;
     @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "regionId", insertable = false, updatable = false)

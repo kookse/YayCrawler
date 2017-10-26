@@ -25,6 +25,14 @@ public class EngineResult implements Serializable{
     private List<Header> headers;
     private LoginParam loginParam;
     private String result;
+    private List<PhantomCookie> phantomCookies;
+    public List<PhantomCookie> getPhantomCookies() {
+        return phantomCookies;
+    }
+
+    public void setPhantomCookies(List<PhantomCookie> phantomCookies) {
+        this.phantomCookies = phantomCookies;
+    }
 
     public String getResult() {
         return result;

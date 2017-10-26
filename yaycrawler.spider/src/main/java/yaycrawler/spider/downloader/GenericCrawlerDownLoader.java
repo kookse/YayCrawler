@@ -222,71 +222,47 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
             String login = pageSite.getLoginEngine();
             String encrypt = pageSite.getEncryptEngine();
             int status = pageSite.getStatus();
-            String loginJudgeExpression = pageSite.getLoginJudgeExpression();
-            String captchaJudgeExpression = pageSite.getCaptchaJudgeExpression();
-            String loginJsFileName = pageSite.getLoginJsFileName();
-            String captchaJsFileName = pageSite.getCaptchaJsFileName();
             String param = pageSite.getLoginParam() != null ? pageSite.getLoginParam() : "";
-            String oldCookieId = String.valueOf(pageRequest.getExtra("cookieId"));
-            if (status == 0) {
-                if (StringUtils.isEmpty(encrypt))
-                    encrypt = "encryptEngine";
-                if (StringUtils.isEmpty(login))
-                    login = "loginEngine";
-                Engine loginEngine = (Engine) SpringContextUtil.getBean(login);
-                Engine encryptEngine = (Engine) SpringContextUtil.getBean(encrypt);
-                Map paramData = null;
-                if (StringUtils.isEmpty(param)) {
-                    paramData = Maps.newHashMap();
-                } else {
-                    paramData = JSON.parseObject(param, Map.class);
-                }
-                if (pageRequest.getExtras() != null && pageRequest.getExtras().size() > 0) {
-                    paramData.putAll(pageRequest.getExtras());
-                    paramData.remove("$pageInfo");
-                } else {
-                    paramData.put("loginName", RequestHelper.getParam(pageRequest.getUrl(), "loginName"));
-                    paramData.put("loginPassword", RequestHelper.getParam(pageRequest.getUrl(), "loginPassword"));
-                }
-                engineResult = encryptEngine.execute(paramData);
-                if (engineResult.getStatus() == null || !engineResult.getStatus())
-                    return engineResult;
-                LoginParam loginParam = engineResult.getLoginParam();
-                loginParam.setUrl(pageRequest.getUrl());
-                engineResult = loginEngine.execute(loginParam);
-                if (engineResult.getStatus()) {
-                    //需要登录了
-                    List<PhantomCookie> phantomCookies = new ArrayList<>();
-                    engineResult.getHeaders().forEach(header -> {
-                        PhantomCookie phantomCookie = new PhantomCookie(header.getName(), header.getValue());
-                        phantomCookies.add(phantomCookie);
-                    });
-                    String loginName = pageRequest.getExtra("loginName") != null ? pageRequest.getExtra("loginName").toString() : RequestHelper.getParam(pageRequest.getUrl(), "loginName");
-                    pageCookieService.deleteCookieBySiteId(pageSite.getId(), loginName);
-                    if (pageCookieService.saveCookies(UrlUtils.getDomain(pageUrl), pageSite.getId(), phantomCookies, loginName)) {
-                        logger.info("保存新的cookie成功！");
-                    } else
-                        logger.info("保存新的cookie失败！");
-                    //重新加入队列
-//                    page.addTargetRequest(pageRequest);
-                } else {
-                    logger.info("登陆失败{}", JSON.toJSONString(pageRequest));
-                }
+            Map paramData = null;
+            if (StringUtils.isEmpty(param)) {
+                paramData = Maps.newHashMap();
             } else {
-                    engineResult.setStatus(Boolean.TRUE);
-                    //需要登录了
-                    autoLoginProxy.login(pageUrl, loginJsFileName, page.getRawText(), oldCookieId);
-                    //重新加入队列
-                    page.addTargetRequest(pageRequest);
-//                    judgeContext = StringUtils.isNotBlank(captchaJsFileName) ? getPageRegionContext(page, pageRequest, captchaJudgeExpression) : null;
-//                    if (judgeContext != null && judgeContext.match()) {
-//                        engineResult.setStatus(Boolean.FALSE);
-//                        //需要刷新验证码了
-//                        captchaIdentificationProxy.recognition(pageUrl, captchaJsFileName, page.getRawText(), oldCookieId);
-//                    }
-//                }
+                paramData = JSON.parseObject(param, Map.class);
             }
-
+            if (pageRequest.getExtras() != null && pageRequest.getExtras().size() > 0) {
+                paramData.putAll(pageRequest.getExtras());
+                paramData.remove("$pageInfo");
+            } else {
+                paramData.put("loginName", RequestHelper.getParam(pageRequest.getUrl(), "loginName"));
+                paramData.put("loginPassword", RequestHelper.getParam(pageRequest.getUrl(), "loginPassword"));
+            }
+            if (StringUtils.isEmpty(encrypt))
+                encrypt = "encryptEngine";
+            if (StringUtils.isEmpty(login))
+                login = "loginEngine";
+            Engine loginEngine = (Engine) SpringContextUtil.getBean(login);
+            Engine encryptEngine = (Engine) SpringContextUtil.getBean(encrypt);
+            engineResult = encryptEngine.execute(paramData);
+            if (engineResult.getStatus() == null || !engineResult.getStatus())
+                return engineResult;
+            LoginParam loginParam = engineResult.getLoginParam();
+            loginParam.setUrl(pageRequest.getUrl());
+            loginParam.setJsStatus(status == 1);
+            engineResult = loginEngine.execute(loginParam);
+            if (engineResult.getStatus()) {
+                //需要登录了
+                List<PhantomCookie> phantomCookies = engineResult.getPhantomCookies();
+                String loginName = pageRequest.getExtra("loginName") != null ? pageRequest.getExtra("loginName").toString() : RequestHelper.getParam(pageRequest.getUrl(), "loginName");
+                pageCookieService.deleteCookieBySiteId(pageSite.getId(), loginName);
+                if (pageCookieService.saveCookies(UrlUtils.getDomain(pageUrl), pageSite.getId(), phantomCookies, loginName)) {
+                    logger.info("保存新的cookie成功！");
+                } else
+                    logger.info("保存新的cookie失败！");
+                //重新加入队列
+//                    page.addTargetRequest(pageRequest);
+            } else {
+                logger.info("登陆失败{}", JSON.toJSONString(pageRequest));
+            }
         }
         return engineResult;
     }

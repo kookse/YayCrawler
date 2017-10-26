@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.selector.*;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * @author bill
@@ -54,17 +56,17 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
     }
 
     public CrawlerSelectable format(String selector) {
-        return format(selector,"");
+        return format(selector, "");
     }
 
     public CrawlerSelectable format(String selector, String text) {
         List<String> datas = all();
         List<String> tmps = Lists.newArrayList();
-        if(datas.size() == 1 && StringUtils.isNotEmpty(text)) {
-            tmps.add(String.format(selector,text));
+        if (datas.size() == 1 && StringUtils.isNotEmpty(text)) {
+            tmps.add(String.format(selector, text));
         } else {
             datas.forEach(data -> {
-                tmps.add(String.format(selector,data));
+                tmps.add(String.format(selector, data));
             });
         }
         return new CrawlerSelectable(tmps);
@@ -81,8 +83,8 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
     public CrawlerSelectable split(String separator) {
         List<String> datas = all();
         List splitData = Lists.newArrayList();
-        datas.forEach(data ->{
-            splitData.addAll(Arrays.asList(StringUtils.split(data,separator)));
+        datas.forEach(data -> {
+            splitData.addAll(Arrays.asList(StringUtils.split(data, separator)));
         });
         return new CrawlerSelectable(splitData);
     }
@@ -101,11 +103,11 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
         if (end <= 0) {
             end += tmps.size();
         }
-        if(step == 0 && jump> 0) {
-            step = end/jump;
+        if (step == 0 && jump > 0) {
+            step = end / jump;
         }
-        if(jump == 0 && step > 0) {
-            jump = end/step;
+        if (jump == 0 && step > 0) {
+            jump = end / step;
         }
         for (int i = start; i < end / step; i++) {
             if (step == 1) {
@@ -127,21 +129,21 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
         return new CrawlerSelectable(datas);
     }
 
-    public CrawlerSelectable index (String indexs) {
+    public CrawlerSelectable index(String indexs) {
         List datas = all();
         if (datas.size() == 1) {
             datas = JSON.parseObject(get(), List.class);
         }
         List<String> indexData = Lists.newArrayList();
-        if(StringUtils.contains(indexs,"-")) {
-            String [] tmps = StringUtils.split(indexs,"-");
+        if (StringUtils.contains(indexs, "-")) {
+            String[] tmps = StringUtils.split(indexs, "-");
             int start = Integer.parseInt(tmps[0]);
-            int end = tmps.length > 1 ? Integer.parseInt(tmps[1]):datas.size();
+            int end = tmps.length > 1 ? Integer.parseInt(tmps[1]) : datas.size();
             for (int i = start; i < end; i++) {
                 indexData.add(String.valueOf(i));
             }
-        } else if(StringUtils.contains(indexs,",")){
-            indexData .addAll(Arrays.asList(StringUtils.split(indexs,",")));
+        } else if (StringUtils.contains(indexs, ",")) {
+            indexData.addAll(Arrays.asList(StringUtils.split(indexs, ",")));
         } else {
             indexData.add(indexs);
         }
@@ -153,6 +155,30 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
         return new CrawlerSelectable(resultData);
     }
 
+    public CrawlerSelectable request(String url,String selector, String text) {
+        List<String> datas = all();
+        List<String> tmps = Lists.newArrayList();
+        if (datas.size() == 1 && StringUtils.isNotEmpty(text)) {
+            url = url.replaceAll(selector + "=([^&|?.]*)", selector + "=" + text)
+                    .replaceAll(selector + "/([^&|?.]*)", selector + "/" + text);
+            tmps.add(url);
+        } else {
+            for(String data:datas) {
+                url = url.replaceAll(selector + "=([^&|?.]*)", selector + "=" + data)
+                        .replaceAll(selector + "/([^&|?.]*)", selector + "/" + data);
+                tmps.add(url);
+            }
+        }
+        return new CrawlerSelectable(tmps);
+    }
+
+    public CrawlerSelectable request(String url,String selector, int text) {
+        return request(url,selector, String.valueOf(text));
+    }
+
+    public CrawlerSelectable request(String url,String selector) {
+        return request(url,selector,"");
+    }
     public CrawlerSelectable index(int index) {
         return index(String.valueOf(index));
     }
@@ -161,20 +187,40 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
         return regexp(regex, String.valueOf(result));
     }
 
+    public CrawlerSelectable regexp(String regex, List results) {
+        RegexSelector regexSelector = Selectors.regex(String.valueOf(regex));
+        List<String> datas = all();
+        List<String> tmps = Lists.newArrayList();
+        for (int i = 0; i < datas.size(); i++) {
+            String tmp = regexSelector.select(datas.get(i));
+            if(tmp == null) {
+                tmps.add(String.valueOf(results.get(i)));
+            } else {
+                tmps.add(tmp);
+            }
+        }
+        return new CrawlerSelectable(tmps);
+    }
+
     public CrawlerSelectable regexp(String regex, String result) {
         RegexSelector regexSelector = Selectors.regex(String.valueOf(regex));
-        String data = regexSelector.select(get());
-        if (StringUtils.isEmpty(data)) {
-            return new CrawlerSelectable(result);
-        } else {
-            return new CrawlerSelectable(data);
-        }
+        List<String> datas = all();
+        List<String> tmps = Lists.newArrayList();
+        datas.forEach(data ->{
+            String tmp = regexSelector.select(data);
+            if(tmp == null) {
+                tmps.add(result);
+            } else {
+                tmps.add(tmp);
+            }
+        });
+        return new CrawlerSelectable(tmps);
     }
 
     public CrawlerSelectable trim() {
         List<String> datas = all();
         List<String> tmps = Lists.newArrayList();
-        if(datas.size() == 1) {
+        if (datas.size() == 1) {
             tmps.add(StringUtils.trim(datas.get(0)));
         } else {
             datas.forEach(data -> {
@@ -275,7 +321,7 @@ public class CrawlerSelectable<T> extends AbstractSelectable {
     }
 
     public CrawlerSelectable replace(int regex, int replacement) {
-        return  replace(String.valueOf(regex), String.valueOf(replacement));
+        return replace(String.valueOf(regex), String.valueOf(replacement));
     }
 
     public CrawlerSelectable replace(String regex, int replacement) {

@@ -133,6 +133,8 @@ public class EncryptEngine implements Engine<Map<String, Object>> {
 //                        info.put("$Cookie", loginParam.getCookie());
                     } else if (name.equalsIgnoreCase("$content")) {
                         loginParam.setContent(finalContent);
+                    } else if (name.equalsIgnoreCase("$loginJsFileName")) {
+                        loginParam.setLoginJsFileName(jsPath + "/" + String.valueOf(value));
                     } else
                         newParam.put(StringUtils.substringAfter(name, "$"), encrypt(String.valueOf(value), info));
                 } else if (StringUtils.startsWith(name, "#")) {
@@ -151,6 +153,8 @@ public class EncryptEngine implements Engine<Map<String, Object>> {
             loginParam.setCookie(cookie);
             loginParam.setNewParams(newParam);
             loginParam.setLoginUrl(loginUrl);
+            loginParam.setUsername(String.valueOf(newParam.get("loginName")));
+            loginParam.setPassword(String.valueOf(newParam.get("loginPassword")));
             engineResult.setStatus(Boolean.TRUE);
             engineResult.setLoginParam(loginParam);
         } catch (Exception e) {

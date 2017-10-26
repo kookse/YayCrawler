@@ -54,7 +54,7 @@ public class GeetestCaptchaIdentification {
         int totalCount = 20;
         int successCount = 0;
         int retryCount = 0;
-//        String pageUrl = "http://www.qichacha.com/search_index?index=0&p=1&key=%E5%BD%A6%E4%B8%9C%E5%A1%91%E8%83%B6%E5%85%AC%E5%8F%B8";
+//        String pageUrl = "http://www.qichacha.com/company_getinfos?unique=9cce0780ab7644008b73bc2120479d31&companyname=%E5%B0%8F%E7%B1%B3%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E8%B4%A3%E4%BB%BB%E5%85%AC%E5%8F%B8&tab=susong";
         String pageUrl = "http://www.gsxt.gov.cn/corp-query-homepage.html";
         String deltaResolveAddress = "http://localhost:8086/worker/resolveGeetestSlicePosition";
         StopWatch stopWatch = new StopWatch();
