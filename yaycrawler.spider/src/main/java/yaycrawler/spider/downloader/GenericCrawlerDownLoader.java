@@ -66,11 +66,13 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
     private DynamicCookieManager dynamicCookieManager;
     @Autowired
     private PageSiteService pageSiteService;
-    @Autowired
-    private AutoLoginProxy autoLoginProxy;
 
-    @Autowired
-    private CaptchaIdentificationProxy captchaIdentificationProxy;
+    @Value("${yaycrawler.api.js.path:d:/tmp/js}")
+    private String jsPath;
+    @Value("${resolver.worker.address:http://localhost:8086/worker/resolveGeetestSlicePosition}")
+    private String resolverAddress;
+    @Value("${phantom.output.encoding:gbk}")
+    private String phantomOutputEncoding;
 
     //    @Autowired
 //    private GenericPageProcessor genericPageProcessor;
@@ -93,13 +95,26 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
         Page page = Page.fail();
         PageInfo pageInfo = pageParserRuleService.findOnePageInfoByRgx(request.getUrl());
         boolean doRecovery = false;
-        EngineResult engineResult = null;
+        EngineResult engineResult;
         if (pageInfo == null && request.getExtra("$pageInfo") != null) {
             pageInfo = (PageInfo) request.getExtra("$pageInfo");
         }
         Site site = task.getSite();
+        PageSite pageSite = pageSiteService.getPageSiteByUrl(request.getUrl());
+        String param = "";
+        if(pageSite!= null)
+            param = pageSite.getLoginParam() != null ? pageSite.getLoginParam() : "";
+        Map paramData = null;
+        if (StringUtils.isEmpty(param)) {
+            paramData = Maps.newHashMap();
+        } else {
+            paramData = JSON.parseObject(param, Map.class);
+        }
+        paramData.put("resolverAddress",resolverAddress);
+        String downloadJsFilename = paramData.get("$downloadJsFileName") != null ?paramData.get("$downloadJsFileName").toString():"casperjsDownload.js";
         while (i < 5 && !pageValidated(page, pageInfo.getPageValidationRule())) {
             try {
+                engineResult = null;
                 boolean isJsRendering = pageInfo != null && "1".equals(pageInfo.getIsJsRendering());
                 String pageUrl = request.getUrl();
                 String loginName = request.getExtra("loginName") != null ? request.getExtra("loginName").toString() : RequestHelper.getParam(request.getUrl(), "loginName");
@@ -146,15 +161,16 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
                     }
                 }
 //            request = RequestHelper.createRequest(request.getUrl(),request.getMethod(),request.getExtras());
-                page = !isJsRendering ? httpClientDownloader.download(request, task, cookie) : mockDonwnloader.download(request, task, cookie);
+                page = !isJsRendering ? httpClientDownloader.download(request, task, cookie) : mockDonwnloader.download(request, task, jsPath + "/" + downloadJsFilename,phantomOutputEncoding,paramData,cookie);
                 String content = page.getRawText();
                 if(StringUtils.isEmpty(content))
                     continue;
                 Pattern pattern = Pattern.compile(regexParam);
                 Matcher matcher = pattern.matcher(content);
 
-                if (!isJsRendering && (!"post".equalsIgnoreCase(request.getMethod()) && page != null) && page.getRawText() != null && matcher.find())
-                    page = mockDonwnloader.download(request, task, cookie);
+                if (!isJsRendering && (!"post".equalsIgnoreCase(request.getMethod()) && page != null) && page.getRawText() != null && matcher.find()) {
+                    page = mockDonwnloader.download(request, task, jsPath + "/" + downloadJsFilename,phantomOutputEncoding,paramData,cookie);
+                }
                 if(page == null || page.getRawText() == null) {
                     String url;
                     for (int j = 1; j <= matcher.groupCount(); j++) {
@@ -201,8 +217,8 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
         Request request = page.getRequest();
         Selectable context = getPageRegionContext(page, request, pageValidationExpression);
         if (context == null) return false;
-        if (context instanceof Selectable)
-            return ((Selectable) context).match();
+        if (context instanceof Selectable && context.get() == null)
+            return context.match();
         else
             return StringUtils.isNotEmpty(String.valueOf(context));
 

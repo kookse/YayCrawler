@@ -170,7 +170,7 @@ public class ConfigSpiderService {
                 return finalSite == null ? ConfigSpiderService.this.getSite(request.getUrl()) : finalSite;
             }
         });
-        if (page != null) {
+        if (page != null && StringUtils.isNotEmpty(page.getRawText())) {
             Map<String, Object> m = new HashMap<>();
             m.put("inputTime", System.currentTimeMillis());
             m.put("page", page);

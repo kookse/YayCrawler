@@ -1,4 +1,4 @@
-package yaycrawler.api.thread;
+package yaycrawler.common.thread;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

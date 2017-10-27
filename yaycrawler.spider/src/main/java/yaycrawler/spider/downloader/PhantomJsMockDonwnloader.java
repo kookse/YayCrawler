@@ -1,6 +1,7 @@
 package yaycrawler.spider.downloader;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Created by ucs_yuananyun on 2016/5/27.
@@ -25,27 +28,18 @@ public class PhantomJsMockDonwnloader extends AbstractDownloader {
 
     private static final Logger logger  = LoggerFactory.getLogger(PhantomJsMockDonwnloader.class);
 
-    public Page download(Request request, Task task, String cookie) {
+    private static Pattern UNICODE_PATTERN = Pattern.compile("\\\\u([0-9a-fA-F]{4})");
+
+    public Page download(Request request, Task task,String casperjsDownloadName,String charset,Map paramData,String cookie) {
         Site site = null;
         if (task != null) {
             site = task.getSite();
         }
         Set<Integer> acceptStatCode;
-//        String charset = "utf-8";
-//        Map<String, String> headers = null;
         String domain = "";
-        String userAgent = "";
-        boolean isUserGzip = true;
-        int retryTimes = 3;
-        String charset = "utf-8";
         if (site != null) {
             acceptStatCode = site.getAcceptStatCode();
             domain = String.valueOf(site.getDomain());
-            userAgent = site.getUserAgent();
-            isUserGzip = site.isUseGzip();
-            retryTimes = site.getRetryTimes();
-            charset = site.getCharset();
-//            headers = site.getHeaders();
         } else {
             acceptStatCode = Sets.newHashSet(200, 500);
         }
@@ -56,25 +50,30 @@ public class PhantomJsMockDonwnloader extends AbstractDownloader {
         try {
 
             List<String> paramList = new ArrayList<>();
-            paramList.add(request.getUrl());
-            paramList.add(URLEncoder.encode(userAgent.replaceAll(" ", "%20"), "utf-8"));
-            paramList.add(domain);
-            paramList.add(String.valueOf(isUserGzip));
-            paramList.add(String.valueOf(retryTimes));
+            paramList.add(String.format("--%s=%s", "pageUrl", request.getUrl()));
+            paramList.add(String.format("--%s=%s", "domain", domain));
             cookie = cookie != null ? URLEncoder.encode(cookie.replaceAll(" ", "%20"), "utf-8") : "";
-            paramList.add(cookie);
-
-            result = CasperjsProgramManager.launch("casperjsDownload.js", charset, paramList);
+            paramList.add(String.format("--%s=%s", "cookies", cookie));
+            paramData.forEach((name,value)->{
+                paramList.add(String.format("--%s=%s", name, value));
+            });
+            StringBuffer buffer = new StringBuffer();
+            request.getExtras().forEach((name,value)->{
+                if(!StringUtils.equalsIgnoreCase(name,"$pageInfo"))
+                    buffer.append(String.format("%s=%s;",name,value));
+            });
+            paramList.add(String.format("--%s=%s","searchParam",buffer.toString()));
+            result = CasperjsProgramManager.launch(casperjsDownloadName, "gbk", paramList);
 
             statusCode = Integer.parseInt(StringUtils.substringBefore(result, "\r\n").trim());
 //            request.putExtra(Request.STATUS_CODE, statusCode);
             if (statusAccept(acceptStatCode, statusCode)) {
-                Page page = handleResponse(request, result);
+                Page page = handleResponse(request, result,charset);
                 onSuccess(request);
                 return page;
             } else {
                 logger.warn("code error {}\t,{}", statusCode, request.getUrl());
-                return null;
+                return Page.fail();
             }
         } catch (Exception e) {
             logger.warn("download page {} error {} msg {}", request.getUrl(), e, result);
@@ -82,7 +81,7 @@ public class PhantomJsMockDonwnloader extends AbstractDownloader {
 //                return addToCycleRetry(request, site);
             }
             onError(request);
-            return null;
+            return Page.fail();
         } finally {
 //            request.putExtra(Request.STATUS_CODE, statusCode);
         }
@@ -92,18 +91,26 @@ public class PhantomJsMockDonwnloader extends AbstractDownloader {
         return acceptStatCode.contains(statusCode);
     }
 
-    protected Page handleResponse(Request request, String content) throws IOException {
+    protected Page handleResponse(Request request, String content,String charset) throws IOException {
         Page page = new Page();
-        page.setRawText(content);
+        byte[] bytes = content.getBytes(charset);
+        page.setBytes(bytes);
+        if (!request.isBinaryContent()) {
+            page.setCharset(charset);
+            content = new String(bytes, charset);
+            //unicode编码处理
+            if (UNICODE_PATTERN.matcher(content).find())
+                content = StringEscapeUtils.unescapeJava(content.replace("\"", "\\\""));
+            page.setRawText(content);
+        }
         page.setUrl(new PlainText(request.getUrl()));
         page.setRequest(request);
-        page.setStatusCode(200);
         return page;
     }
 
     @Override
     public Page download(Request request, Task task) {
-        return download(request, task, null);
+        return download(request, task, "casperjsDownload.js","gbk",null,null);
     }
 
     @Override

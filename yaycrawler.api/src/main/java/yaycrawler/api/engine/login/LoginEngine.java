@@ -41,12 +41,8 @@ public class LoginEngine implements Engine<LoginParam> {
     @Value("${login.engine.validate:self.location =  \"(.*)\"}")
     private String regexParam;
 
-    @Value("${server.address}")
-    private String serverIP;
-    @Value("${server.port}")
-    private String serverPort;
-    @Value("${server.context-path}")
-    private String serverContextPath;
+    @Value("${resolver.worker.address:http://localhost:8086/worker/resolveGeetestSlicePosition}")
+    private String resolverAddress;
 
     @Override
     public EngineResult execute(LoginParam info) {
@@ -80,7 +76,6 @@ public class LoginEngine implements Engine<LoginParam> {
                     if (StringUtils.isBlank(userName)) return null;
                     if (StringUtils.isBlank(password)) return null;
 
-                    String resolverAddress = String.format("http://%s:%s%s/%s", serverIP, serverPort, serverContextPath, "resolveGeetestSlicePosition");
                     String result = null;
                     List<String> paramList = new ArrayList<>();
                     loginParam.getNewParams().forEach((name, value) -> {
@@ -173,10 +168,17 @@ public class LoginEngine implements Engine<LoginParam> {
         } else {
             try {
                 HttpResponse response = httpUtil.doGet(loginParam.getUrl(), null, headerList);
+                List<PhantomCookie> phantomCookies = engineResult.getPhantomCookies();
+                Header[] headers = response.getHeaders("Set-Cookie");
+                for (Header header : headers) {
+                    PhantomCookie phantomCookie = new PhantomCookie(header.getName(), header.getValue());
+                    phantomCookies.add(phantomCookie);
+                    headerList.add(new BasicHeader("Cookie", header.getValue()));
+                }
                 String content = EntityUtils.toString(response.getEntity());
                 pattern = Pattern.compile(regexParam);
                 matcher = pattern.matcher(content);
-                String url = "";
+                String url;
                 while (matcher.find()) {
                     for (int j = 1; j <= matcher.groupCount(); j++) {
                         url = matcher.group(j);
@@ -184,11 +186,19 @@ public class LoginEngine implements Engine<LoginParam> {
                             if (!StringUtils.startsWithAny(url, "http", "https"))
                                 url = StringUtils.substringBeforeLast(loginParam.getUrl(), "/") + "/" + url;
                             response = httpUtil.doGet(url, null, headerList);
+                            headers = response.getHeaders("Set-Cookie");
+                            for (Header header : headers) {
+                                PhantomCookie phantomCookie = new PhantomCookie(header.getName(), header.getValue());
+                                phantomCookies.add(phantomCookie);
+                                headerList.add(new BasicHeader("Cookie", header.getValue()));
+                            }
                             content = EntityUtils.toString(response.getEntity());
                             break;
                         }
                     }
+                    matcher = pattern.matcher(content);
                 }
+                engineResult.setPhantomCookies(phantomCookies);
                 engineResult.setResult(content);
             } catch (Exception e) {
                 logger.error("pageUrl {} Exception {}", loginUrl, e);

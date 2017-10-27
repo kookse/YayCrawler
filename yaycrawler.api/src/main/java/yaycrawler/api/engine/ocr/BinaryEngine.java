@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import yaycrawler.api.engine.Engine;
-import yaycrawler.api.thread.DynamicThreadPoolExecutorMaintainer;
 import yaycrawler.common.model.BinaryDto;
 import yaycrawler.common.model.EngineResult;
+import yaycrawler.common.thread.DynamicThreadPoolExecutorMaintainer;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

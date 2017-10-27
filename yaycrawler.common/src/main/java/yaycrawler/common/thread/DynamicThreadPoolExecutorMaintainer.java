@@ -1,4 +1,4 @@
-package yaycrawler.api.thread;
+package yaycrawler.common.thread;
 
 import yaycrawler.common.model.SystemConsts;
 
