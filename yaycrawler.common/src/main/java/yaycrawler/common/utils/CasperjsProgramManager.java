@@ -70,6 +70,7 @@ public class CasperjsProgramManager {
             //启动两个线程，一个线程负责读标准输出流，另一个负责读标准错误流
             StringBuffer finalSbf = sbf;
             String finalPageCharset = pageCharset;
+            processBuilder.redirectErrorStream(true);
             CASPERJS_EXECUTOR_POOL.execute(()->{
                 BufferedReader br1 = null;
                 try {
@@ -91,24 +92,24 @@ public class CasperjsProgramManager {
                     }
                 }
             });
-            CASPERJS_EXECUTOR_POOL.execute(()->{
-                BufferedReader br2 = new  BufferedReader(new  InputStreamReader(is2));
-                try {
-                    String line2 = null ;
-                    while ((line2 = br2.readLine()) !=  null ) {
-                        if (line2 != null){}
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                finally{
-                    try {
-                        is2.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+//            CASPERJS_EXECUTOR_POOL.execute(()->{
+//                BufferedReader br2 = new  BufferedReader(new  InputStreamReader(is2));
+//                try {
+//                    String line2 = null ;
+//                    while ((line2 = br2.readLine()) !=  null ) {
+//                        if (line2 != null){}
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                finally{
+//                    try {
+//                        is2.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            });
             process.waitFor();
             process.destroy();
             return sbf.toString();

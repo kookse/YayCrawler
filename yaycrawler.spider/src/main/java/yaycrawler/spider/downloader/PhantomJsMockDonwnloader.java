@@ -93,6 +93,7 @@ public class PhantomJsMockDonwnloader extends AbstractDownloader {
 
     protected Page handleResponse(Request request, String content,String charset) throws IOException {
         Page page = new Page();
+        content = StringUtils.substringBetween(content,"$PageStart","$PageEnd");
         byte[] bytes = content.getBytes(charset);
         page.setBytes(bytes);
         if (!request.isBinaryContent()) {

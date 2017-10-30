@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
-import us.codecraft.webmagic.scheduler.PriorityScheduler;
-import yaycrawler.api.thread.DynamicThreadPoolExecutorMaintainer;
+
 import yaycrawler.common.model.CrawlerRequest;
+import yaycrawler.common.thread.DynamicThreadPoolExecutorMaintainer;
 import yaycrawler.dao.service.PageParserRuleService;
 import yaycrawler.spider.crawler.YaySpider;
 import yaycrawler.spider.downloader.GenericCrawlerDownLoader;
@@ -21,7 +21,6 @@ import yaycrawler.spider.pipeline.GenericPipeline;
 import yaycrawler.spider.processor.GenericPageProcessor;
 import yaycrawler.spider.scheduler.CrawlerQueueScheduler;
 import yaycrawler.spider.service.PageSiteService;
-import yaycrawler.spider.utils.RequestHelper;
 import yaycrawler.worker.listener.TaskDownloadFailureListener;
 
 import java.util.HashMap;
