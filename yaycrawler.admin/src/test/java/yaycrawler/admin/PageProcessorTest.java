@@ -165,4 +165,17 @@ public class PageProcessorTest {
             System.out.println(result);
         }
     }
+
+    @Test
+    public void testXicidaili() throws Exception {
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        List<Header> headerList = Lists.newArrayList();
+        headerList.add(new BasicHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"));
+        HttpResponse response = httpUtil.doGet("http://api.xicidaili.com/free2016.txt",null, headerList);
+        Header[] headers = response.getHeaders("Set-Cookie");
+        for (Header header : headers) {
+            headerList.add(new BasicHeader("Cookie",header.getValue()));
+        }
+        System.out.println(EntityUtils.toString(response.getEntity()));
+    }
 }

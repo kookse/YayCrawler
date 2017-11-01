@@ -98,6 +98,7 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
         EngineResult engineResult;
         if (pageInfo == null && request.getExtra("$pageInfo") != null) {
             pageInfo = (PageInfo) request.getExtra("$pageInfo");
+            request.getExtras().remove("$pageInfo");
         }
         Site site = task.getSite();
         PageSite pageSite = pageSiteService.getPageSiteByUrl(request.getUrl());
@@ -191,9 +192,8 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
             }
         }
 
-        if (page != null && page.getRawText() == null)
+        if (page != null && page.getRawText() == null || i >=5)
             return null;
-
         return page;
     }
 

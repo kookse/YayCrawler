@@ -153,11 +153,12 @@ public class ConfigSpiderService {
             Long inputTime = MapUtils.getLong(m, "inputTime");
             Page page = (Page) MapUtils.getObject(m, "page");
             long leftTime = System.currentTimeMillis() - inputTime;
-            if (leftTime > 86400000L) {
+            if (leftTime > 5400000L) {
                 pageMap.remove(request.getUrl());
+            } else {
+                pageMap.remove(m);
+                return page;
             }
-            pageMap.remove(m);
-            return page;
         }
         Page page = downloader.download(request, new Task() {
             @Override
