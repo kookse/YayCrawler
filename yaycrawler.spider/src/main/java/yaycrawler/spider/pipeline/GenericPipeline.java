@@ -71,7 +71,8 @@ public class GenericPipeline implements Pipeline {
                     if (persistentService != null) {
                         logger.debug("开始持久化{}到{}", groupedDataEntry.getKey(), persistentService.toString());
                         Map dataMap = groupedDataEntry.getValue();
-                        dataMap.put("loginParams",request.getExtras());
+                        if(request.getExtras() != null && request.getExtras().size() > 0)
+                            dataMap.put("loginParams",request.getExtras());
                         if (!persistentService.saveCrawlerResult(pageUrl, dataMap))
                             logger.error("可能持久化{}到{}失败！", groupedDataEntry.getKey(), persistentService.toString());
 //                        else if(rockeMQStatus) {
@@ -80,7 +81,7 @@ public class GenericPipeline implements Pipeline {
 //                        }
                     }
                 } catch (Exception ex) {
-                    logger.error(ex.getMessage());
+                    logger.error("{}",ex);
                 }
             }
         } catch (Exception ex) {

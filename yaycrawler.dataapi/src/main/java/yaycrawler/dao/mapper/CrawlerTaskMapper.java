@@ -200,7 +200,15 @@ public interface CrawlerTaskMapper {
             " and status = #{batchStatus}</script>")
     Integer updateCrawlerTaskByStatus(@Param("status") Integer status, @Param("msg") String msg, @Param("batchStatus") Integer batchStatus, @Param("ids") List<?> ids);
 
-    @Update("update crawler_task set status=#{status},worker_id=#{workId},message=#{msg} where code=#{code}")
+    @Update("<script>" +
+            "update crawler_task " +
+            "<set>" +
+            "status=#{status},worker_id=#{workId},message=#{msg}," +
+            "   <if test=\"status == 2\"> started_time = now(),</if>" +
+            "   <if test=\"status == 5\"> completed_time = now(),</if>" +
+            "</set>" +
+            "where code=#{code}" +
+            "</script>")
     int updateCrawlerTaskStatus(@Param("code") String code, @Param("workId") String workId, @Param("status") int status, @Param("msg") String msg);
 
     @Update("update crawler_task set status=#{status} where order_id = #{orderId}")

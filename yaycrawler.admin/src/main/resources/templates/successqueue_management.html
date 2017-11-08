@@ -26,7 +26,8 @@
                     </h4>
                 </div>
                 <div class="modal-body">
-                    <textarea id="ta_result" style="width: 100%;" rows="20"></textarea>
+                    <pre id="ta_result" style="max-height: 340px;overflow-y: scroll;"></pre>
+                    <!--<textarea id="ta_result" style="width: 100%;" rows="20"></textarea>-->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default"
@@ -82,15 +83,20 @@
                                 field: 'startTime',
                                 title: '任务完成时间',
                                 formatter: function (value, row, index) {
+                                    if(!row.extendMap.startTime) return "未知";
                                     var timestamp = row.extendMap.startTime;
-                                    var d = new Date(timestamp);    //根据时间戳生成的时间对象
-                                    var date = (d.getFullYear()) + "-" +
-                                        (d.getMonth() + 1) + "-" +
-                                        (d.getDate()) + " " +
-                                        (d.getHours()) + ":" +
-                                        (d.getMinutes()) + ":" +
-                                        (d.getSeconds());
-                                    return date;
+                                    if(timestamp instanceof Date) {
+                                        return timestamp;
+                                    } else {
+                                        var d = new Date(timestamp);    //根据时间戳生成的时间对象
+                                        var date = (d.getFullYear()) + "-" +
+                                            (d.getMonth() + 1) + "-" +
+                                            (d.getDate()) + " " +
+                                            (d.getHours()) + ":" +
+                                            (d.getMinutes()) + ":" +
+                                            (d.getSeconds());
+                                        return date;
+                                    }
                                 }
                             },
                             {
@@ -122,7 +128,7 @@
                                                 if (resultReq != null && resultReq.crawlerRequestList.length > 0) {
                                                     result.crawlerRequestList = resultReq.crawlerRequestList;
                                                 }
-                                                $("#ta_result").val(JSON.stringify(result, null, "\t"));
+                                                $("#ta_result").html(JSON.stringify(result, null, "\t"));
                                             },
                                             error: function (msg) {
                                                 debugger
@@ -130,9 +136,9 @@
                                                 var resultReq = JSON.parse(row.extendMap.extraInfo);
                                                 if (resultReq != null && resultReq.crawlerRequestList.length > 0) {
                                                     result.crawlerRequestList = resultReq.crawlerRequestList;
-                                                    $("#ta_result").val(JSON.stringify(result, null, "\t"));
+                                                    $("#ta_result").html(JSON.stringify(result, null, "\t"));
                                                 } else {
-                                                    $("#ta_result").val("查询出现异常！");
+                                                    $("#ta_result").html("查询出现异常！");
                                                 }
 //                                                    var resultReq = row.extendMap.result;
 //                                                    if (resultReq.crawlerRequestList.length > 0) {

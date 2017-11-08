@@ -44,7 +44,6 @@ public class CrawlerTask {
      * 请求的数据（JSON字符串）
      */
     @Column(name = "data",columnDefinition="text")
-    @Type(type = "JsonDataUserType")
     private String data;
 
     /**
@@ -80,7 +79,7 @@ public class CrawlerTask {
     /**
      * 任务的执行信息
      */
-    @Column(columnDefinition = "varchar(200)")
+    @Column(columnDefinition = "text")
     private String message;
 
 

@@ -332,7 +332,11 @@ public class RedisCrawlerQueueService extends AbstractICrawlerQueueService {
         for (DefaultTypedTuple detail : taskCodeList) {
             String data = redisTemplate.opsForHash().get(getTaskInfoHashIdentification(),detail.getValue()).toString();
             CrawlerRequest crawlerRequest = JSON.parseObject(data, CrawlerRequest.class);
-            crawlerRequest.setExtendMap(ImmutableMap.of("$keyword",detail));
+            Map<String,Object> extendMap = crawlerRequest.getExtendMap();
+            extendMap.put("startTime", detail.getScore().longValue());
+            extendMap.put("extraInfo", null);
+            extendMap.put("$keyword",detail);
+            crawlerRequest.setExtendMap(extendMap);
             taskList.add(crawlerRequest);
         }
         return taskList;

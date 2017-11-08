@@ -1,16 +1,10 @@
-package yaycrawler.worker.service;
+package yaycrawler.spider.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.common.model.CrawlerRequest;
-import yaycrawler.common.utils.FtpClientUtils;
-import yaycrawler.common.utils.HttpUtil;
-import yaycrawler.common.utils.HttpUtils;
 import yaycrawler.spider.persistent.IResultPersistentService;
 import yaycrawler.spider.persistent.PersistentDataType;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,6 +100,11 @@ public class ImagePersistentService implements IResultPersistentService {
     @Override
     public String getSupportedDataType() {
         return PersistentDataType.IMAGE;
+    }
+
+    @Override
+    public Object getCrawlerResult(String collectionName, String taskId) {
+        return null;
     }
 
 }

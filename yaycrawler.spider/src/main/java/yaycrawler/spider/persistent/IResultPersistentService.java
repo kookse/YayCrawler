@@ -24,4 +24,5 @@ public interface IResultPersistentService {
      */
     String getSupportedDataType();
 
+    Object getCrawlerResult(String collectionName,String taskId);
 }

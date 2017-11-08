@@ -1,4 +1,4 @@
-package yaycrawler.worker.service;
+package yaycrawler.spider.service;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -10,6 +10,7 @@ import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.spider.persistent.IResultPersistentService;
 import yaycrawler.spider.persistent.PersistentDataType;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -42,5 +43,10 @@ public class MongDBPersistentService implements IResultPersistentService {
     @Override
     public String getSupportedDataType() {
         return PersistentDataType.MONGDB;
+    }
+
+    @Override
+    public Object getCrawlerResult(String collectionName, String taskId) {
+        return mongoTemplate.findById(taskId, LinkedHashMap.class, collectionName);
     }
 }

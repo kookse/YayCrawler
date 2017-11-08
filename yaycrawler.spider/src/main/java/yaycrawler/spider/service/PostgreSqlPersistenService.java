@@ -1,4 +1,4 @@
-package yaycrawler.worker.service;
+package yaycrawler.spider.service;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -27,8 +27,10 @@ public class PostgreSqlPersistenService implements IResultPersistentService {
         String paramJson = JSON.toJSONString(regionDataMap);
         crawlerData.setData(paramJson);
         crawlerData.setPageUrl(pageUrl);
-        Object orderId = ((Map)regionDataMap.get("loginParams")).get("orderId");
-        crawlerData.setOrderId(orderId!=null?orderId.toString():null);
+        crawlerData.setOrderId(_id);
+        Map loginParams = (Map) regionDataMap.get("loginParams");
+        if(loginParams != null)
+            crawlerData.setOrderId(loginParams.get("orderId") !=null ?loginParams.get("orderId").toString():null);
         crawlerDataRepository.save(crawlerData);
         return true;
     }
@@ -36,5 +38,15 @@ public class PostgreSqlPersistenService implements IResultPersistentService {
     @Override
     public String getSupportedDataType() {
         return PersistentDataType.POSTGRESQL;
+    }
+
+    @Override
+    public Object getCrawlerResult(String collectionName, String taskId) {
+        CrawlerData crawlerData = crawlerDataRepository.findByCode(taskId);
+        if(crawlerData == null)
+            return null;
+        else {
+            return crawlerData.getData();
+        }
     }
 }

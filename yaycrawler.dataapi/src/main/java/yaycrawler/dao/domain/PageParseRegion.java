@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +48,8 @@ public class PageParseRegion implements Serializable {
     private Set<UrlParseRule> urlParseRules;
 
     @Column(name = "createdDate",columnDefinition = "timestamp default (now())")
-    private Date createdDate = new Date();
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate = Calendar.getInstance().getTime();
 
     public PageParseRegion() {
         fieldParseRules =new HashSet<>();
@@ -103,8 +105,6 @@ public class PageParseRegion implements Serializable {
         this.urlParseRules = urlParseRules;
     }
 
-    @DateTimeFormat(pattern="yyyy-MM-dd")
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getCreatedDate() {
         return createdDate;
     }

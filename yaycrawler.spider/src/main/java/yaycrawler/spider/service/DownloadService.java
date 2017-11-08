@@ -1,4 +1,4 @@
-package yaycrawler.worker.service;
+package yaycrawler.spider.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Request;
 import yaycrawler.common.model.CrawlerRequest;
@@ -28,23 +29,23 @@ import java.util.concurrent.Executors;
 /**
  * Created by bill on 2017/5/5.
  */
-@Service
+@Component
 public class DownloadService {
 
     private static final Logger logger  = LoggerFactory.getLogger(DownloadService.class);
 
     private ExecutorService executorService;
 
-    @Value("${ftp.server.url}")
+    @Value("${ftp.server.url:127.0.0.1}")
     private String url;
-    @Value("${ftp.server.port}")
+    @Value("${ftp.server.port:2121}")
     private int port;
-    @Value("${ftp.server.username}")
+    @Value("${ftp.server.username:admin}")
     private String username;
-    @Value("${ftp.server.password}")
+    @Value("${ftp.server.password:admin}")
     private String password;
 
-    @Value("${ftp.server.path}")
+    @Value("${ftp.server.path:d/tmp}")
     private String ftpPath;
 
     private FTPUtils ftpUtil;

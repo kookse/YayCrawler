@@ -1,33 +1,23 @@
-package yaycrawler.worker.service;
+package yaycrawler.spider.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.utils.FTPUtils;
-import yaycrawler.common.utils.FtpClientUtils;
-import yaycrawler.common.utils.FtpUtil;
-import yaycrawler.common.utils.HttpUtil;
 import yaycrawler.spider.listener.IPageParseListener;
 import yaycrawler.spider.persistent.IResultPersistentService;
 import yaycrawler.spider.persistent.PersistentDataType;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -141,6 +131,11 @@ public class DocumentPersistentService implements IResultPersistentService {
     @Override
     public String getSupportedDataType() {
         return PersistentDataType.DOCMUENT;
+    }
+
+    @Override
+    public Object getCrawlerResult(String collectionName, String taskId) {
+        return null;
     }
 
 }
