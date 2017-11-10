@@ -20,16 +20,16 @@ import java.util.List;
 public interface CrawlerDataMapper {
 
     @Select("SELECT data1.order_id FROM " +
-            "( SELECT order_id, COUNT (1) FROM crawler_task GROUP BY order_id ) AS data1," +
-            " ( SELECT order_id, COUNT (1) FROM crawler_task WHERE status = #{status} GROUP BY order_id ) AS data2 " +
+            "( SELECT order_id, COUNT (1) FROM crawler_task where order_id != null GROUP BY order_id ) AS data1," +
+            " ( SELECT order_id, COUNT (1) FROM crawler_task WHERE status = #{status} and order_id != null GROUP BY order_id ) AS data2 " +
             "where data1.order_id = data2.order_id and data1.count = data2.count")
-    public List<String> getOrderIds(@Param("status") Integer status);
+    List<String> getOrderIds(@Param("status") Integer status);
 
     @Select("select id as id,code as code," +
             "created_time as createdTime,data as data," +
             "page_url as pageUrl," +
             "order_id as orderId from crawler_data where order_id = #{orderId}")
-    public List<CrawlerData> findByOrderId(@Param("orderId") String orderId);
+    List<CrawlerData> findByOrderId(@Param("orderId") String orderId);
 
 
 }

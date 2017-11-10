@@ -61,7 +61,7 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
             if (crawlerTask != null)
                 crawlerTaskMapper.deleteByCode(crawlerRequest.getHashCode());
             CrawlerTask task = CrawlerTask.convertFromCrawlerRequest(crawlerRequest);
-            task.setOrderId(crawlerRequest.getData().get("orderId") != null ?crawlerRequest.getData().get("orderId").toString():crawlerRequest.getHashCode());
+            task.setOrderId(crawlerRequest.getData().get("orderId") != null ?crawlerRequest.getData().get("orderId").toString():null);
             task.setStatus(CrawlerStatus.INIT.getStatus());
             task.setCreatedTime(new Date());
             crawlerTaskRepository.save(task);

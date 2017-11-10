@@ -44,7 +44,8 @@ public class RocketMQTask {
             List<CrawlerData> crawlerDataList = crawlerDataMapper.findByOrderId(orderId);
             Map regionDataMap = Maps.newHashMap();
             crawlerDataList.forEach(crawlerData -> {
-                regionDataMap.putAll(crawlerData.getData());
+                if(crawlerData.getData() != null)
+                    regionDataMap.putAll(crawlerData.getData());
             });
             Map<String,Object> data = new HashMap<>();
             regionDataMap.remove("_id");

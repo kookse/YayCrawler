@@ -27,7 +27,7 @@ public class PostgreSqlPersistenService implements IResultPersistentService {
         String paramJson = JSON.toJSONString(regionDataMap);
         crawlerData.setData(paramJson);
         crawlerData.setPageUrl(pageUrl);
-        crawlerData.setOrderId(_id);
+        //crawlerData.setOrderId(_id);
         Map loginParams = (Map) regionDataMap.get("loginParams");
         if(loginParams != null)
             crawlerData.setOrderId(loginParams.get("orderId") !=null ?loginParams.get("orderId").toString():null);
