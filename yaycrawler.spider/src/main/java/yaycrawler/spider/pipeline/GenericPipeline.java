@@ -67,6 +67,8 @@ public class GenericPipeline implements Pipeline {
                     IResultPersistentService persistentService = null;
                     if(StringUtils.equalsIgnoreCase(groupedDataEntry.getKey(),PersistentDataType.MAP)) {
                         persistentService = persistentServiceFactory.getPersistentServiceByDataType(resultPersistent.toLowerCase());
+                    } else {
+                        persistentService = persistentServiceFactory.getPersistentServiceByDataType(groupedDataEntry.getKey());
                     }
                     if (persistentService != null) {
                         logger.debug("开始持久化{}到{}", groupedDataEntry.getKey(), persistentService.toString());

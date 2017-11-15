@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Request;
+import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.utils.FTPUtils;
 import yaycrawler.common.utils.HttpUtil;
@@ -86,7 +87,7 @@ public class DownloadService {
                             if (!StringUtils.contains(documentName, ".")) {
                                 documentName = documentName + suffix;
                             }
-                            File document = new File(ftpPath + "/" + documentName);
+                            File document = new File(ftpPath + "/" + UrlUtils.getDomain(src) + "/" + documentName);
                             Files.createParentDirs(document);
                             Files.write(bytes, document);
 

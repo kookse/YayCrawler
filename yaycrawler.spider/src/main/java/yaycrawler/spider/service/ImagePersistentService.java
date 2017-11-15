@@ -16,6 +16,7 @@ import yaycrawler.spider.persistent.IResultPersistentService;
 import yaycrawler.spider.persistent.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,15 +27,6 @@ import java.util.Map;
 public class ImagePersistentService implements IResultPersistentService {
 
     private static final Logger logger  = LoggerFactory.getLogger(ImagePersistentService.class);
-
-    @Value("${ftp.server.url}")
-    private String url;
-    @Value("${ftp.server.port}")
-    private int port;
-    @Value("${ftp.server.username}")
-    private String username;
-    @Value("${ftp.server.password}")
-    private String password;
 
     @Autowired(required = false)
     private DownloadService downloadService;
@@ -52,9 +44,14 @@ public class ImagePersistentService implements IResultPersistentService {
 //            List<Header> headers = new ArrayList<>();
 //            headers.add(new BasicHeader("",""));
             for (Object o : regionDataMap.values()) {
-                Map<String,Object> regionData=(Map<String,Object>)o;
+                Collection regionData;
+                if(o instanceof Map) {
+                    regionData = ((Map<String,Object>)o).values();
+                } else {
+                    regionData = (Collection) o;
+                }
                 if(regionData==null) continue;
-                for (Object src : regionData.values()) {
+                for (Object src : regionData) {
                     if (src instanceof List)
                         srcList = (List<String>) src;
                     else if(src instanceof HashedMap) {
