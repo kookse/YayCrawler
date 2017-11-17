@@ -1,35 +1,23 @@
-package yaycrawler.worker.service;
+package yaycrawler.spider.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.common.model.CrawlerRequest;
 import yaycrawler.common.utils.FTPUtils;
-import yaycrawler.common.utils.FtpClientUtils;
-import yaycrawler.common.utils.FtpUtil;
-import yaycrawler.common.utils.HttpUtil;
 import yaycrawler.spider.listener.IPageParseListener;
 import yaycrawler.spider.persistent.IResultPersistentService;
 import yaycrawler.spider.persistent.PersistentDataType;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by ucs_yuananyun on 2016/5/23.
@@ -39,26 +27,11 @@ public class DocumentPersistentService implements IResultPersistentService {
 
     private static final Logger logger  = LoggerFactory.getLogger(DocumentPersistentService.class);
 
-    @Value("${ftp.server.url}")
-    private String url;
-    @Value("${ftp.server.port}")
-    private int port;
-    @Value("${ftp.server.username}")
-    private String username;
-    @Value("${ftp.server.password}")
-    private String password;
-
-    @Value("${ftp.server.path}")
-    private String ftpPath;
-
-    private FTPUtils ftpUtil;
-
     @Autowired(required = false)
     private IPageParseListener pageParseListener;
 
     @Autowired(required = false)
     private DownloadService downloadService;
-
 
     /**
      * param data {id:"",srcList:""}
@@ -69,13 +42,15 @@ public class DocumentPersistentService implements IResultPersistentService {
         try {
             List<String> srcList = new ArrayList<>();
             String id = "";
-            //HttpUtil httpUtil = HttpUtil.getInstance();
-//            List<Header> headers = new ArrayList<>();
-//            headers.add(new BasicHeader("",""));
             for (Object o : regionDataMap.values()) {
-                Map<String,Object> regionData=(Map<String,Object>)o;
+                Collection regionData;
+                if(o instanceof HashedMap) {
+                    regionData = ((Map<String,Object>)o).values();
+                } else {
+                    regionData = (Collection) o;
+                }
                 if(regionData==null) continue;
-                for (Object src : regionData.values()) {
+                for (Object src : regionData) {
                     if (src instanceof List)
                         srcList = (List<String>) src;
                     else if(src instanceof HashedMap) {
@@ -141,6 +116,11 @@ public class DocumentPersistentService implements IResultPersistentService {
     @Override
     public String getSupportedDataType() {
         return PersistentDataType.DOCMUENT;
+    }
+
+    @Override
+    public Object getCrawlerResult(String collectionName, String taskId) {
+        return null;
     }
 
 }

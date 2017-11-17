@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -36,7 +37,8 @@ public class FieldParseRule implements Serializable {
     private String valueType;
 
     @Column(name = "createdDate", columnDefinition = "timestamp default (now())")
-    private Date createdDate = new Date();;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate = Calendar.getInstance().getTime();
 
     public FieldParseRule() {
         valueType = "string";
@@ -90,8 +92,6 @@ public class FieldParseRule implements Serializable {
         this.regionId = regionId;
     }
 
-    @DateTimeFormat(pattern="yyyy-MM-dd")
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getCreatedDate() {
         return createdDate;
     }

@@ -1,16 +1,10 @@
-package yaycrawler.worker.service;
+package yaycrawler.spider.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +12,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.utils.UrlUtils;
 import yaycrawler.common.model.CrawlerRequest;
-import yaycrawler.common.utils.FtpClientUtils;
-import yaycrawler.common.utils.HttpUtil;
-import yaycrawler.common.utils.HttpUtils;
 import yaycrawler.spider.persistent.IResultPersistentService;
 import yaycrawler.spider.persistent.PersistentDataType;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -38,15 +27,6 @@ import java.util.Map;
 public class ImagePersistentService implements IResultPersistentService {
 
     private static final Logger logger  = LoggerFactory.getLogger(ImagePersistentService.class);
-
-    @Value("${ftp.server.url}")
-    private String url;
-    @Value("${ftp.server.port}")
-    private int port;
-    @Value("${ftp.server.username}")
-    private String username;
-    @Value("${ftp.server.password}")
-    private String password;
 
     @Autowired(required = false)
     private DownloadService downloadService;
@@ -64,9 +44,14 @@ public class ImagePersistentService implements IResultPersistentService {
 //            List<Header> headers = new ArrayList<>();
 //            headers.add(new BasicHeader("",""));
             for (Object o : regionDataMap.values()) {
-                Map<String,Object> regionData=(Map<String,Object>)o;
+                Collection regionData;
+                if(o instanceof Map) {
+                    regionData = ((Map<String,Object>)o).values();
+                } else {
+                    regionData = (Collection) o;
+                }
                 if(regionData==null) continue;
-                for (Object src : regionData.values()) {
+                for (Object src : regionData) {
                     if (src instanceof List)
                         srcList = (List<String>) src;
                     else if(src instanceof HashedMap) {
@@ -112,6 +97,11 @@ public class ImagePersistentService implements IResultPersistentService {
     @Override
     public String getSupportedDataType() {
         return PersistentDataType.IMAGE;
+    }
+
+    @Override
+    public Object getCrawlerResult(String collectionName, String taskId) {
+        return null;
     }
 
 }

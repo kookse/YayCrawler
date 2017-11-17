@@ -192,8 +192,8 @@ public class GenericCrawlerDownLoader extends AbstractDownloader {
             }
         }
 
-        if (page != null && page.getRawText() == null || i >=5)
-            return null;
+        if ((page != null && page.getRawText() == null )|| (page.getRawText() == null && i >=5))
+            return Page.fail();
         return page;
     }
 

@@ -196,7 +196,7 @@ public class GenericPageProcessor implements PageProcessor {
                 resultData.add(childMap);
             }
         }
-        if ((nodes.size() > 1 || StringUtils.equalsIgnoreCase(dataType, "autoField")) && resultData.size() > 0)
+        if ((nodes.size() >= 1 || StringUtils.equalsIgnoreCase(dataType, "autoField")) && resultData.size() > 0)
             return resultData;
         else {
             resultData.add(resultMap);

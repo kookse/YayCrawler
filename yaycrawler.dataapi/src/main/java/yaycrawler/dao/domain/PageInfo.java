@@ -2,12 +2,12 @@ package yaycrawler.dao.domain;
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.internal.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -44,8 +44,9 @@ public class PageInfo {
     @Column(name = "isJsRendering", columnDefinition = "char default '0' ")
     private String isJsRendering;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createdDate", columnDefinition = "timestamp default (now())")
-    private Date createdDate = new Date();;
+    private Date createdDate = Calendar.getInstance().getTime();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "pageId", insertable = false, updatable = false)
@@ -117,8 +118,6 @@ public class PageInfo {
         }
     }
 
-    @DateTimeFormat(pattern="yyyy-MM-dd")
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getCreatedDate() {
         return createdDate;
     }

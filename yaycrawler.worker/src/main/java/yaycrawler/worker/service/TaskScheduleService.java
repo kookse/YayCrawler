@@ -20,6 +20,7 @@ import yaycrawler.spider.listener.IPageParseListener;
 import yaycrawler.spider.pipeline.GenericPipeline;
 import yaycrawler.spider.processor.GenericPageProcessor;
 import yaycrawler.spider.scheduler.CrawlerQueueScheduler;
+import yaycrawler.spider.service.DownloadService;
 import yaycrawler.spider.service.PageSiteService;
 import yaycrawler.worker.listener.TaskDownloadFailureListener;
 

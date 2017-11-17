@@ -126,8 +126,6 @@ public class SiteCookie implements Serializable {
         this.available = available;
     }
 
-    @DateTimeFormat(pattern="yyyy-MM-dd")
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getCreatedDate() {
         return createdDate;
     }

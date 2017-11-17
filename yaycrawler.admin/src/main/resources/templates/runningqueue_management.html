@@ -40,16 +40,20 @@
                         field: 'startTime',
                         title: '任务运行时间',
                         formatter: function (value, row, index) {
-                            if(!row.extendMap) return "未知";
+                            if(!row.extendMap.startTime) return "未知";
                             var timestamp = row.extendMap.startTime;
-                            var d = new Date(timestamp);    //根据时间戳生成的时间对象
-                            var date = (d.getFullYear()) + "-" +
+                            if(timestamp instanceof Date) {
+                                return timestamp;
+                            } else {
+                                var d = new Date(timestamp);    //根据时间戳生成的时间对象
+                                var date = (d.getFullYear()) + "-" +
                                     (d.getMonth() + 1) + "-" +
                                     (d.getDate()) + " " +
                                     (d.getHours()) + ":" +
                                     (d.getMinutes()) + ":" +
                                     (d.getSeconds());
-                            return date;
+                                return date;
+                            }
                         }
                     }, {
                         field: 'url',

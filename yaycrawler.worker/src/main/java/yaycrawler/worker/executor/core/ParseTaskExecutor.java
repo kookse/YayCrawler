@@ -57,17 +57,6 @@ public class ParseTaskExecutor implements ITaskExecutor<CrawlerRequest> {
         return result;
     }
 
-    private List<CrawlerRequest> getCrawlerRequests(List<CrawlerTask> taskList) {
-        List<CrawlerRequest> requestList = new ArrayList<>(taskList.size());
-        for (CrawlerTask task : taskList) {
-            CrawlerRequest crawlerRequest = task.convertToCrawlerRequest();
-            crawlerRequest.getExtendMap().put("startTime", task.getStartedTime());
-            crawlerRequest.getExtendMap().put("extraInfo", task.getMessage());
-            requestList.add(crawlerRequest);
-        }
-        return requestList;
-    }
-
     @Override
     public ScheduleResult execute(List<CrawlerRequest> crawlerTask) {
         ScheduleResult result = new ScheduleResult();

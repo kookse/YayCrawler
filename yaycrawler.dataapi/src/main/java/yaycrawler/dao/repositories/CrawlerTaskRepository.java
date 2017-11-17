@@ -63,7 +63,7 @@ public interface CrawlerTaskRepository extends PagingAndSortingRepository<Crawle
     @Query(value = "UPDATE crawler_task set status = :status where status = :oldStatus and (extract(epoch from current_timestamp(0)) - extract(epoch from to_timestamp(to_char(started_time, 'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))) > :timeout",nativeQuery = true)
     void refreshBreakedQueue(@Param("status")Integer status,@Param("oldStatus")Integer oldStatus, @Param("timeout") long timeout);
 
-    Page<CrawlerTask> findAllByStatus(int status, Pageable pageable);
+    Page<CrawlerTask> findAllByStatusOrStatus(int status,int oldStatus, Pageable pageable);
 
     CrawlerTask findFirstByCode(String code);
 }

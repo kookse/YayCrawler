@@ -5,7 +5,9 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @Entity
@@ -30,13 +32,14 @@ public class CrawlerData {
     /**
      * 请求的数据（JSON字符串）
      */
-    @Column(name = "data",columnDefinition="text")
+    @Column(name = "data")
     @Type(type = "JsonDataUserType")
     private String data;
 
     @Column(name = "created_time",columnDefinition = "timestamp default (now())")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdTime = new Date();
+    private Date createdTime = Calendar.getInstance().getTime();
+
     @Column(name = "pageUrl" , columnDefinition = "varchar(300)")
     private String pageUrl;
 
@@ -72,18 +75,20 @@ public class CrawlerData {
         this.pageUrl = pageUrl;
     }
 
-    public String getData() {
-        return data;
-    }
 
     public void setData(String data) {
         this.data = data;
     }
 
-    public Map getDataMap() {
+    public Map getData() {
+        Map crawler = null;
         if (this.data != null) {
             try {
-                return JSON.parseObject(data, Map.class);
+                crawler = JSON.parseObject(data, Map.class);
+                crawler.put("pageUrl",this.pageUrl);
+                crawler.put("timestamp",this.createdTime);
+                crawler.put("_id",this.code);
+                return crawler;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return null;

@@ -1,5 +1,6 @@
 package yaycrawler.master.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
             if (crawlerTask != null)
                 crawlerTaskMapper.deleteByCode(crawlerRequest.getHashCode());
             CrawlerTask task = CrawlerTask.convertFromCrawlerRequest(crawlerRequest);
-            task.setOrderId(crawlerRequest.getData().get("orderId") != null ?crawlerRequest.getData().get("orderId").toString():"");
+            task.setOrderId(crawlerRequest.getData().get("orderId") != null ?crawlerRequest.getData().get("orderId").toString():null);
             task.setStatus(CrawlerStatus.INIT.getStatus());
             task.setCreatedTime(new Date());
             crawlerTaskRepository.save(task);
@@ -120,13 +121,7 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
      */
     @Override
     public boolean moveRunningTaskToSuccessQueue(CrawlerResult crawlerResult) {
-        crawlerTaskMapper.updateCrawlerTaskStatus(crawlerResult.getKey(),"", CrawlerStatus.SUCCESS.getStatus(), CrawlerStatus.SUCCESS.getMsg());
-//        crawlerTaskRepository.updateTaskToSuccessStatus(crawlerResult.getKey(),CrawlerStatus.SUCCESS.getStatus());
-        //把附带的子任务加入队列
-        List<CrawlerRequest> childRequestList = crawlerResult.getCrawlerRequestList();
-        if (childRequestList != null && childRequestList.size() > 0) {
-            pushTasksToWaitingQueue(childRequestList, false);
-        }
+        crawlerTaskMapper.updateCrawlerTaskStatus(crawlerResult.getKey(),"", CrawlerStatus.SUCCESS.getStatus(), JSON.toJSONString(crawlerResult));
         return true;
     }
 
@@ -150,7 +145,7 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
     @Override
     public QueueQueryResult queryWaitingQueues(QueueQueryParam queryParam) {
         Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.ASC, "createdTime")));
-        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(CrawlerStatus.INIT.getStatus(), pageable);
+        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatusOrStatus(CrawlerStatus.INIT.getStatus(),CrawlerStatus.INIT.getStatus(), pageable);
         return new QueueQueryResult(getCrawlerRequests(pageData.getContent()), pageData.getTotalPages(), pageData.getTotalElements());
     }
 
@@ -162,8 +157,8 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
      */
     @Override
     public QueueQueryResult queryRunningQueues(QueueQueryParam queryParam) {
-        Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.DESC, "startedTime")));
-        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(CrawlerStatus.DEALING.getStatus(), pageable);
+        Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.DESC, "createdTime")));
+        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatusOrStatus(CrawlerStatus.DEALING.getStatus(),CrawlerStatus.DEALING.getStatus(), pageable);
         return new QueueQueryResult(getCrawlerRequests(pageData.getContent()), pageData.getTotalPages(), pageData.getTotalElements());
     }
 
@@ -175,8 +170,8 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
      */
     @Override
     public QueueQueryResult queryFailQueues(QueueQueryParam queryParam) {
-        Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.DESC, "completedTime")));
-        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(CrawlerStatus.FAILURE.getStatus(), pageable);
+        Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.DESC, "createdTime")));
+        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatusOrStatus(CrawlerStatus.FAILURE.getStatus(),CrawlerStatus.FAILURE.getStatus(), pageable);
         return new QueueQueryResult(getCrawlerRequests(pageData.getContent()), pageData.getTotalPages(), pageData.getTotalElements());
     }
 
@@ -188,8 +183,8 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
      */
     @Override
     public QueueQueryResult querySuccessQueues(QueueQueryParam queryParam) {
-        Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.DESC, "completedTime")));
-        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatus(CrawlerStatus.SUCCESS.getStatus(), pageable);
+        Pageable pageable = new PageRequest(queryParam.getPageIndex(), queryParam.getPageSize(), new Sort(new Sort.Order(Sort.Direction.DESC, "createdTime")));
+        Page<CrawlerTask> pageData = crawlerTaskRepository.findAllByStatusOrStatus(CrawlerStatus.SUCCESS.getStatus(),CrawlerStatus.EXPORT.getStatus(), pageable);
         return new QueueQueryResult(getCrawlerRequests(pageData.getContent()), pageData.getTotalPages(), pageData.getTotalElements());
     }
 
@@ -199,9 +194,15 @@ public class DBCrawlerQueueService extends AbstractICrawlerQueueService {
         for (CrawlerTask task : taskList) {
             CrawlerRequest crawlerRequest = task.convertToCrawlerRequest();
             Map<String,Object> extendMap = crawlerRequest.getExtendMap();
-            extendMap.put("startTime", task.getStartedTime());
+            if(task.getStatus() == CrawlerStatus.FAILURE.getStatus() || task.getStatus() == CrawlerStatus.SUCCESS.getStatus() || task.getStatus() == CrawlerStatus.EXPORT.getStatus())
+                extendMap.put("startTime", task.getCompletedTime());
+            else if(task.getStatus() == CrawlerStatus.DEALING.getStatus())
+                extendMap.put("startTime",task.getStartedTime());
+            else if(task.getStatus() == CrawlerStatus.INIT.getStatus() || task.getStatus() == CrawlerStatus.READY.getStatus())
+                extendMap.put("startTime",task.getCreatedTime());
             extendMap.put("extraInfo", task.getMessage());
-            crawlerRequest.setExtendMap(ImmutableMap.of("$keyword",task.getId()));
+            extendMap.put("$keyword",task.getId());
+            crawlerRequest.setExtendMap(extendMap);
             String url = getUniqueUrl(crawlerRequest);
             crawlerRequest.setUrl(url);
             String hashCode = DigestUtils.sha1Hex(url);

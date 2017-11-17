@@ -2,6 +2,7 @@ package yaycrawler.master.quartz;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,8 @@ public class RocketMQTask {
             List<CrawlerData> crawlerDataList = crawlerDataMapper.findByOrderId(orderId);
             Map regionDataMap = Maps.newHashMap();
             crawlerDataList.forEach(crawlerData -> {
-                regionDataMap.putAll(crawlerData.getDataMap());
+                if(crawlerData.getData() != null)
+                    regionDataMap.putAll(crawlerData.getData());
             });
             Map<String,Object> data = new HashMap<>();
             regionDataMap.remove("_id");
@@ -52,7 +54,8 @@ public class RocketMQTask {
             Map loginParams = (Map) regionDataMap.get("loginParams");
             regionDataMap.remove("loginParams");
             data.put("result",regionDataMap);
-            data.put("orderId",loginParams.get("orderId"));
+            if(loginParams != null)
+                data.put("orderId",loginParams.get("orderId"));
             String paramJson = JSON.toJSONString(data);
             boolean flag = produceService.sendMsg(TOPIC, TAG, null, paramJson);
             if(flag)

@@ -8,6 +8,6 @@ import java.sql.Types;
 public class CustomPostgreSqlDialect extends PostgreSQL9Dialect {
 
     public CustomPostgreSqlDialect() {
-        this.registerColumnType(Types.JAVA_OBJECT, "data");
+        this.registerColumnType(Types.JAVA_OBJECT, "jsonb");
     }
 }

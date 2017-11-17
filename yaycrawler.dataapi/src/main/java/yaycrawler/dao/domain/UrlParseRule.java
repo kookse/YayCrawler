@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
@@ -37,7 +38,8 @@ public class UrlParseRule implements Serializable {
     private Set<UrlRuleParam> urlRuleParams;
 
     @Column(name = "createdDate", columnDefinition = "timestamp default (now())")
-    private Date createdDate = new Date();
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate = Calendar.getInstance().getTime();
 
     public UrlParseRule() {
         method = "GET";
@@ -89,8 +91,6 @@ public class UrlParseRule implements Serializable {
         this.urlRuleParams = urlRuleParams;
     }
 
-    @DateTimeFormat(pattern="yyyy-MM-dd")
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getCreatedDate() {
         return createdDate;
     }
